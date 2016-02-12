@@ -1,2 +1,2 @@
-# exchange-plugins
-Plugins for the Tandem exchange WordPress theme
+# exchange-plugin
+Plugin for the Tandem exchange WordPress theme
