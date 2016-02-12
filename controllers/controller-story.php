@@ -1,0 +1,139 @@
+<?php
+
+/*
+ * Controller Class
+ * Author: Willem Prins | SOMTIJDS
+ * Project Tandem
+ * Date created: 11/2/2016
+ */
+
+class StoryController extends BaseController {
+
+
+	public function __construct() {
+		//parent::__construct($post_id_or_post_object);
+	}
+
+	function mapStory($post) {
+        	$post_id = $post->ID;	
+        	if ($post_id < 1) {
+        		throw new Exception("This is no valid post");
+        	}
+        		
+        	$story = new Story();
+               	
+        	//set title
+        	$story->title = get_the_title( $post_id  );
+        	$story->editorial_intro = get_field('editorial_intro', $post_id ); 
+        	
+        	//set language
+        	$language_term = get_field('language', $post_id );
+        	if ($language_term) { $story->language = $language_term->name; }
+
+			//set category
+			$cat = get_field('category', $post_id ); 
+			if ($cat) { $story->category = $cat->name; }
+
+			//set particpant
+			$storyteller = get_field('story_teller', $post_id); 
+        	if ($storyteller) {
+				$story->storyteller = new Participant();
+				$story->storyteller->name = $storyteller->post_title;
+        	}
+			
+			//set tags
+			$terms = get_field('topics');
+			if( $terms ): 
+				foreach( $terms as $term ): 
+					$story->addTag($term->name, get_term_link( $term ));
+				endforeach;
+			endif;
+			if (get_field('add_special_tags')) {
+				if( in_array( 'location', get_field('add_special_tags') ) )
+				{
+					$story->addTag('TODO location', 'TODO url');
+				} elseif ( in_array( 'programme_round', get_field('add_special_tags') ) )
+				{
+					$story->addTag('TODO programme_round', 'TODO url');
+				}
+			}
+        	
+        	return $story;
+        }
+
+	/**
+    * Returns one story
+	* @return Story or null
+    */
+		
+	function getStory($post_id_or_object) {
+		if ($post_id_or_object) {
+        	$post = get_post($post_id_or_object);
+     		return $this->mapStory ($post) ;
+     	} else {
+     		return null;
+     	}		
+	}
+
+
+	protected function executeQuery( $args ) {
+		$query = new WP_Query( $args );
+		return $query->posts;
+	}
+
+
+	private function getStorySet( $args ) {
+		$posts = $this->executeQuery( $args );
+		
+		$stories = array();		
+		foreach( $posts as $p){
+			$stories[] = $this->mapStory ($p);
+		}
+		return $stories;
+	}
+
+
+
+	/**
+    * Returns all story
+	* @return array of stories
+    */
+	function getAllStories() {
+		$stories = array();
+			foreach( $this->getAllStoryPosts() as $p){
+			$stories[] = $this->mapStory ($p);
+		}
+		return $stories;
+	}
+
+
+	function getAllStoryPosts() {
+		$args = array(
+			'post_type' => 'story'
+		);	
+		$query = new WP_Query( $args );
+		return $query->posts;
+	}
+
+	function getStoriesByTaxonomy($taxonomy, $tax_name) {
+		$args = array(
+			'post_type' => 'story',
+			'tax_query' => array(
+				array(
+					'taxonomy' => ''.$taxonomy,
+					'field'    => 'name',
+					'terms'    => ''.$tax_name,
+				),
+			),
+		);
+		return $this->getStorySet($arg);
+	}
+
+	function getStoriesByProgramme_round($taxParams) {
+	}
+
+	
+	function getStoriesByProject($projectID) {
+	}
+
+}
