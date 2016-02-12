@@ -1,0 +1,9 @@
+{
+    "name": "retrorism/exchange-plugin",
+    "version": "master",
+    "type": "wordpress-plugin",
+    "dist": {
+        "url": "git@github.com:retrorism/exchange-plugin.git",
+        "type": "git"
+    }
+}
