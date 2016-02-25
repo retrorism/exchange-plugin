@@ -1,7 +1,7 @@
 <?php
 /**
  * @package Exchange-Plugin
- * @version 0.1
+ * @version 0.1.0
  */
 /*
 Plugin Name: Tandem
@@ -51,7 +51,7 @@ function tandem_deactivate() {
 
 
 
-//Register theme as taxomy
+//Register theme as taxonomy
 function tandem_create_tax_topic() {
     register_taxonomy(
         'topic',  //The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
@@ -59,11 +59,11 @@ function tandem_create_tax_topic() {
         array(
             'hierarchical' => false,
             'label' => 'Topics',  //Display name
-            'show_ui'           => false,
-			'query_var' => true,
+            'show_ui' => false,
+						'query_var' => true,
             'rewrite' => array(
-                'slug' => 'topics', // This controls the base slug that will display before each term
-                'with_front' => false // Don't display the category base before
+            		'slug' => 'topics', // This controls the base slug that will display before each term
+              	'with_front' => false // Don't display the category base before
             )
         )
     );
@@ -71,7 +71,7 @@ function tandem_create_tax_topic() {
 add_action( 'init', 'tandem_create_tax_topic');
 
 
-//Register methodologies as taxomy
+//Register methodologies as taxonomy
 function tandem_create_tax_methodology() {
     register_taxonomy(
         'methodology',  //The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
@@ -91,7 +91,7 @@ function tandem_create_tax_methodology() {
 add_action( 'init', 'tandem_create_tax_methodology');
 
 
-//Register discipline as taxomy
+//Register discipline as taxonomy
 function tandem_create_tax_discipline() {
     register_taxonomy(
         'discipline',  //The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
@@ -129,7 +129,7 @@ function tandem_create_tax_output() {
 }
 add_action( 'init', 'tandem_create_tax_output');
 
-//Register language as taxomy
+//Register language as taxonomy
 function tandem_create_tax_language() {
     register_taxonomy(
         'language',  //The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
@@ -137,7 +137,7 @@ function tandem_create_tax_language() {
         array(
             'hierarchical' => false,
             'label' => 'Language',  //Display name
-            'show_ui'           => false,
+            'show_ui' => true,
             'query_var' => true,
             'rewrite' => array(
                 'slug' => 'languages', // This controls the base slug that will display before each term
@@ -220,7 +220,6 @@ function tandem_create_project() {
 		'rewrite' => array( 'slug' => 'projects' ),
 		)
 	);
-
 
 }
 
@@ -331,7 +330,6 @@ function tandem_add_meta_boxes_for_story( $post ) {
 /* Creates the meta box for projecgt. */
 function tandem_add_meta_boxes_for_project( $post ) {
 
-
     add_meta_box(
         'tandem-programme_round-parent',
         __( 'Programme round', 'example-textdomain' ),
@@ -401,13 +399,13 @@ add_action('admin_menu', 'tandem_register_custom_submenu_page');
 
 function tandem_register_custom_submenu_page() {
 
-	add_submenu_page(
-		'edit.php?post_type=story',
-		'Languages',
-		'Languages',
-		'edit_posts',
-		'edit-tags.php?taxonomy=language&post_type=story',
-		false );
+	// add_submenu_page(
+	// 	'edit.php?post_type=story',
+	// 	'Languages',
+	// 	'Languages',
+	// 	'edit_posts',
+	// 	'edit-tags.php?taxonomy=language&post_type=story',
+	// 	false );
 
 	add_submenu_page(
 		'edit.php?post_type=project',
