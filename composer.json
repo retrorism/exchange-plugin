@@ -1,6 +1,6 @@
 {
     "name": "retrorism/exchange-plugin",
-    "description": "Plugin that adds all necessary classes, templates and admin functions for the Tandem theme"
+    "description": "Plugin that adds all necessary classes, templates and admin functions for the Tandem theme",
     "authors":  [
       {
         "name": "Bart Bloemers",
