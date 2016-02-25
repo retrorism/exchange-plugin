@@ -15,36 +15,36 @@ class StoryController extends BaseController {
 	}
 
 	function mapStory($post) {
-        	$post_id = $post->ID;	
+        	$post_id = $post->ID;
         	if ($post_id < 1) {
         		throw new Exception("This is no valid post");
         	}
-        		
+
         	$story = new Story();
-               	
+
         	//set title
         	$story->title = get_the_title( $post_id  );
-        	$story->editorial_intro = get_field('editorial_intro', $post_id ); 
-        	
+        	$story->editorial_intro = get_field('editorial_intro', $post_id );
+
         	//set language
         	$language_term = get_field('language', $post_id );
         	if ($language_term) { $story->language = $language_term->name; }
 
 			//set category
-			$cat = get_field('category', $post_id ); 
+			$cat = get_field('category', $post_id );
 			if ($cat) { $story->category = $cat->name; }
 
 			//set particpant
-			$storyteller = get_field('story_teller', $post_id); 
+			$storyteller = get_field('story_teller', $post_id);
         	if ($storyteller) {
 				$story->storyteller = new Participant();
 				$story->storyteller->name = $storyteller->post_title;
         	}
-			
+
 			//set tags
 			$terms = get_field('topics');
 			if( $terms ): 
-				foreach( $terms as $term ): 
+				foreach( $terms as $term ):
 					$story->addTag($term->name, get_term_link( $term ));
 				endforeach;
 			endif;
@@ -57,7 +57,7 @@ class StoryController extends BaseController {
 					$story->addTag('TODO programme_round', 'TODO url');
 				}
 			}
-        	
+
         	return $story;
         }
 
@@ -65,14 +65,14 @@ class StoryController extends BaseController {
     * Returns one story
 	* @return Story or null
     */
-		
+
 	function getStory($post_id_or_object) {
 		if ($post_id_or_object) {
         	$post = get_post($post_id_or_object);
      		return $this->mapStory ($post) ;
      	} else {
      		return null;
-     	}		
+     	}
 	}
 
 
@@ -84,14 +84,13 @@ class StoryController extends BaseController {
 
 	private function getStorySet( $args ) {
 		$posts = $this->executeQuery( $args );
-		
-		$stories = array();		
+
+		$stories = array();
 		foreach( $posts as $p){
 			$stories[] = $this->mapStory ($p);
 		}
 		return $stories;
 	}
-
 
 
 	/**
@@ -110,7 +109,7 @@ class StoryController extends BaseController {
 	function getAllStoryPosts() {
 		$args = array(
 			'post_type' => 'story'
-		);	
+		);
 		$query = new WP_Query( $args );
 		return $query->posts;
 	}
@@ -132,8 +131,8 @@ class StoryController extends BaseController {
 	function getStoriesByProgramme_round($taxParams) {
 	}
 
-	
-	function getStoriesByProject($projectID) {
+
+	function getStoriesByCollaboration($collaborationID) {
 	}
 
 }

@@ -55,7 +55,7 @@ function tandem_deactivate() {
 function tandem_create_tax_topic() {
     register_taxonomy(
         'topic',  //The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
-        array('project','story'),        //post type name
+        array('collaboration','story'),        //post type name
         array(
             'hierarchical' => false,
             'label' => 'Topics',  //Display name
@@ -75,7 +75,7 @@ add_action( 'init', 'tandem_create_tax_topic');
 function tandem_create_tax_methodology() {
     register_taxonomy(
         'methodology',  //The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
-        array('project'),        //post type name
+        array('collaboration'),        //post type name
         array(
             'hierarchical' => false,
             'label' => 'Methodologies',  //Display name
@@ -95,7 +95,7 @@ add_action( 'init', 'tandem_create_tax_methodology');
 function tandem_create_tax_discipline() {
     register_taxonomy(
         'discipline',  //The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
-        array('project'),    //post type name
+        array('collaboration'),    //post type name
         array(
             'hierarchical' => false,
             'label' => 'Disciplines',  //Display name
@@ -114,7 +114,7 @@ add_action( 'init', 'tandem_create_tax_discipline');
 function tandem_create_tax_output() {
     register_taxonomy(
         'output',  //The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
-        'project',    //post type name
+        'collaboration',    //post type name
         array(
             'hierarchical' => false,
             'label' => 'Outputs',  //Display name
@@ -149,81 +149,41 @@ function tandem_create_tax_language() {
 add_action( 'init', 'tandem_create_tax_language');
 
 
-
-//Register programme_round as Post Type
-function tandem_create_programme_round() {
-
-	// set up labels
-	$labels = array(
- 		'name' => 'Programme rounds',
-    	'singular_name' => 'Programme round',
-    	'add_new' => 'Add new Programme round',
-    	'add_new_item' => 'Add new Programme round',
-    	'edit_item' => 'Edit Programme round',
-    	'new_item' => 'New Programme round',
-    	'all_items' => 'All Programme rounds',
-    	'view_item' => 'View Programme round',
-    	'search_items' => 'Search Programme rounds',
-    	'not_found' =>  'No Programme rounds Found',
-    	'not_found_in_trash' => 'No Programme rounds found in Trash',
-    	'parent_item_colon' => '',
-    	'menu_name' => 'Programme rounds',
-    );
-    //register post type
-	register_post_type( 'programme_round', array(
-		'labels' => $labels,
-		'has_archive' => true,
-		'menu_icon' => 'dashicons-chart-pie',
- 		'public' => true,
-    	//'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'
-		'supports' => array( 'title','editor'),
-		'exclude_from_search' => false,
-		'capability_type' => 'post',
-		'rewrite' => array( 'slug' => 'programme-rounds' ),
-		)
-	);
-}
-
-add_action( 'init', 'tandem_create_programme_round' );
-
-
-//Register Project as Post Type
-function tandem_create_project() {
+//Register Story as Post Type
+function tandem_create_story() {
 
 	// set up labels
 	$labels = array(
- 		'name' => 'Projects',
-    	'singular_name' => 'Project',
-    	'add_new' => 'Add new Project',
-    	'add_new_item' => 'Add new Project',
-    	'edit_item' => 'Edit Project',
-    	'new_item' => 'New Project',
-    	'all_items' => 'All Projects',
-    	'view_item' => 'View Project',
-    	'search_items' => 'Search Projects',
-    	'not_found' =>  'No Projects Found',
-    	'not_found_in_trash' => 'No Projects found in Trash',
+ 		'name' => 'Stories',
+    	'singular_name' => 'Story',
+    	'add_new' => 'Add new Story',
+    	'add_new_item' => 'Add new Story',
+    	'edit_item' => 'Edit Story',
+    	'new_item' => 'New Story',
+    	'all_items' => 'All Stories',
+    	'view_item' => 'View Story',
+    	'search_items' => 'Search Stories',
+    	'not_found' =>  'No Stories Found',
+    	'not_found_in_trash' => 'No Stories found in Trash',
     	'parent_item_colon' => '',
-    	'menu_name' => 'Projects',
+    	'menu_name' => 'Stories',
     );
     //register post type
-	register_post_type( 'project', array(
+	register_post_type( 'story', array(
 		'labels' => $labels,
 		'has_archive' => true,
-		'menu_icon' => 'dashicons-editor-paste-text',
+		'menu_icon' => 'dashicons-book',
+		'menu_position' => 2,
  		'public' => true,
-    	//'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'
-		'supports' => array( 'title', 'thumbnail','revisions'),
-		//'taxonomies' => array( 'output', 'theme', 'discipline' ),
+		'supports' => array( 'title'),
+		//'taxonomies' => array( 'category','post_tag'),
 		'exclude_from_search' => false,
 		'capability_type' => 'post',
-		'rewrite' => array( 'slug' => 'projects' ),
+		'rewrite' => array( 'slug' => 'stories' ),
 		)
 	);
 
 }
-
-
 
 //Register participant as Post Type
 function tandem_create_participant() {
@@ -249,6 +209,7 @@ function tandem_create_participant() {
 		'labels' => $labels,
 		'has_archive' => true,
 		'menu_icon' => 'dashicons-groups',
+		'menu_position' => 3,
  		'public' => true,
     	//'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'
 		'supports' => array( 'title'),
@@ -259,50 +220,82 @@ function tandem_create_participant() {
 	);
 }
 
-add_action( 'init', 'tandem_create_participant' );
-
-
-
-//Register Story as Post Type
-function tandem_create_story() {
+//Register Collaboration as Post Type
+function tandem_create_collaboration() {
 
 	// set up labels
 	$labels = array(
- 		'name' => 'Stories',
-    	'singular_name' => 'Story',
-    	'add_new' => 'Add new Story',
-    	'add_new_item' => 'Add new Story',
-    	'edit_item' => 'Edit Story',
-    	'new_item' => 'New Story',
-    	'all_items' => 'All Stories',
-    	'view_item' => 'View Story',
-    	'search_items' => 'Search Stories',
-    	'not_found' =>  'No Stories Found',
-    	'not_found_in_trash' => 'No Stories found in Trash',
+ 		'name' => 'Collaborations',
+    	'singular_name' => 'Collaboration',
+    	'add_new' => 'Add new Collaboration',
+    	'add_new_item' => 'Add new Collaboration',
+    	'edit_item' => 'Edit Collaboration',
+    	'new_item' => 'New Collaboration',
+    	'all_items' => 'All Collaborations',
+    	'view_item' => 'View Collaboration',
+    	'search_items' => 'Search Collaborations',
+    	'not_found' =>  'No Collaborations Found',
+    	'not_found_in_trash' => 'No Collaborations found in Trash',
     	'parent_item_colon' => '',
-    	'menu_name' => 'Stories',
+    	'menu_name' => 'Collaborations',
     );
     //register post type
-	register_post_type( 'story', array(
+	register_post_type( 'collaboration', array(
 		'labels' => $labels,
 		'has_archive' => true,
-		'menu_icon' => 'dashicons-book',
+		'menu_icon' => 'dashicons-editor-paste-text',
+		'menu_position' => 4,
  		'public' => true,
-		'supports' => array( 'title'),
-		//'taxonomies' => array( 'category','post_tag'),
+    	//'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'
+		'supports' => array( 'title', 'thumbnail','revisions'),
+		//'taxonomies' => array( 'output', 'theme', 'discipline' ),
 		'exclude_from_search' => false,
 		'capability_type' => 'post',
-		'rewrite' => array( 'slug' => 'stories' ),
+		'rewrite' => array( 'slug' => 'collaborations' ),
 		)
 	);
 
-
 }
 
+//Register Programme round as Post Type
+function tandem_create_programme_round() {
 
-add_action( 'init', 'tandem_create_project' );
+	// set up labels
+	$labels = array(
+ 		'name' => 'Programme rounds',
+    	'singular_name' => 'Programme round',
+    	'add_new' => 'Add new Programme round',
+    	'add_new_item' => 'Add new Programme round',
+    	'edit_item' => 'Edit Programme round',
+    	'new_item' => 'New Programme round',
+    	'all_items' => 'All Programme rounds',
+    	'view_item' => 'View Programme round',
+    	'search_items' => 'Search Programme rounds',
+    	'not_found' =>  'No Programme rounds Found',
+    	'not_found_in_trash' => 'No Programme rounds found in Trash',
+    	'parent_item_colon' => '',
+    	'menu_name' => 'Programme rounds',
+    );
+    //register post type
+	register_post_type( 'programme_round', array(
+		'labels' => $labels,
+		'has_archive' => true,
+		'menu_icon' => 'dashicons-chart-pie',
+		'menu_position' => 5,
+ 		'public' => true,
+    	//'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'
+		'supports' => array( 'title','editor'),
+		'exclude_from_search' => false,
+		'capability_type' => 'post',
+		'rewrite' => array( 'slug' => 'programme-rounds' ),
+		)
+	);
+}
 
 add_action( 'init', 'tandem_create_story' );
+add_action( 'init', 'tandem_create_participant' );
+add_action( 'init', 'tandem_create_collaboration' );
+add_action( 'init', 'tandem_create_programme_round' );
 
 
 
@@ -311,14 +304,14 @@ add_action( 'add_meta_boxes_story', 'tandem_add_meta_boxes_for_story' );
 
 
 /* Hook meta box to just the 'story' post type. */
-add_action( 'add_meta_boxes_project', 'tandem_add_meta_boxes_for_project' );
+add_action( 'add_meta_boxes_collaboration', 'tandem_add_meta_boxes_for_collaboration' );
 
 /* Creates  meta box for a story. */
 function tandem_add_meta_boxes_for_story( $post ) {
 
     add_meta_box(
         'tandem-story-parent',
-        __( 'Projects', 'example-textdomain' ),
+        __( 'Collaborations', 'example-textdomain' ),
         'tandem_story_parent_meta_box',
         $post->post_type,
         'side',
@@ -328,7 +321,7 @@ function tandem_add_meta_boxes_for_story( $post ) {
 }
 
 /* Creates the meta box for projecgt. */
-function tandem_add_meta_boxes_for_project( $post ) {
+function tandem_add_meta_boxes_for_collaboration( $post ) {
 
     add_meta_box(
         'tandem-programme_round-parent',
@@ -346,7 +339,7 @@ function tandem_story_parent_meta_box( $post ) {
 
     $parents = get_posts(
         array(
-            'post_type'   => 'project',
+            'post_type'   => 'collaboration',
             'orderby'     => 'title',
             'order'       => 'ASC',
             'numberposts' => -1
@@ -363,7 +356,7 @@ function tandem_story_parent_meta_box( $post ) {
 
         echo '</select>';
     } else {
-   		echo 'You have first to select projects';
+   		echo 'You have first to select collaborations';
     }
 }
 
@@ -408,35 +401,35 @@ function tandem_register_custom_submenu_page() {
 	// 	false );
 
 	add_submenu_page(
-		'edit.php?post_type=project',
+		'edit.php?post_type=collaboration',
 		'Topics',
 		'Topics',
 		'edit_posts',
-		'edit-tags.php?taxonomy=topic&post_type=project',
+		'edit-tags.php?taxonomy=topic&post_type=collaboration',
 		false );
 
 	add_submenu_page(
-		'edit.php?post_type=project',
+		'edit.php?post_type=collaboration',
 		'Disciplines',
 		'Disciplines',
 		'edit_posts',
-		'edit-tags.php?taxonomy=discipline&post_type=project',
+		'edit-tags.php?taxonomy=discipline&post_type=collaboration',
 		false );
 
 	add_submenu_page(
-		'edit.php?post_type=project',
+		'edit.php?post_type=collaboration',
 		'Methodologies',
 		'Methodologies',
 		'edit_posts',
-		'edit-tags.php?taxonomy=methodologies&post_type=project',
+		'edit-tags.php?taxonomy=methodologies&post_type=collaboration',
 		false );
 
 	add_submenu_page(
-		'edit.php?post_type=project',
+		'edit.php?post_type=collaboration',
 		'Outputs',
 		'Outputs',
 		'edit_posts',
-		'edit-tags.php?taxonomy=output&post_type=project',
+		'edit-tags.php?taxonomy=output&post_type=collaboration',
 		false );
 
 }
