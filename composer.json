@@ -15,8 +15,9 @@
     ],
     "version": "0.1.0",
     "type": "wordpress-plugin",
-    "dist": {
+    "source": {
         "url": "https://github.com/retrorism/exchange-plugin.git",
-        "type": "git"
+        "type": "git",
+        "reference": "dev-master"
     }
 }
