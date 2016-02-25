@@ -1,6 +1,19 @@
 {
     "name": "retrorism/exchange-plugin",
-    "version": "0.1",
+    "description": "Plugin that adds all necessary classes, templates and admin functions for the Tandem theme"
+    "authors":  [
+      {
+        "name": "Bart Bloemers",
+        "email": "bart@badjo.nl",
+        "homepage": "http://www.badjo.nl"
+      },
+      {
+        "name": "Willem Prins | SOMTIJDS",
+        "email": "willem@somtijds.nl",
+        "homepage": "http://www.somtijds.nl"
+      }
+    ],
+    "version": "0.1.0",
     "type": "wordpress-plugin",
     "dist": {
         "url": "https://github.com/retrorism/exchange-plugin.git",
