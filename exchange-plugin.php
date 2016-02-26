@@ -48,9 +48,6 @@ function tandem_deactivate() {
 	return;
 }
 
-
-
-
 //Register theme as taxonomy
 function tandem_create_tax_topic() {
     register_taxonomy(
@@ -88,8 +85,6 @@ function tandem_create_tax_methodology() {
         )
     );
 }
-add_action( 'init', 'tandem_create_tax_methodology');
-
 
 //Register discipline as taxonomy
 function tandem_create_tax_discipline() {
@@ -108,9 +103,8 @@ function tandem_create_tax_discipline() {
         )
     );
 }
-add_action( 'init', 'tandem_create_tax_discipline');
 
-//Register output as taxomy
+//Register output as taxonomy
 function tandem_create_tax_output() {
     register_taxonomy(
         'output',  //The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
@@ -127,7 +121,6 @@ function tandem_create_tax_output() {
         )
     );
 }
-add_action( 'init', 'tandem_create_tax_output');
 
 //Register language as taxonomy
 function tandem_create_tax_language() {
@@ -140,14 +133,12 @@ function tandem_create_tax_language() {
             'show_ui' => true,
             'query_var' => true,
             'rewrite' => array(
-                'slug' => 'languages', // This controls the base slug that will display before each term
-                'with_front' => false // Don't display the category base before
+            'slug' => 'languages', // This controls the base slug that will display before each term
+            'with_front' => false // Don't display the category base before
             )
         )
     );
 }
-add_action( 'init', 'tandem_create_tax_language');
-
 
 //Register Story as Post Type
 function tandem_create_story() {
@@ -207,13 +198,13 @@ function tandem_create_participant() {
     //register post type
 	register_post_type( 'participant', array(
 		'labels' => $labels,
-		'has_archive' => true,
+		'has_archive' => false,
 		'menu_icon' => 'dashicons-groups',
 		'menu_position' => 3,
  		'public' => true,
     	//'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'
 		'supports' => array( 'title'),
-		'exclude_from_search' => false,
+		'exclude_from_search' => true,
 		'capability_type' => 'post',
 		'rewrite' => array( 'slug' => 'participant' ),
 		)
@@ -292,45 +283,44 @@ function tandem_create_programme_round() {
 	);
 }
 
+/* Hook taxonomy creation to init. */
+add_action( 'init', 'tandem_create_tax_methodology');
+add_action( 'init', 'tandem_create_tax_discipline');
+add_action( 'init', 'tandem_create_tax_output');
+add_action( 'init', 'tandem_create_tax_language');
+
+/* Hook post creation to init. */
 add_action( 'init', 'tandem_create_story' );
 add_action( 'init', 'tandem_create_participant' );
 add_action( 'init', 'tandem_create_collaboration' );
 add_action( 'init', 'tandem_create_programme_round' );
 
-
-
-/* Hook meta box to just the 'story' post type. */
+/* Hook meta boxes to the 'story' and 'collaboration' post types. */
 add_action( 'add_meta_boxes_story', 'tandem_add_meta_boxes_for_story' );
-
-
-/* Hook meta box to just the 'story' post type. */
 add_action( 'add_meta_boxes_collaboration', 'tandem_add_meta_boxes_for_collaboration' );
 
 /* Creates  meta box for a story. */
 function tandem_add_meta_boxes_for_story( $post ) {
-
-    add_meta_box(
-        'tandem-story-parent',
-        __( 'Collaborations', 'example-textdomain' ),
-        'tandem_story_parent_meta_box',
-        $post->post_type,
-        'side',
-        'core'
-    );
-
+	add_meta_box(
+    'tandem-story-parent',
+      __( 'Collaborations', 'example-textdomain' ),
+      'tandem_story_parent_meta_box',
+      $post->post_type,
+      'side',
+      'core'
+  );
 }
 
 /* Creates the meta box for projecgt. */
 function tandem_add_meta_boxes_for_collaboration( $post ) {
-
-    add_meta_box(
-        'tandem-programme_round-parent',
-        __( 'Programme round', 'example-textdomain' ),
-        'tandem_programme_rounds_parent_meta_box',
-        $post->post_type,
-        'side',
-        'core'
-    );
+  add_meta_box(
+    'tandem-programme_round-parent',
+    __( 'Programme round', 'example-textdomain' ),
+		'tandem_programme_rounds_parent_meta_box',
+    $post->post_type,
+    'side',
+    'core'
+  );
 
 }
 
