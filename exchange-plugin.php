@@ -130,10 +130,28 @@ function tandem_create_tax_language() {
         array(
             'hierarchical' => false,
             'label' => 'Language',  //Display name
-            'show_ui' => true,
+            'show_ui' => false,
             'query_var' => true,
             'rewrite' => array(
             'slug' => 'languages', // This controls the base slug that will display before each term
+            'with_front' => false // Don't display the category base before
+            )
+        )
+    );
+}
+
+//Register language as locatoin
+function tandem_create_tax_location() {
+    register_taxonomy(
+        'location',  //The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
+        array('participant','story'),    //post type name
+        array(
+            'hierarchical' => false,
+            'label' => 'Location',  //Display name
+            'show_ui' => false,
+            'query_var' => true,
+            'rewrite' => array(
+            'slug' => 'locations', // This controls the base slug that will display before each term
             'with_front' => false // Don't display the category base before
             )
         )
@@ -288,6 +306,8 @@ add_action( 'init', 'tandem_create_tax_methodology');
 add_action( 'init', 'tandem_create_tax_discipline');
 add_action( 'init', 'tandem_create_tax_output');
 add_action( 'init', 'tandem_create_tax_language');
+add_action( 'init', 'tandem_create_tax_location');
+
 
 /* Hook post creation to init. */
 add_action( 'init', 'tandem_create_story' );
@@ -382,13 +402,13 @@ add_action('admin_menu', 'tandem_register_custom_submenu_page');
 
 function tandem_register_custom_submenu_page() {
 
-	// add_submenu_page(
-	// 	'edit.php?post_type=story',
-	// 	'Languages',
-	// 	'Languages',
-	// 	'edit_posts',
-	// 	'edit-tags.php?taxonomy=language&post_type=story',
-	// 	false );
+	add_submenu_page(
+	 	'edit.php?post_type=story',
+	 	'Languages',
+	 	'Languages',
+	 	'edit_posts',
+	 	'edit-tags.php?taxonomy=language&post_type=story',
+		false );
 
 	add_submenu_page(
 		'edit.php?post_type=collaboration',
@@ -422,8 +442,74 @@ function tandem_register_custom_submenu_page() {
 		'edit-tags.php?taxonomy=output&post_type=collaboration',
 		false );
 
+	add_submenu_page(
+		'edit.php?post_type=participant',
+		'Locations',
+		'Locations',
+		'edit_posts',
+		'edit-tags.php?taxonomy=location&post_type=participant',
+		false );
 }
 
+
+/**
+ * Save post metadata when a post is saved.
+ *
+ * @param int $post_id The post ID.
+ * @param post $post The post object.
+ * @param bool $update Whether this is an existing post being updated or not.
+ */
+function save_post_participant_meta( $post_id, $post, $update ) {
+	
+    //$location = get_field('orginsation_location', $post_id );
+    //$location = get_field('organisation_city', $post_id );
+    
+    // specific field value
+    $location =  $_POST['acf']['field_56b9ba1fceb87']; //organisation_city
+    
+    if ( isset( $location ) ) {    
+    	// Add these location, note the last argument is true.
+		$term_taxonomy_ids = wp_set_object_terms( $post_id, $location, 'location', false );
+
+    }
+}
+//vervangen door onderste functie
+//add_action( 'save_post_participant', 'save_post_participant_meta', 10, 3 );
+
+
+function save_post_with_each_acf_update( $post_id ) {
+
+	$post_type = get_post_type( $post_id );
+	if ( $post_type == 'participant' ) {
+		$location = get_field('organisation_city', $post_id );    
+	    if ( isset( $location ) ) {
+    		// Add these location, note the last argument is true.
+			$term_taxonomy_ids = wp_set_object_terms( $post_id, $location, 'location', false );
+		}
+	} elseif ( $post_type == 'story' ) {
+			$story_teller = get_field('story_teller', $post_id );    
+			$location = $story_teller->organisation_city;
+			
+			$selected = get_field('add_special_tags', $post_id);
+			if( is_array($selected) && in_array('location', $selected) && isset( $location )) {
+    			// Add  location, note the last argument is false.
+				$term_taxonomy_ids = wp_set_object_terms( $post_id, $location, 'location', false );	
+			} elseif (!is_array($selected) ||  !in_array('location', $selected)) {
+				//remove location
+				wp_set_object_terms( $post_id, null, 'location' );
+			}
+			
+	}
+}
+
+add_action('acf/save_post', 'save_post_with_each_acf_update', 20);
+
+
+function tandem_admin_enqueue_scripts() {
+	wp_enqueue_script( 'tandem-admin-js', plugin_dir_url( TANDEM_FILE )  . 'js/tandem_admin.js', array(), '1.0.0', true );
+}
+
+add_action('admin_enqueue_scripts', 'tandem_admin_enqueue_scripts');
 
 
 /**
