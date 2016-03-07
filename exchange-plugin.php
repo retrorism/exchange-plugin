@@ -27,6 +27,31 @@ if ( ! defined( 'TANDEM_PATH' ) ) {
 	define( 'TANDEM_PATH', plugin_dir_path( TANDEM_FILE ) );
 }
 
+if ( ! isset( $GLOBALS['TANDEM_CONFIG'] ) ) {
+	$GLOBALS['TANDEM_CONFIG'] = array(
+		'COLORS' => array (
+			'yellow-tandem' => 'f4c522', /* Tandem styleguide */
+			'black-tandem'  => '4c4d53', /* Tandem styleguide */
+			'white'					=> 'ffffff',
+			'salmon-1-web'  => 'fde1c7', /* Section bg webguide */
+			'yellow-1-web'  => 'fffbdb', /* Section bg webguide */
+			'blue-1-web'    => 'dceff0', /* Section bg webguide */
+			'yellow-1'      => 'fffac0', /* Sticky Notes styleguide */
+			'yellow-2'      => 'f0c063',
+			'yellow-3'      => 'eba847',
+			'yellow-4'      => 'e27f20',
+			'salmon-1'      => 'f7e6ce',
+			'salmon-2'      => 'f0c590',
+			'salmon-3'      => 'eaab73',
+			'salmon-4'      => 'e07856',
+			'blue-1'        => 'bcdde9',
+			'blue-2'        => '93c9e4',
+			'blue-3'        => '0f9fd6',
+			'blue-4'        => '1F588E'
+		)
+	);
+}
+
 /* Runs on plugin is activated */
 register_activation_hook(TANDEM_FILE, 'tandem_activate');
 
@@ -460,14 +485,14 @@ function tandem_register_custom_submenu_page() {
  * @param bool $update Whether this is an existing post being updated or not.
  */
 function save_post_participant_meta( $post_id, $post, $update ) {
-	
+
     //$location = get_field('orginsation_location', $post_id );
     //$location = get_field('organisation_city', $post_id );
-    
+
     // specific field value
     $location =  $_POST['acf']['field_56b9ba1fceb87']; //organisation_city
-    
-    if ( isset( $location ) ) {    
+
+    if ( isset( $location ) ) {
     	// Add these location, note the last argument is true.
 		$term_taxonomy_ids = wp_set_object_terms( $post_id, $location, 'location', false );
 
@@ -481,24 +506,24 @@ function save_post_with_each_acf_update( $post_id ) {
 
 	$post_type = get_post_type( $post_id );
 	if ( $post_type == 'participant' ) {
-		$location = get_field('organisation_city', $post_id );    
+		$location = get_field('organisation_city', $post_id );
 	    if ( isset( $location ) ) {
     		// Add these location, note the last argument is true.
 			$term_taxonomy_ids = wp_set_object_terms( $post_id, $location, 'location', false );
 		}
 	} elseif ( $post_type == 'story' ) {
-			$story_teller = get_field('story_teller', $post_id );    
+			$story_teller = get_field('story_teller', $post_id );
 			$location = $story_teller->organisation_city;
-			
+
 			$selected = get_field('add_special_tags', $post_id);
 			if( is_array($selected) && in_array('location', $selected) && isset( $location )) {
     			// Add  location, note the last argument is false.
-				$term_taxonomy_ids = wp_set_object_terms( $post_id, $location, 'location', false );	
+				$term_taxonomy_ids = wp_set_object_terms( $post_id, $location, 'location', false );
 			} elseif (!is_array($selected) ||  !in_array('location', $selected)) {
 				//remove location
 				wp_set_object_terms( $post_id, null, 'location' );
 			}
-			
+
 	}
 }
 
@@ -525,6 +550,9 @@ function tandem_auto_load( $class ) {
 		$classes = array(
 			'participant'  => TANDEM_PATH . 'includes/class_participant.php',
 			'story'  => TANDEM_PATH . 'includes/class_story.php',
+			'basepattern' => TANDEM_PATH . 'includes/patterns/class_pattern-base.php',
+			'paragraph' => TANDEM_PATH . 'includes/patterns/class_paragraph.php',
+			'section' => TANDEM_PATH . 'includes/patterns/class_section.php',
 			'basecontroller'  => TANDEM_PATH . 'controllers/controller-base.php',
 			'storycontroller'  => TANDEM_PATH . 'controllers/controller-story.php',
 		);

@@ -9,13 +9,12 @@
 
 class Story {
 	private $taglist = array();
-
 	public $language;
 	public $category;
 	public $title;
 	public $editorial_intro;
-	
-	
+
+
 	function addTag($name, $link) {
 		$this->taglist[] = array('name' => $name, 'link' => $link);
 	}
@@ -24,17 +23,17 @@ class Story {
 		return $this->taglist;
 	}
 
-	
+
 	function getTagShortList() {
 		$shortlist = array();
-		
+
 		foreach( $this->taglist as $tag ) {
 			if (count($shortlist) > 2) {
 				continue;
 			}
-			
+
 			$shortlist[] = $tag;
-		} 		
+		}
 		return $shortlist;
 	}
 
