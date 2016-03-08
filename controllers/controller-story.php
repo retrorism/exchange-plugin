@@ -81,6 +81,7 @@ class StoryController extends BaseController {
 			}
 		}
 
+		// set sections
 		if ( !empty( $acf['sections'] ) ) {
 			$story->sections = $acf['sections'];
 		}

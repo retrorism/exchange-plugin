@@ -9,8 +9,9 @@
 class Paragraph extends BasePattern {
 
   // initiate pattern
-  function __construct($input, $modifiers = array(),$parent = '') {
-    Parent::__construct($input, $modifiers,$parent);
+  function __construct( $input, $parent = '', $modifiers = array() ) {
+    Parent::__construct( $input, $parent, $modifiers );
+
   }
 
 }
