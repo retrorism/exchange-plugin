@@ -48,7 +48,11 @@ class Section extends BasePattern {
           switch ( $e['acf_fc_layout'] ) {
 
             case 'image':
-              $image = new Image( $e['image'],$this->base );
+              $iamge_mods = array();
+              if ( $e['image_orientation'] === 'portrait' ) {
+                $image_mods['orientation'] = 'portrait';
+              }
+              $image = new Image( $e['image'],$this->base, $image_mods );
               $this->output .= $image->embed();
               break;
 

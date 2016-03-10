@@ -216,7 +216,11 @@ function tandem_create_story() {
 		'menu_icon' => 'dashicons-book',
 		'menu_position' => 2,
  		'public' => true,
-		'supports' => array( 'title'),
+		'supports' => array(
+			'title',
+			'thumbnail',
+			'revisions',
+		),
 		//'taxonomies' => array( 'category','post_tag'),
 		'exclude_from_search' => false,
 		'capability_type' => 'post',
@@ -253,7 +257,7 @@ function tandem_create_participant() {
 		'menu_position' => 3,
  		'public' => true,
     	//'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'
-		'supports' => array( 'title'),
+		'supports' => array( 'title' ),
 		'exclude_from_search' => true,
 		'capability_type' => 'post',
 		'rewrite' => array( 'slug' => 'participant' ),
@@ -288,7 +292,11 @@ function tandem_create_collaboration() {
 		'menu_position' => 4,
  		'public' => true,
     	//'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'
-		'supports' => array( 'title', 'thumbnail','revisions'),
+		'supports' => array(
+			'title',
+			'thumbnail',
+			'revisions',
+		),
 		//'taxonomies' => array( 'output', 'theme', 'discipline' ),
 		'exclude_from_search' => false,
 		'capability_type' => 'post',

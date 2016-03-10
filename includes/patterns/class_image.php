@@ -20,17 +20,27 @@ class Image extends BasePattern {
   public $src_set;
 
   // initiate pattern
-  function __construct($input, $modifiers = array(),$parent = '') {
-    Parent::__construct($input, $modifiers,$parent);
+  function __construct( $input, $parent = '', $modifiers = array() ) {
+    Parent::__construct( $input, $parent, $modifiers );
+
+    // check for portrait modifier
+    if ( $modifiers['orientation'] === 'portrait' ) {
+      $this->orientation = 'portrait';
+    }
+    else {
+      $this->orientation = 'landscape';
+    }
+
+    $image_size = 'story-'.$this->orientation;
 
     // get src_set from attachment_id
     if ( isset ( $input['ID'] ) ) {
-      $this->src_set = wp_get_attachment_image_srcset( $input['ID'], $GLOBALS['TANDEM_CONFIG']['IMAGES']['size-in-story'] ) ;
+      $this->src_set = wp_get_attachment_image_srcset( $input['ID'], $image_size ) ;
     }
-    
+
     // get src just in case
-    if ( !empty( $input[$GLOBALS['TANDEM_CONFIG']['IMAGES']['size-in-story']] ) ) {
-      $this->src = $input[$GLOBALS['TANDEM_CONFIG']['IMAGES']['size-in-story']];
+    if ( !empty( $input['sizes'][$image_size] ) ) {
+      $this->src = $input['sizes'][$image_size];
     }
 
     // get orientation
@@ -55,7 +65,7 @@ class Image extends BasePattern {
     // add src to output
     $this->output .= '<img src="' . $this->src . '"';
 
-    // add srcset to output
+    //add srcset to output
     if ( $this->src_set ) {
       $this->output .= ' srcset="' . esc_attr( $this->src_set ) . '"';
     }
