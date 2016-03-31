@@ -48,7 +48,7 @@ class StoryController extends BaseController {
 
 		// Retrieve post_id variable or throw Exception.
 		$post_id = $post->ID;
-		if ( $post_id < 1 ) {
+		if ( ! ( $post_id >= 1 ) ) {
 			throw new Exception( 'This is no valid post' );
 		}
 
@@ -87,8 +87,8 @@ class StoryController extends BaseController {
 
 		// Set participant.
 		$storyteller = $acf['story_teller'];
-		if ( $storyteller ) {
-				$story->storyteller = new Participant();
+		if ( is_object( $storyteller ) ) {
+				$story->storyteller = new Participant( $storyteller );
 				$story->storyteller->name = $storyteller->post_title;
 		}
 

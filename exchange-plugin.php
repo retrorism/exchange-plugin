@@ -21,6 +21,10 @@ if ( ! function_exists( 'add_filter' ) ) {
 	exit();
 }
 
+if ( ! defined( 'TANDEM_NAME' ) ) {
+	define( 'TANDEM_NAME', 'exchange-plugin' );
+}
+
 if ( ! defined( 'TANDEM_FILE' ) ) {
 	define( 'TANDEM_FILE', __FILE__ );
 }
@@ -36,10 +40,12 @@ add_action( 'plugins_loaded','tandem_require_functions' );
  */
 function tandem_require_functions() {
 	$files = array(
-		'admin-acf.php',
 		'admin.php',
+		'admin-acf.php',
+		'admin-options.php',
 		'globals.php',
 		'post-types.php',
+		'public.php',
 		'taxonomies.php',
 	);
 	foreach ( $files as $file ) {
@@ -92,6 +98,7 @@ function tandem_auto_load( $class ) {
 			'caption' => TANDEM_PATH . 'assets/classes/patterns/class-caption.php',
 			'basecontroller'  => TANDEM_PATH . 'assets/classes/controllers/class-controller-base.php',
 			'storycontroller'  => TANDEM_PATH . 'assets/classes/controllers/class-controller-story.php',
+			'participantcontroller'  => TANDEM_PATH . 'assets/classes/controllers/class-controller-participant.php',
 		);
 	}
 

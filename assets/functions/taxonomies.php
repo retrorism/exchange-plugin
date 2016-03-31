@@ -102,12 +102,15 @@ function tandem_create_tax_language() {
 		'story',	// Post type name.
 		array(
 			'hierarchical' => false,
-			'label'        => 'Language',  // Display name.
-			'show_ui'      => false,
+			'label'        => 'Languages',  // Display name.
+			'show_ui'      => true,
 			'query_var'    => true,
 			'rewrite'      => array(
 				'slug'       => 'languages', // This controls the base slug that will display before each term.
 				'with_front' => false, // Don't display the category base before.
+			),
+			'labels'       => array(
+				'add_new_item' => 'Add new language tag',
 			),
 		)
 	);

@@ -20,9 +20,11 @@ add_action( 'admin_enqueue_scripts', 'tandem_admin_enqueue_scripts' );
 
 /* Register admin menu pages upon loading admin menu */
 add_action( 'admin_menu', 'tandem_register_custom_submenu_page' );
+add_action( 'admin_menu', 'tandem_register_settings');
+add_action( 'admin_menu', 'tandem_add_options_page');
 
 /* Hook meta boxes to the 'story' and 'collaboration' post types. */
-add_action( 'add_meta_boxes_story', 'tandem_add_meta_boxes_for_story' );
+// add_action( 'add_meta_boxes_story', 'tandem_add_meta_boxes_for_story' );
 add_action( 'add_meta_boxes_collaboration', 'tandem_add_meta_boxes_for_collaboration' );
 
 function tandem_admin_enqueue_scripts() {
@@ -31,13 +33,13 @@ function tandem_admin_enqueue_scripts() {
 
 function tandem_register_custom_submenu_page() {
 
-	add_submenu_page(
-		'edit.php?post_type=story',
-		'Languages',
-		'Languages',
-		'edit_posts',
-		'edit-tags.php?taxonomy=language&post_type=story',
-	false );
+	// add_submenu_page(
+	// 	'edit.php?post_type=story',
+	// 	'Languages',
+	// 	'Languages',
+	// 	'edit_posts',
+	// 	'edit-tags.php?taxonomy=language&post_type=story'
+	// );
 
 	add_submenu_page(
 		'edit.php?post_type=collaboration',
@@ -85,7 +87,7 @@ function tandem_register_custom_submenu_page() {
 function tandem_add_meta_boxes_for_story( $post ) {
 	add_meta_box(
 		'tandem-story-parent',
-		__( 'Collaborations', 'exchange-plugin' ),
+		__( 'Collaboration?', 'exchange-plugin' ),
 		'tandem_story_parent_meta_box',
 		$post->post_type,
 		'side',
@@ -114,6 +116,7 @@ function tandem_story_parent_meta_box( $post ) {
 		'orderby'     => 'title',
 		'order'       => 'ASC',
 		'numberposts' => -1,
+		'posts_per_page' => -1,
 	);
 
 	$parent_query = new WP_Query( $args );

@@ -25,40 +25,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 class StoryController extends BaseController {
 
 	/**
-	 * Constructor for Story controller.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 **/
-	public function __construct() {
-
-		// parent::__construct($post_id_or_post_object);
-	}
-
-	/**
 	 * Return story object with properties taken from ACF Fields.
 	 *
 	 * @since 0.1.0
 	 * @access public
 	 *
-	 * @param integer $post Post ID.
-	 * @return object $story Story object with set properties.
+	 * @param object $story Newly instantiated Story class object.
+	 * @param object $post Story post object
+	 * @return object $story Story class object with set properties.
 	 *
 	 * @throws Exception When no valid post ID is presented.
 	 **/
-	public function map_story( $post ) {
+	public static function map_story( $story, $post ) {
 
-		// Retrieve post_id variable or throw Exception.
+		// Retrieve post_id variable
 		$post_id = $post->ID;
-		if ( $post_id < 1 ) {
-			throw new Exception( 'This is no valid post' );
+
+		// Throw Exception when the input is not a valid story post type object.
+		if ( ! ( $post_id >= 1 ) || $post->post_type !== 'story' ) {
+			unset( $story );
+			throw new Exception( 'This is not a valid post' );
 		}
 
 		// Dump ACF variables.
 		$acf = get_fields( $post_id );
-
-		// Create story class.
-		$story = new Story();
 
 		if ( ! empty( $acf ) ) {
 			$story->acf = $acf;
@@ -90,7 +80,7 @@ class StoryController extends BaseController {
 		// Set participant.
 		$storyteller = $acf['story_teller'];
 		if ( $storyteller ) {
-				$story->storyteller = new Participant();
+				$story->storyteller = new Participant( $post );
 				$story->storyteller->name = $storyteller->post_title;
 		}
 
@@ -226,5 +216,25 @@ class StoryController extends BaseController {
 	 * @TODO Write function.
 	 **/
 	public function get_stories_by_collaboration( $collaboration_id ) {
+	}
+
+	/**
+	 * Retrieve story byline template from options page.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @return array $templates Byline templates for present and past projects to be replaced with story-specific fields.
+	 */
+	public function get_byline_templates() {
+		$templates = array();
+		$byline_template_present = get_option( TANDEM_NAME . '_byline_template_present' );
+		$byline_template_past = get_option( TANDEM_NAME . '_byline_template_past' );
+		if ( empty( $byline_template_present ) ) {
+			$templates['present'] = 'This story was shared by [[storyteller]], who currently participates in [[programme_round]] with [[collaboration]]';
+		}
+		if ( empty( $byline_template_past ) ) {
+			$templates['past'] = 'This story was shared by [[storyteller]], who participated in [[programme_round]] with [[collaboration]]';
+		}
+		return $templates;
 	}
 }
