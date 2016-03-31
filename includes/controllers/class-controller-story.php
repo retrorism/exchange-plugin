@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Controller for stories
+ * Controller for stories.
  *
  * This class contains all story logic.
  *
@@ -23,9 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class StoryController extends BaseController {
 
 	/**
-	 * Constructor for Story controller
-	 *
-	 * At instantiation this method fills basename variable, base and parent classes and initial output.
+	 * Constructor for Story controller.
 	 *
 	 * @since 0.1.0
 	 * @access public
@@ -36,15 +34,15 @@ class StoryController extends BaseController {
 	}
 
 	/**
-	 * Fill Story instance with properties.
-	 *
-	 * At instantiation this method fills basename variable, base and parent classes and initial output.
+	 * Return story object with properties taken from ACF Fields.
 	 *
 	 * @since 0.1.0
+	 * @access public
 	 *
 	 * @param integer $post Post ID.
+	 * @return object $story Story object with set properties.
 	 *
-	 * @throws Exception Errors out when no valid post ID is presented.
+	 * @throws Exception When no valid post ID is presented.
 	 **/
 	public function map_story( $post ) {
 
@@ -122,9 +120,8 @@ class StoryController extends BaseController {
 	/**
 	 * Returns one story with all its properties.
 	 *
-	 * @return Story or null
-	 *
 	 * @param mixed $post_id_or_object Post ID or Object.
+	 * @return Story object or null
 	 */
 	function get_story( $post_id_or_object ) {
 		if ( $post_id_or_object ) {
@@ -136,11 +133,10 @@ class StoryController extends BaseController {
 	}
 
 	/**
-	 * Returna posts with WP Query using supplied argument array.
-	 *
-	 * @return array of stories
+	 * Return posts with WP Query using supplied argument array.
 	 *
 	 * @param array $args Query arguments.
+	 * @return array of stories
 	 */
 	protected function execute_query( $args ) {
 		$query = new WP_Query( $args );
@@ -192,10 +188,9 @@ class StoryController extends BaseController {
 	/**
 	 * Retrieve stories by taxonomy.
 	 *
-	 * @return array of story post objects
-	 *
 	 * @param string $taxonomy Taxonomy name.
 	 * @param string $term Term name.
+	 * @return array of story objects
 	 **/
 	public function get_stories_by_taxonomy( $taxonomy, $term ) {
 		$args = array(
