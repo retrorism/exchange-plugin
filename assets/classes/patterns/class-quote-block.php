@@ -87,14 +87,14 @@ class BlockQuote extends BasePattern {
 	 **/
 	protected function set_quote_caption( $source_ind, $source_info ) {
 		if ( ! empty( $source_ind ) ) {
-			$this->source['source_name'] = $input['bquote_source_individual'];
+			$this->source['source_name'] = $source_ind;
 		}
 
 		if ( ! empty( $source_info ) ) {
-			$this->source['source_info'] = $input['bquote_source_info'];
+			$this->source['source_info'] = $source_info;
 		}
 
-		if ( ! empty( $this->source ) ) {
+		if ( count( $this->source ) > 0 ) {
 			$caption = new Caption( $this->source, $this->base );
 		}
 	}

@@ -18,10 +18,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 function tandem_add_options_page() {
 	add_theme_page(
-		__( 'Exchange settings', TANDEM_NAME ),
-		__( 'Exchange ', TANDEM_NAME ),
+		__( 'Exchange settings', EXCHANGE_PLUGIN ),
+		__( 'Exchange ', EXCHANGE_PLUGIN ),
 		'manage_options',
-		TANDEM_NAME,
+		EXCHANGE_PLUGIN,
 		'tandem_display_options_page'
 	);
 }
@@ -32,7 +32,7 @@ function tandem_add_options_page() {
  * @since  0.1.0
  */
 function tandem_display_options_page() {
-	include_once TANDEM_PATH . 'parts/admin-display.php';
+	include_once EXCHANGE_PLUGIN_PATH . 'parts/admin-display.php';
 }
 
 /**
@@ -45,32 +45,32 @@ function tandem_register_settings() {
 
 	// Add a General section
 	add_settings_section(
-		TANDEM_NAME . '_general',
-		__( 'Tandem Exchange theme Settings', TANDEM_NAME ),
+		EXCHANGE_PLUGIN . '_general',
+		__( 'Tandem Exchange theme Settings', EXCHANGE_PLUGIN ),
 		'tandem_settings_general_cb' ,
-		TANDEM_NAME
+		EXCHANGE_PLUGIN
 	);
 
 	add_settings_field(
-		TANDEM_NAME . '_byline_template_past',
-		__( 'Byline template (past)', TANDEM_NAME ),
+		EXCHANGE_PLUGIN . '_byline_template_past',
+		__( 'Byline template (past)', EXCHANGE_PLUGIN ),
 		'tandem_settings_byline_template_past_cb',
-		TANDEM_NAME,
-		TANDEM_NAME . '_general',
-		array( 'label_for' => TANDEM_NAME . '_byline_template_past' )
+		EXCHANGE_PLUGIN,
+		EXCHANGE_PLUGIN . '_general',
+		array( 'label_for' => EXCHANGE_PLUGIN . '_byline_template_past' )
 	);
 
 	add_settings_field(
-		TANDEM_NAME . '_byline_template_present',
-		__( 'Byline template (present)', TANDEM_NAME ),
+		EXCHANGE_PLUGIN . '_byline_template_present',
+		__( 'Byline template (present)', EXCHANGE_PLUGIN ),
 		'tandem_settings_byline_template_present_cb',
-		TANDEM_NAME,
-		TANDEM_NAME . '_general',
-		array( 'label_for' => TANDEM_NAME . '_byline_template_present' )
+		EXCHANGE_PLUGIN,
+		EXCHANGE_PLUGIN . '_general',
+		array( 'label_for' => EXCHANGE_PLUGIN . '_byline_template_present' )
 	);
 
-	register_setting( TANDEM_NAME, TANDEM_NAME . '_byline_template_present', 'tandem_settings_sanitize_byline_template' );
-	register_setting( TANDEM_NAME, TANDEM_NAME . '_byline_template_past', 'tandem_settings_sanitize_byline_template' );
+	register_setting( EXCHANGE_PLUGIN, EXCHANGE_PLUGIN . '_byline_template_present', 'tandem_settings_sanitize_byline_template' );
+	register_setting( EXCHANGE_PLUGIN, EXCHANGE_PLUGIN . '_byline_template_past', 'tandem_settings_sanitize_byline_template' );
 
 }
 
@@ -80,7 +80,7 @@ function tandem_register_settings() {
  * @since  0.1.0
  */
 function tandem_settings_general_cb() {
-	echo '<p>' . __( 'Display options for the Tandem website', TANDEM_NAME ) . '</p>';
+	echo '<p>' . __( 'Display options for the Tandem website', EXCHANGE_PLUGIN ) . '</p>';
 }
 
 /**
@@ -89,21 +89,20 @@ function tandem_settings_general_cb() {
  * @since  0.1.0
  */
 function tandem_settings_byline_template_present_cb() {
-	$present = get_option( TANDEM_NAME . '_byline_template_present' );
+	$present = get_option( EXCHANGE_PLUGIN . '_byline_template_present' );
 	?>
 	<fieldset>
-		<label for="<?php echo TANDEM_NAME .'_byline_template_present' ?>">
-			<?php _e( 'Byline template for stories told by current participants', TANDEM_NAME ); ?>
+		<label for="<?php echo EXCHANGE_PLUGIN .'_byline_template_present' ?>">
+			<?php _e( 'Byline template for stories told by current participants. Use [[storyteller]], [[programme_round]] and [[collaboration]] as placeholders for the byline specifics.', EXCHANGE_PLUGIN ); ?>
 		</label>
 		<textarea style="display: block;"
-			name="<?php echo TANDEM_NAME . '_byline_template_present' ?>"
-			id="<?php echo TANDEM_NAME . '_byline_template_present' ?>"
-			placeholder="<?php _e( 'Use [[...]]', TANDEM_NAME ); ?>"
-			<?php if ( !empty( $present ) ) : ?>
-				><?php echo esc_html( $present ); ?></textarea>
-			<?php else: ?>
-				></textarea>
-			<?php endif; ?>
+			name="<?php echo EXCHANGE_PLUGIN . '_byline_template_present' ?>"
+			id="<?php echo EXCHANGE_PLUGIN . '_byline_template_present' ?>"
+			placeholder="<?php _e( 'Use [[...]]', EXCHANGE_PLUGIN ); ?>"><?php if ( !empty( $present ) ) {
+																				echo esc_textarea( $present ) . '</textarea>';
+																			} else {
+																				echo '</textarea>';
+																			} ?>
 	</fieldset>
 <?php
 
@@ -115,21 +114,20 @@ function tandem_settings_byline_template_present_cb() {
  * @since  0.1.0
  */
 function tandem_settings_byline_template_past_cb() {
-	$past = get_option( TANDEM_NAME . '_byline_template_past' );
+	$past = get_option( EXCHANGE_PLUGIN . '_byline_template_past' );
 	?>
 	<fieldset>
-		<label for="<?php echo TANDEM_NAME .'_byline_template_past' ?>">
-			<?php _e( 'Byline template for stories told by alumni', TANDEM_NAME ); ?>
+		<label for="<?php echo EXCHANGE_PLUGIN .'_byline_template_past' ?>">
+			<?php _e( 'Byline template for stories told by alumni. Use [[storyteller]], [[programme_round]] and [[collaboration]] as placeholders for the byline specifics.', EXCHANGE_PLUGIN ); ?>
 		</label>
 		<textarea style="display: block;"
-			name="<?php echo TANDEM_NAME . '_byline_template_past' ?>"
-			id="<?php echo TANDEM_NAME . '_byline_template_past' ?>"
-			placeholder="<?php _e( 'Use [[...]]', TANDEM_NAME ); ?>"
-			<?php if ( !empty( $past ) ) : ?>
-				value="<?php echo esc_html( $past ) ; ?>">
-			<?php else: ?>
-				></textarea>
-			<?php endif; ?>
+			name="<?php echo EXCHANGE_PLUGIN . '_byline_template_past' ?>"
+			id="<?php echo EXCHANGE_PLUGIN . '_byline_template_past' ?>"
+			placeholder="<?php _e( 'Use [[...]]', EXCHANGE_PLUGIN ); ?>"><?php if ( !empty( $past ) ) {
+																				echo esc_textarea( $past ) . '</textarea>';
+																			} else {
+																				echo '</textarea>';
+																			} ?>
 	</fieldset>
 <?php
 }

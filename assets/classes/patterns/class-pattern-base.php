@@ -35,6 +35,24 @@ abstract class BasePattern {
 	public $classes = array();
 
 	/**
+	 * List of data-attributes for pattern container element.
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 * @var array $data Attributes-list.
+	 **/
+	protected $data = array();
+
+	/**
+	 * List of link-attributes for pattern container element.
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 * @var array $data Link attributes-list.
+	 **/
+	protected $link_attributes = array();
+
+	/**
 	 * List of classes for pattern container element.
 	 *
 	 * @since 0.1.0
@@ -61,7 +79,6 @@ abstract class BasePattern {
 	 **/
 	public $base;
 
-
 	/**
 	 * Constructor for Pattern Base class.
 	 *
@@ -74,12 +91,15 @@ abstract class BasePattern {
 	 * @param string $parent String referring to pattern.
 	 * @param array  $modifiers Additional modifiers that influence look and functionality.
 	 **/
-	protected function __construct( $input, $parent, $modifiers ) {
+	protected function __construct( $input, $parent = '', $modifiers = array() ) {
 
 		$this->set_basename();
 		$this->set_parent_and_base_class( $parent );
-		$this->set_initial_output( $input );
 
+		if ( ! empty( $modifiers ) ) {
+			$this->process_modifiers( $modifiers );
+		}
+		$this->set_initial_output( $input );
 	}
 
 	/**
@@ -101,14 +121,15 @@ abstract class BasePattern {
 	 * @param string $parent Parent basename.
 	 **/
 	protected function set_parent_and_base_class( $parent ) {
-		if ( isset( $parent ) ) {
+		if ( ! empty( $parent ) ) {
 			$this->parent = $parent;
 			// Add generic story element class for all direct children of a section.
 			if ( 'section' === $this->parent ) {
-				$this->classes[] = 'section__story-element';
+				$this->classes[] = 'section__slice';
+				$this->classes[] = $this->base;
+			} else {
+				$this->classes[] = $this->parent . '__' . $this->base;
 			}
-			// Add parent classes.
-			$this->classes[] = $this->parent . '__' . $this->base;
 		} else {
 			// Fallback to setting generic class element.
 			$this->classes[] = $this->base;
@@ -129,7 +150,7 @@ abstract class BasePattern {
 	protected function set_initial_output( $input ) {
 		if ( ! empty( $input ) ) {
 			$this->output_tag_open();
-			$this->output .= $input;
+			$this->output .= '<h1 style="color: red">No output defined for' . $this->base . '</h1>';
 			$this->output_tag_close();
 		}
 	}
@@ -144,8 +165,96 @@ abstract class BasePattern {
 	 **/
 	protected function stringify_classes() {
 		if ( ! empty( $this->classes ) ) {
-			$string = implode( ' ', $this->classes );
-			return esc_attr( $string );
+			$string = 'class="' . esc_attr( implode( ' ', $this->classes ) ) . '"';
+			return $string;
+		}
+	}
+
+	/**
+	 * Stringify link attributes for use in HTML.
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 **/
+	protected function stringify_link_attributes() {
+		if ( ! empty( $this->link_attributes ) ) {
+			$list = array();
+			foreach ( $this->link_attributes as $key => $val ) {
+				if ( ! empty( $val ) ) {
+					$list[] = $key . '="' . esc_attr( $val ) . '"';
+				}
+			}
+			if ( count( $list ) > 0 ) {
+				$string = implode( ' ', $list );
+			}
+			return $string;
+		}
+	}
+
+	/**
+	 * Stringify data attributes for use in HTML.
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 *
+	 * @TODO move HTML output to template parts instead?
+	 **/
+	protected function stringify_data() {
+		if ( ! empty( $this->data ) ) {
+			$list = array();
+			foreach ( $this->data as $key => $val ) {
+				$list[] = 'data-' . $key . '=' . esc_attr( $val );
+			}
+			if ( count( $list ) > 0 ) {
+				$string = implode( ' ', $list );
+			}
+			return $string;
+		}
+	}
+
+	/**
+	 * Stringify data attributes for use in HTML.
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 *
+	 * @param array $modifiers Modifiers array passed in Constructor.
+	 **/
+	protected function process_modifiers( $modifiers ) {
+		foreach ( $modifiers as $key => $val ) {
+			switch ( $key ) {
+				case 'data' :
+					$data_atts = $modifiers[ $key ];
+					if ( ! empty( $data_atts ) && is_array( $data_atts ) ) {
+						foreach ( $data_atts as $k => $v ) {
+							if ( is_string( $k ) ) {
+								$this->set_data_attribute( $k, $v );
+							}
+						}
+					}
+					break;
+				case 'link_attributes' :
+					$link_atts = $modifiers[ $key ];
+					if ( ! empty( $link_atts ) && is_array( $link_atts ) ) {
+						foreach ( $link_atts as $k => $v ) {
+							if ( is_string( $k ) ) {
+								$this->set_link_attribute( $k, $v );
+							}
+						}
+					}
+					break;
+				case 'classes' :
+					$classes = $modifiers[ $key ];
+					if ( ! empty( $classes ) && is_array( $classes ) ) {
+						foreach ( $classes as $class ) {
+							$this->classes[] = $class ;
+						}
+					}
+					break;
+				default :
+					$this->set_modifier_class( $key, $val );
+					break;
+			}
 		}
 	}
 
@@ -163,16 +272,48 @@ abstract class BasePattern {
 	 * @TODO move HTML output to template parts instead?
 	 * @TODO create util class for util functions like hex_to_slug
 	 **/
-	protected function set_modifier_classes( $key, $val ) {
-		$class = '';
-		if ( 'colour' === $key ) {
-			$val = tandem_hex_to_slug( $val );
+	protected function set_modifier_class( $key, $val ) {
+		if ( is_string( $val ) ) {
+			$class = '';
+			if ( 'colour' === $key ) {
+				$val = tandem_hex_to_slug( $val );
+			}
+			if ( ! empty( $this->parent ) ) {
+				$class .= $this->parent . '__';
+			}
+			$class .= $this->base.'--'.$val;
+			$this->classes[] = $class;
 		}
-		if ( ! empty( $this->parent ) ) {
-			$class .= $this->parent . '__';
+	}
+
+	/**
+	 * Add data-attribute.
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 *
+	 * @param string $key Data-attribute identifier.
+	 * @param string $val Contains the value for this data-attribute.
+	 **/
+	protected function set_data_attribute( $key, $val ) {
+		if (  null !== $val || 'undefined' !== $val || 'NaN' !== $val ) {
+			$this->data[ $key ] = $val;
 		}
-		$class .= $this->base.'--'.$val;
-		$this->classes[] = $class;
+	}
+
+	/**
+	 * Add link-attribute.
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 *
+	 * @param string $key Link-attribute identifier.
+	 * @param string $val Contains the value for this link-attribute.
+	 **/
+	protected function set_link_attribute( $key, $val ) {
+		if ( ! empty( $val ) && is_string( $val ) ) {
+			$this->link_attributes[ $key ] = $val;
+		}
 	}
 
 	/**
@@ -184,7 +325,7 @@ abstract class BasePattern {
 	 * @return string HTML closing comment.
 	 **/
 	protected function end_pattern_tag_comment() {
-		return '<!-- END ' . strtoupper( $this->base ) . ' ELEMENT-->' . PHP_EOL;
+		return '<!-- end ' . strtolower( $this->base ) . ' -->' . PHP_EOL;
 	}
 
 	/**
@@ -201,7 +342,17 @@ abstract class BasePattern {
 		} else {
 			$eol = PHP_EOL;
 		}
-		$this->output = '<' . $tag . ' class="' . $this->stringify_classes() . '">' . $eol;
+		$this->output = '<' . $tag;
+		if ( count( $this->classes ) > 0 ) {
+			$this->output .= ' ' . $this->stringify_classes();
+		}
+		if ( count( $this->link_attributes ) > 0 ) {
+			$this->output .= ' ' . $this->stringify_link_attributes();
+		}
+		if ( count( $this->data ) > 0 ) {
+			$this->output .= ' ' . $this->stringify_data();
+		}
+		$this->output .= '>' . $eol;
 	}
 
 	/**
@@ -224,6 +375,7 @@ abstract class BasePattern {
 	public function publish() {
 		echo $this->output;
 	}
+
 
 	/**
 	 * Returns escaped pattern output for use in parent object.

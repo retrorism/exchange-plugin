@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 0.1.0
  **/
-class Paragraph extends BasePattern {
+class Byline extends BasePattern {
 
 	/**
 	 * Constructor for Paragraphs.
@@ -36,16 +36,16 @@ class Paragraph extends BasePattern {
 	 * @param string $parent Optional. String referring to pattern
 	 * @param array $modifiers Optional. Additional modifiers that influence look and functionality.
 	 **/
-  function __construct( $input, $parent, $modifiers ) {
+  function __construct( $input, $parent = '', $modifiers = array() ) {
 	Parent::__construct( $input, $parent, $modifiers );
 
 	if ( 'string' === gettype( $input ) && ! empty( $input ) ) {
 
-		$this->output_tag_open();
+		$this->output_tag_open('div');
 
 		$this->output .= $input;
 
-		$this->output_tag_close();
+		$this->output_tag_close('div');
 
 	}
 

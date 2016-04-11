@@ -68,22 +68,19 @@ class ImageDuo extends BasePattern {
 	 * @param array $input ACF field input.
 	 **/
 	protected function set_gallery( $input ) {
+		$i = 0;
 		foreach ( $input as $image ) {
 			if ( ! empty( $image['filename'] ) ) {
-				array_push( $this->gallery, $image );
+				$this->gallery[ $i ] = $image;
 			}
-
-			$i = 0;
-			while ( $i < 2 ) {
-				$pos = 'left';
-				if ( 1 === $i ) {
-					$pos = 'right';
-				}
-				$mods['position'] = $pos;
-				$gallery_item = new Image( $this->gallery[ $i ], $this->base, $mods );
-				$this->output .= $gallery_item->embed();
-				$i++;
+			$pos = 'left';
+			if ( 1 === $i ) {
+				$pos = 'right';
 			}
+			$mods['position'] = $pos;
+			$gallery_item = new Image( $this->gallery[ $i ], $this->base, $mods );
+			$this->output .= $gallery_item->embed();
+			$i++;
 		}
 	}
 }

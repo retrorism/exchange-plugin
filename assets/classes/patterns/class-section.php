@@ -32,16 +32,16 @@ class Section extends BasePattern {
 	 * @access public
 	 * @var string $section_header Optional section header.
 	 **/
-	public $section_header;
+	protected $section_header;
 
 	/**
 	 * List of story elements - these are the elements (content styled in patterns).
 	 *
 	 * @since 0.1.0
-	 * @access public
+	 * @access protected
 	 * @var array $story_elements Elements-list.
 	 **/
-	public $story_elements;
+	protected $story_elements;
 
 	/**
 	 * Constructor for Section Pattern class objects.
@@ -59,12 +59,12 @@ class Section extends BasePattern {
 
 		// Check for background colour modifier and add to classes.
 		if ( isset( $input['background_colour'] ) ) {
-			$this->set_modifier_classes( 'colour', $input['background_colour'] );
+			$this->set_modifier_class( 'colour', $input['background_colour'] );
 		}
 
 		$this->output_tag_open( 'section' );
-		$this->set_section_header( $input );
-		$this->get_story_elements( $input );
+		$this->build_section_header( $input );
+		$this->build_story_elements( $input );
 		$this->output_tag_close( 'section' );
 	}
 
@@ -76,8 +76,8 @@ class Section extends BasePattern {
 	 *
 	 * @param string $input ACF text input value.
 	 **/
-	protected function set_section_header( $input ) {
-		if ( isset( $input['section_header'] ) ) {
+	protected function build_section_header( $input ) {
+		if ( ! empty( $input['section_header'] ) ) {
 			$this->section_header = new SectionHeader( $input['section_header'], $this->base );
 			$this->output .= $this->section_header->embed();
 		}
@@ -94,7 +94,7 @@ class Section extends BasePattern {
 	 *
 	 * @TODO proper Error notifications.
 	 **/
-	public function get_story_elements( $input ) {
+	protected function build_story_elements( $input ) {
 		// Check for story elements.
 		if ( isset( $input['story_elements'] ) ) {
 			$this->story_elements = $input['story_elements'];
@@ -105,11 +105,11 @@ class Section extends BasePattern {
 					switch ( $e['acf_fc_layout'] ) {
 
 						case 'image':
-							$iamge_mods = array();
+							$image_mods = array();
 							if ( 'portrait' === $e['image_orientation']  ) {
 								$image_mods['orientation'] = 'portrait';
 							}
-							$image = new Image( $e['image'],$this->base, $image_mods );
+							$image = new Image( $e['image'], $this->base, $image_mods );
 							$this->output .= $image->embed();
 							break;
 
@@ -137,13 +137,48 @@ class Section extends BasePattern {
 							$this->output .= $pullquote->embed();
 							break;
 
+						case 'embed_video':
+							$video = new Video( $e['embed_video'], $this->base );
+							$this->output .= $video->embed();
+							break;
+
+						case 'interview_conversation':
+							$interview = new InterviewConversation( $e['interview'], $this->base );
+							$this->output .= $interview->embed();
+							break;
+						case 'interview_q_and_a':
+							$interview = new InterviewQA( $e['interview'], $this->base );
+							$this->output .= $interview->embed();
+							break;
 						case 'subheader':
 							$subheader = new SubHeader( $e['text'], $this->base );
 							$this->output .= $subheader->embed();
 							break;
 
+						case 'emphasis_block':
+							$block_mods = array();
+							$type = $e['block_type'];
+							if ( ! empty( $type ) ) {
+								$block_mods['type'] = $type;
+								if ( 'cta_tandem' === $type ) {
+									$input = $e['cta_elements'];
+									$colour = $e['cta_colour'];
+								} else {
+									$input = $e['block_elements'];
+									$colour = $e['post-it_colour'];
+									var_dump( $e );
+									print_r($colour);
+								}
+								$block_mods['colour'] = $colour;
+								$emphasis_block = new EmphasisBlock( $input, $this->base, $block_mods );
+								$this->output .= $emphasis_block->embed();
+							}
+							break;
+
 						default:
-							$this->output .= ( 'something else' );
+							$this->output .= '<div data-alert class="alert-box alert">';
+							$this->output .= '<strong>' . __( 'Error: This layout has not yet been defined', EXCHANGE_PLUGIN ) . '</strong>';
+							$this->output .= '</div>';
 							break;
 					}
 				}

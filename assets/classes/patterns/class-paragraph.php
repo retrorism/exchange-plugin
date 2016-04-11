@@ -37,9 +37,8 @@ class Paragraph extends BasePattern {
 	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
 	 **/
 	function __construct( $input, $parent = '', $modifiers = array() ) {
-		Parent::__construct( $input );
-
-		if ( 'string' === gettype( $input ) && ! empty( $input ) ) {
+		Parent::__construct( $input, $parent, $modifiers );
+		if ( is_string( $input ) && ! empty( $input ) ) {
 			$this->output_tag_open();
 			$this->output .= $input;
 			$this->output_tag_close();

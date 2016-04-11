@@ -71,6 +71,33 @@ class Story {
 	public $title;
 
 	/**
+	 * Header image.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var Image $header_image Header image object.
+	 **/
+	public $header_image;
+
+	/**
+	 * Has header image.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var Bool $has_header_image Set to true when header image is set.
+	 **/
+	public $has_header_image = false;
+
+	/**
+	 * Has editorial intro check
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var Bool $has_header_image Set to true when header image is set.
+	 **/
+	public $has_editorial_intro = false;
+
+	/**
 	 * Editorial Intro text taken from excerpt (needs to allow for links).
 	 *
 	 * @since 0.1.0
@@ -86,11 +113,9 @@ class Story {
 	 *
 	 * @since 0.1.0
 	 * @access public
-	 * @var object $post Story post object
-	 *
+	 * @param object $post Story post object.
 	 **/
 	public function __construct( $post ) {
-
 		$this->set_controller();
 		$this->controller->map_story( $this, $post );
 	}
@@ -102,8 +127,15 @@ class Story {
 	 * @access private
 	 **/
 	private function set_controller() {
-		$this->controller = StoryController::get_instance();
+		$this->controller = new StoryController();
 	}
+
+	/**
+	 * Set story properties.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 **/
 
 	/**
 	 * Add tag to tag list, accompanied by its archive link.
@@ -133,8 +165,6 @@ class Story {
 		return $this->tag_list;
 	}
 
-
-
 	/**
 	 * Returns short list of tags (no more than 2) for this story.
 	 *
@@ -158,26 +188,28 @@ class Story {
 		return $shortlist;
 	}
 
-	public function get_byline() {
-		if ( is_object( $this->storyteller ) ) {
-			$templates = $this->controller->get_byline_templates();
-			if ( $this->storyteller->is_active ) {
-				$byline_template = $templates['present'];
-			} else {
-				$byline_template = $templates['past'];
-			}
-			$byline_template = str_replace( '[[storyteller]]', $this->storyteller->name, $byline_template );
-			$byline_template = str_replace( '[[programme_round]]', $this->storyteller->programme_round, $byline_template );
-			$byline_template = str_replace( '[[collaboration]]', $this->storyteller->collaboration, $byline_template );
+	public function publish_header_image() {
+		if ( null !== $this->header_image ) {
+			$this->header_image->publish();
+		}
+	}
 
-			$programme_round = $this->programme_round;
+	public function publish_intro() {
+		if ( null !== $this->editorial_intro ) {
+			$this->editorial_intro->publish();
+		}
+	}
+
+	public function publish_byline() {
+		if ( null != $this->byline ) {
+			$this->byline->publish();
 		}
 	}
 
 	public function publish_sections() {
 		// Loop through sections.
 		foreach( $this->sections as $s ) {
-			$section = new Section( $s );
+			$section = new Section( $s, strtolower( get_class( $this ) ) );
 			$section->publish();
 		}
 	}

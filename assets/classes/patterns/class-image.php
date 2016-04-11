@@ -1,6 +1,6 @@
 <?php
 /**
- * Paragraph Class
+ * Image Class
  * Author: Willem Prins | SOMTIJDS
  * Project: Tandem
  * Date created: 07/03/2016
@@ -97,7 +97,7 @@ class Image extends BasePattern {
 	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
 	 **/
 	public function __construct( $input, $parent = '', $modifiers = array() ) {
-		Parent::__construct( $input, $modifiers );
+		Parent::__construct( $input, $parent, $modifiers );
 
 		$this->set_image_properties( $input, $modifiers );
 
@@ -125,7 +125,7 @@ class Image extends BasePattern {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param array $input ACF input.
+	 * @param array $input ACF input, consisting of image araray.
 	 * @param array $modifiers List of modifiers received from sibling classes.
 	 **/
 	protected function set_image_properties( $input, $modifiers ) {
@@ -136,8 +136,14 @@ class Image extends BasePattern {
 			$this->set_image_orientation( $h, $w, $modifiers );
 			$this->set_image_quality( $h, $w );
 		};
-
-		$image_size = 'story-' . $this->orientation;
+		// Set image to header-image size, else switch to to story-portrait or story-landscape.
+		if ( key_exists( 'is_header_image', $modifiers ) ) {
+			if ( true === $modifiers['is_header_image'] ) {
+				$image_size = 'header-image';
+			}
+		} else {
+			$image_size = 'story-' . $this->orientation;
+		}
 
 		// Set src_set from attachment_id.
 		if ( ! empty( $input['ID'] ) ) {
@@ -263,14 +269,14 @@ class Image extends BasePattern {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @global integer TANDEM_CONFIG->IMAGES->hq-norm.
+	 * @global integer EXCHANGE_PLUGIN_CONFIG->IMAGES->hq-norm.
 	 *
 	 * @param array $h Image height.
 	 * @param array $w Image width.
 	 **/
 	protected function set_image_quality( $h, $w ) {
 		$sum = $h * $w;
-		if ( is_int( $sum ) && $sum >= $GLOBALS['TANDEM_CONFIG']['IMAGES']['hq-norm'] ) {
+		if ( is_int( $sum ) && $sum >= $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['IMAGES']['hq-norm'] ) {
 			$this->is_hq = true;
 		}
 	}

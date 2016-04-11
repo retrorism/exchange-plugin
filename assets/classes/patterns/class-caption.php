@@ -38,7 +38,7 @@ class Caption extends BasePattern {
 	 * @throws Exception Throws error when there's no parent set for this caption.
 	 **/
 	public function __construct( $input, $parent = '', $modifiers = array() ) {
-		Parent::__construct( $input );
+		Parent::__construct( $input, $parent, $modifiers );
 
 		if ( ! empty( $this->parent ) ) {
 			if ( 'image' === $this->parent ) {

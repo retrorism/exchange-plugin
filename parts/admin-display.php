@@ -18,8 +18,8 @@
 	    <h2><?php echo esc_html( get_admin_page_title() ); ?></h2>
 	    <form action="options.php" method="post">
 	        <?php
-	            settings_fields( TANDEM_NAME );
-	            do_settings_sections( TANDEM_NAME );
+	            settings_fields( EXCHANGE_PLUGIN );
+	            do_settings_sections( EXCHANGE_PLUGIN );
 	            submit_button();
 	        ?>
 	    </form>

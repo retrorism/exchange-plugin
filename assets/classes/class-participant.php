@@ -57,29 +57,30 @@ class Participant {
 	 * Collaboration admin page.
 	 *
 	 * @since 0.1.0
-	 * @access protected
-	 * @var integer $collaboration.
+	 * @access public
+	 * @var object $collaboration Collaboration object.
 	 */
-	protected $collaboration;
+	public $collaboration;
 
 	/**
 	 * Constructor for participant objects.
 	 *
 	 * @since 0.1.0
 	 * @access public
-	 * @param object $post Participant post object.
+	 * @param object $postobj Participant post object.
 	 **/
-	public function __construct( $post ) {
+	public function __construct( $postobj ) {
 		$this->set_controller();
+		$this->controller->map_participant( $this, $postobj );
 	}
 
 	/**
-	 * Set controller property to instance of Participant controller.
+	 * Set controller property to a new instance of Participant controller.
 	 *
 	 * @since 0.1.0
 	 * @access private
 	 **/
 	private function set_controller() {
-		$this->controller = ParticipantController::get_instance();
+		$this->controller = new ParticipantController();
 	}
 }

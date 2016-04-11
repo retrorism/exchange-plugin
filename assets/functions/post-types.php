@@ -51,6 +51,7 @@ function tandem_create_story() {
 		'exclude_from_search' => false,
 		'capability_type'     => 'post',
 		'supports'            => array( 'title', 'thumbnail', 'revisions' ),
+		'taxonomies'          => array( 'category' ),
 		'rewrite'             => array( 'slug' => 'stories' ),
 		// Removed 'taxonomies' => array( 'category','post_tag').
 	) );
@@ -124,6 +125,7 @@ function tandem_create_collaboration() {
 		'exclude_from_search' => false,
 		'capability_type' => 'post',
 		'rewrite' => array( 'slug' => 'collaborations' ),
+		'taxonomies' => array( 'location','topic','discipline','methodology','output'),
 		)
 	);
 

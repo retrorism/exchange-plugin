@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 };
 
 /* Hook admin scripts to admin_enqueue scripts */
-add_action( 'admin_enqueue_scripts', 'tandem_admin_enqueue_scripts' );
+//add_action( 'admin_enqueue_scripts', 'tandem_admin_enqueue_scripts' );
 
 /* Register admin menu pages upon loading admin menu */
 add_action( 'admin_menu', 'tandem_register_custom_submenu_page' );
@@ -28,7 +28,7 @@ add_action( 'admin_menu', 'tandem_add_options_page');
 add_action( 'add_meta_boxes_collaboration', 'tandem_add_meta_boxes_for_collaboration' );
 
 function tandem_admin_enqueue_scripts() {
-	wp_enqueue_script( 'tandem-admin-js', plugin_dir_url( TANDEM_FILE )  . '/assets/js/tandem_admin.js', array(), '0.1.0', true );
+	wp_enqueue_script( 'tandem-admin-js', plugin_dir_url( EXCHANGE_PLUGIN_FILE )  . '/assets/js/tandem_admin.js', array(), '0.1.0', true );
 }
 
 function tandem_register_custom_submenu_page() {
@@ -41,45 +41,45 @@ function tandem_register_custom_submenu_page() {
 	// 	'edit-tags.php?taxonomy=language&post_type=story'
 	// );
 
-	add_submenu_page(
-		'edit.php?post_type=collaboration',
-		'Topics',
-		'Topics',
-		'edit_posts',
-		'edit-tags.php?taxonomy=topic&post_type=collaboration',
-	false );
+	// add_submenu_page(
+	// 	'edit.php?post_type=collaboration',
+	// 	'Topics',
+	// 	'Topics',
+	// 	'edit_posts',
+	// 	'edit-tags.php?taxonomy=topic&post_type=collaboration',
+	// false );
 
-	add_submenu_page(
-		'edit.php?post_type=collaboration',
-		'Disciplines',
-		'Disciplines',
-		'edit_posts',
-		'edit-tags.php?taxonomy=discipline&post_type=collaboration',
-	false );
+	// add_submenu_page(
+	// 	'edit.php?post_type=collaboration',
+	// 	'Disciplines',
+	// 	'Disciplines',
+	// 	'edit_posts',
+	// 	'edit-tags.php?taxonomy=discipline&post_type=collaboration',
+	// false );
 
-	add_submenu_page(
-		'edit.php?post_type=collaboration',
-		'Methodologies',
-		'Methodologies',
-		'edit_posts',
-		'edit-tags.php?taxonomy=methodologies&post_type=collaboration',
-	false );
+	// add_submenu_page(
+	// 	'edit.php?post_type=collaboration',
+	// 	'Methodologies',
+	// 	'Methodologies',
+	// 	'edit_posts',
+	// 	'edit-tags.php?taxonomy=methodologies&post_type=collaboration',
+	// false );
 
-	add_submenu_page(
-		'edit.php?post_type=collaboration',
-		'Outputs',
-		'Outputs',
-		'edit_posts',
-		'edit-tags.php?taxonomy=output&post_type=collaboration',
-	false );
+	// add_submenu_page(
+	// 	'edit.php?post_type=collaboration',
+	// 	'Outputs',
+	// 	'Outputs',
+	// 	'edit_posts',
+	// 	'edit-tags.php?taxonomy=output&post_type=collaboration',
+	// false );
 
-	add_submenu_page(
-		'edit.php?post_type=participant',
-		'Locations',
-		'Locations',
-		'edit_posts',
-		'edit-tags.php?taxonomy=location&post_type=participant',
-	false );
+	// add_submenu_page(
+	// 	'edit.php?post_type=participant',
+	// 	'Locations',
+	// 	'Locations',
+	// 	'edit_posts',
+	// 	'edit-tags.php?taxonomy=location&post_type=participant',
+	// false );
 }
 
 
@@ -148,7 +148,7 @@ function tandem_programme_rounds_parent_meta_box( $post ) {
 		'numberposts' => -1,
 	);
 
-	$parent_query = new WP_Query( args );
+	$parent_query = new WP_Query( $args );
 	$parents = $parent_query->posts;
 
 	if ( ! empty( $parents ) ) {

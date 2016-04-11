@@ -15,17 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 };
 
-if ( ! defined( 'TANDEM_FILE' ) ) {
-	define( 'TANDEM_FILE', __FILE__ );
-}
-
-if ( ! defined( 'TANDEM_PATH' ) ) {
-	define( 'TANDEM_PATH', plugin_dir_path( TANDEM_FILE ) );
-}
-
-if ( ! isset( $GLOBALS['TANDEM_CONFIG'] ) ) {
-	$GLOBALS['TANDEM_CONFIG'] = array(
-		'COLORS' => array(
+if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
+	$GLOBALS['EXCHANGE_PLUGIN_CONFIG'] = array(
+		'COLOURS' => array(
 			'yellow-tandem' => 'f4c522', /* Tandem styleguide */
 			'black-tandem'  => '4c4d53', /* Tandem styleguide */
 			'white'         => 'ffffff',
@@ -45,7 +37,7 @@ if ( ! isset( $GLOBALS['TANDEM_CONFIG'] ) ) {
 			'blue-1'        => 'bcdde9',
 			'blue-2'        => '93c9e4',
 			'blue-3'        => '0f9fd6', /* Accents on blue */
-			'blue-4'        => '1F588E',
+			'blue-4'        => '1f588e',
 		),
 		'IMAGES' => array(
 			/* 'hq-norm' => 381024,  756 * 504 */
@@ -53,4 +45,46 @@ if ( ! isset( $GLOBALS['TANDEM_CONFIG'] ) ) {
 			'size-in-story' => 'medium_large',
 		),
 	);
+}
+
+/*
+* Source: http://support.advancedcustomfields.com/forums/topic/customise-color-picker-swatches/
+*/
+
+// Adds client's custom colors to WYSIWYG editor and ACF color picker.
+
+if ( empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['bg'] ) ) {
+  if ( !empty ( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS'] ) ) {
+      $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['bg'] = array(
+        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['salmon-1-web'],
+        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-1-web'],
+        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['blue-1-web'],
+        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['blue-3'],
+        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-tandem'],
+        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['black-tandem'],
+        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['white'],
+      );
+  }
+}
+
+if ( empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['accents'] ) ) {
+  if ( !empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS'] ) ) {
+      $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['accents'] = array(
+        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['salmon-4'],
+        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-3'],
+        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['blue-4'],
+        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-tandem'],
+      );
+  }
+}
+
+if ( empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['boxes'] ) ) {
+  if ( !empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS'] ) ) {
+      $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['boxes'] = array(
+        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['salmon-1-web'],
+        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-1-web'],
+        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['rose-1-web'],
+        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['blue-2-web'],
+      );
+  }
 }

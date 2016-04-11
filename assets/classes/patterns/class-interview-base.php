@@ -1,35 +1,32 @@
 <?php
 /**
- * Section Header Class
+ * Interview - conversation style
  * Author: Willem Prins | SOMTIJDS
  * Project: Tandem
- * Date created: 07/03/2016
+ * Date created: 08/04/16
  *
  * @package Exchange Plugin
  **/
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
-	header( 'Status: 403 Forbidden' );
-	header( 'HTTP/1.1 403 Forbidden' );
 	exit;
 };
 
 /**
- * Section Header pattern class.
+ * Interview Conversation Class
  *
- * This class serves to build section headers.
+ *  Class description
  *
  * @since 0.1.0
  **/
-class SectionHeader extends BasePattern {
+abstract class BaseInterview extends BasePattern {
 
 	/**
-	 * Constructor for Caption Pattern class objects.
-	 *
-	 * At instantiation this method adds background colour modifier,
+	 * Constructor for Interview Conversation class objects.
 	 *
 	 * @since 0.1.0
+	 * @access public
 	 *
 	 * @param mixed  $input Pattern content as defined in ACF input values.
 	 * @param string $parent String referring to pattern.
@@ -37,10 +34,9 @@ class SectionHeader extends BasePattern {
 	 **/
 	public function __construct( $input, $parent = '', $modifiers = array() ) {
 		Parent::__construct( $input, $parent, $modifiers );
-
-		$this->output_tag_open( 'header' );
-		$this->output .= '<h2>' . $input . '</h2>' . PHP_EOL;
-		$this->output_tag_close( 'header' );
-
+		$this->output_tag_open('section');
+		$this->output .= $this->build_interview( $input ) . PHP_EOL;
+		$this->output_tag_close('section');
 	}
+
 }

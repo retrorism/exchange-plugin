@@ -31,28 +31,31 @@ class StoryController extends BaseController {
 	 * @access public
 	 *
 	 * @param object $story Newly instantiated Story class object.
-	 * @param object $post Story post object
-	 * @return object $story Story class object with set properties.
+	 * @param object $post Story post object.
 	 *
 	 * @throws Exception When no valid post ID is presented.
 	 **/
-	public static function map_story( $story, $post ) {
 
-		// Retrieve post_id variable
+	public function map_story( $story, $post ) {
+
+		// Retrieve post_id variable.
 		$post_id = $post->ID;
 
 		// Throw Exception when the input is not a valid story post type object.
-		if ( ! ( $post_id >= 1 ) || $post->post_type !== 'story' ) {
-			unset( $story );
+		if ( ! ( $post_id >= 1 ) || 'story' !== $post->post_type ) {
+			//unset( $story );
 			throw new Exception( 'This is not a valid post' );
 		}
 
 		// Dump ACF variables.
-		$acf = get_fields( $post_id );
+		$acf_editorial_intro = get_field( 'editorial_intro', $post_id );
+		$acf_storyteller = get_field( 'storyteller', $post_id );
+		$acf_category = get_field( 'category', $post_id );
+		$acf_language = get_field( 'language', $post_id );
+		$acf_terms = get_field( 'terms', $post_id );
+		$acf_sections = get_field( 'sections', $post_id );
+		$acf_header_image = get_field( 'header_image', $post_id );
 
-		if ( ! empty( $acf ) ) {
-			$story->acf = $acf;
-		}
 
 		// Set story title.
 		$story->title = get_the_title( $post_id );
@@ -61,52 +64,87 @@ class StoryController extends BaseController {
 		$story->type = get_post_type( $post_id );
 
 		// Set editorial introduction.
-		if ( ! empty( $acf['editorial_intro'] ) ) {
-			$story->editorial_intro = $acf['editorial_intro'];
+		if ( ! empty( $acf_editorial_intro ) ) {
+			$story->editorial_intro = new EditorialIntro( $acf_editorial_intro, 'story' );
 		}
 
 		// Set language.
-		$language_term = $acf['language'];
-		if ( $language_term ) {
-			$story->language = $language_term->name;
+		if ( is_object( $acf_language ) ) {
+			if ( 'WP_Term' === get_class( $acf_language ) ) {
+				$story->language = $acf_language->name;
+			}
 		}
 
 		// Set category.
-		$cat = $acf['category'];
-		if ( $cat ) {
-			$story->category = $cat->name;
+		if ( is_object( $acf_category ) ) {
+			if ( 'WP_Term' === get_class( $acf_category ) ) {
+				$story->category = $acf_category->name;
+			}
 		}
 
 		// Set participant.
-		$storyteller = $acf['story_teller'];
-		if ( $storyteller ) {
-				$story->storyteller = new Participant( $post );
-				$story->storyteller->name = $storyteller->post_title;
+		if ( is_object( $acf_storyteller ) ) {
+			if ( 'WP_Post' === get_class( $acf_storyteller ) ) {
+				$story->storyteller = new Participant( $acf_storyteller );
+				$story->storyteller->name = $acf_storyteller->post_title;
+			}
 		}
 
 		// Set tags.
-		$terms = $acf['topics'];
-		if ( $terms ) {
+		if ( ! empty( $acf_terms ) ) {
 			foreach ( $terms as $term ) {
 				$story->add_tag( $term->name, get_term_link( $term ) );
 			}
 		}
 
 		// Set special tags.
-		if ( $acf['add_special_tags'] ) {
-			if ( in_array( 'location', $acf['add_special_tags'], true ) ) {
-				$story->add_tag( 'TODO location', 'TODO url' );
-			} elseif ( in_array( 'programme_round', $acf['add_special_tags'], true ) ) {
-				$story->add_tag( 'TODO programme_round', 'TODO url' );
-			}
-		}
+		// if ( $acf['add_special_tags'] ) {
+		// 	if ( in_array( 'location', $acf['add_special_tags'], true ) ) {
+		// 		$story->add_tag( 'TODO location', 'TODO url' );
+		// 	} elseif ( in_array( 'programme_round', $acf['add_special_tags'], true ) ) {
+		// 		$story->add_tag( 'TODO programme_round', 'TODO url' );
+		// 	}
+		// }
 
 		// Set sections.
-		if ( ! empty( $acf['sections'] ) ) {
-			$story->sections = $acf['sections'];
+		if ( ! empty( $acf_sections ) ) {
+			$story->sections = $acf_sections;
 		}
 
+		// Set header image.
+		if ( 'none' !== $acf_header_image ) {
+			$story->header_image = $this->get_header_image( $acf_header_image, $post_id );
+			$story->has_header_image = true;
+		}
+
+		$this->set_byline( $story );
+
 		return $story;
+	}
+
+	/**
+	 * Retrieves and attaches header image to story
+	 *
+	 * @param string $acf_header_image Advanced Custom Fields Header selection option
+	 * @param integer $post_id.
+	 * @return Image object or null
+	 */
+	protected function get_header_image( $acf_header_image, $post_id ) {
+		switch ( $acf_header_image ) {
+			case 'use_featured_image':
+				// Use ACF function to create array for Image object constructor.
+				$thumb = acf_get_attachment( get_post_thumbnail_id( $post_id ), 'header_image' );
+				break;
+			case 'upload_new_image':
+				$thumb = get_field( 'upload_header_image', $post_id );
+				break;
+			default: break;
+		}
+		if ( is_array( $thumb ) ) {
+			return new HeaderImage( $thumb, 'story', array(
+				'is_header_image' => true,
+			) );
+		}
 	}
 
 	/**
@@ -225,16 +263,51 @@ class StoryController extends BaseController {
 	 * @access public
 	 * @return array $templates Byline templates for present and past projects to be replaced with story-specific fields.
 	 */
-	public function get_byline_templates() {
+	protected function get_byline_templates() {
 		$templates = array();
-		$byline_template_present = get_option( TANDEM_NAME . '_byline_template_present' );
-		$byline_template_past = get_option( TANDEM_NAME . '_byline_template_past' );
+		$byline_template_present = get_option( EXCHANGE_PLUGIN . '_byline_template_present' );
+		$byline_template_past = get_option( EXCHANGE_PLUGIN . '_byline_template_past' );
 		if ( empty( $byline_template_present ) ) {
 			$templates['present'] = 'This story was shared by [[storyteller]], who currently participates in [[programme_round]] with [[collaboration]]';
+		}
+		else {
+			$templates['present'] = $byline_template_present;
 		}
 		if ( empty( $byline_template_past ) ) {
 			$templates['past'] = 'This story was shared by [[storyteller]], who participated in [[programme_round]] with [[collaboration]]';
 		}
+		else {
+			$templates['past'] = $byline_template_past;
+		}
 		return $templates;
+	}
+
+	/**
+	 * If storyteller is set, Replace placeholders in template with personal details connected to the storyteller.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @param story object
+	 * @return string $byline Byline object built from byline template.
+	 **/
+	public function set_byline( $story ) {
+		if ( is_object( $story->storyteller ) && is_object( $story->storyteller->collaboration ) ) {
+			$templates = $this->get_byline_templates();
+
+			if ( $story->storyteller->is_active ) {
+				$byline_template = $templates['present'];
+			} else {
+				$byline_template = $templates['past'];
+			}
+			$byline_template = str_replace( '[[storyteller]]', $story->storyteller->name, $byline_template );
+			$byline_template = str_replace( '[[programme_round]]', tandem_create_link( $story->storyteller->collaboration->programme_round ), $byline_template );
+			$byline = str_replace( '[[collaboration]]', tandem_create_link( $story->storyteller->collaboration ), $byline_template );
+
+			$story->byline = new Byline( $byline, 'footer' );
+		}
+
+		else {
+			$story->byline = null;
+		}
 	}
 }

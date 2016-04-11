@@ -21,16 +21,16 @@ if ( ! function_exists( 'add_filter' ) ) {
 	exit();
 }
 
-if ( ! defined( 'TANDEM_NAME' ) ) {
-	define( 'TANDEM_NAME', 'exchange-plugin' );
+if ( ! defined( 'EXCHANGE_PLUGIN' ) ) {
+	define( 'EXCHANGE_PLUGIN', 'exchange-plugin' );
 }
 
-if ( ! defined( 'TANDEM_FILE' ) ) {
-	define( 'TANDEM_FILE', __FILE__ );
+if ( ! defined( 'EXCHANGE_PLUGIN_FILE' ) ) {
+	define( 'EXCHANGE_PLUGIN_FILE', __FILE__ );
 }
 
-if ( ! defined( 'TANDEM_PATH' ) ) {
-	define( 'TANDEM_PATH', plugin_dir_path( TANDEM_FILE ) );
+if ( ! defined( 'EXCHANGE_PLUGIN_PATH' ) ) {
+	define( 'EXCHANGE_PLUGIN_PATH', plugin_dir_path( EXCHANGE_PLUGIN_FILE ) );
 }
 
 add_action( 'plugins_loaded','tandem_require_functions' );
@@ -40,24 +40,24 @@ add_action( 'plugins_loaded','tandem_require_functions' );
  */
 function tandem_require_functions() {
 	$files = array(
+		'globals.php',
 		'admin.php',
 		'admin-acf.php',
 		'admin-options.php',
-		'globals.php',
 		'post-types.php',
 		'public.php',
 		'taxonomies.php',
 	);
 	foreach ( $files as $file ) {
-		require_once( TANDEM_PATH . 'assets/functions/' . $file );
+		require_once( EXCHANGE_PLUGIN_PATH . 'assets/functions/' . $file );
 	}
 }
 
 /* Runs on plugin is activated */
-register_activation_hook( TANDEM_FILE, 'tandem_activate' );
+register_activation_hook( EXCHANGE_PLUGIN_FILE, 'tandem_activate' );
 
 /* Runs on plugin deactivation */
-register_deactivation_hook( TANDEM_FILE, 'tandem_deactivate' );
+register_deactivation_hook( EXCHANGE_PLUGIN_FILE, 'tandem_deactivate' );
 
 /**
  * Runs on activation of the plugin.
@@ -84,21 +84,40 @@ function tandem_auto_load( $class ) {
 
 	if ( null === $classes ) {
 		$classes = array(
-			'participant'  => TANDEM_PATH . 'assets/classes/class-participant.php',
-			'story'  => TANDEM_PATH . 'assets/classes/class-story.php',
-			'basepattern' => TANDEM_PATH . 'assets/classes/patterns/class-pattern-base.php',
-			'paragraph' => TANDEM_PATH . 'assets/classes/patterns/class-paragraph.php',
-			'pullquote' => TANDEM_PATH . 'assets/classes/patterns/class-quote-pull.php',
-			'blockquote' => TANDEM_PATH . 'assets/classes/patterns/class-quote-block.php',
-			'section' => TANDEM_PATH . 'assets/classes/patterns/class-section.php',
-			'sectionheader' => TANDEM_PATH . 'assets/classes/patterns/class-header-section.php',
-			'subheader' => TANDEM_PATH . 'assets/classes/patterns/class-header-sub.php',
-			'image' => TANDEM_PATH . 'assets/classes/patterns/class-image.php',
-			'imageduo' => TANDEM_PATH . 'assets/classes/patterns/class-image-duo.php',
-			'caption' => TANDEM_PATH . 'assets/classes/patterns/class-caption.php',
-			'basecontroller'  => TANDEM_PATH . 'assets/classes/controllers/class-controller-base.php',
-			'storycontroller'  => TANDEM_PATH . 'assets/classes/controllers/class-controller-story.php',
-			'participantcontroller'  => TANDEM_PATH . 'assets/classes/controllers/class-controller-participant.php',
+			'participant'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-participant.php',
+			'story'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-story.php',
+			'collaboration'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-collaboration.php',
+			'programmeround'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-programme-round.php',
+			'basepattern' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-pattern-base.php',
+
+			'byline' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-byline.php',
+			'editorialintro' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-editorial-intro.php',
+
+			'paragraph' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-paragraph.php',
+			'pullquote' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-quote-pull.php',
+			'blockquote' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-quote-block.php',
+			'video' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-video.php',
+			'baseinterview' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-interview-base.php',
+			'interviewconversation' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-interview-conversation.php',
+			'interviewqa' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-interview-qa.php',
+			'section' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-section.php',
+			'sectionheader' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-header-section.php',
+			'subheader' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-header-sub.php',
+			'image' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-image.php',
+			'headerimage' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-image-header.php',
+			'imageduo' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-image-duo.php',
+			'caption' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-caption.php',
+			'emphasisblock' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-emphasis-block.php',
+			'button' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-button.php',
+			'blocklist' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-block-list.php',
+			'imagesvg' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-image-svg.php',
+
+			'basecontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-base.php',
+			'storycontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-story.php',
+			'participantcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-participant.php',
+			'collaborationcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-collaboration.php',
+			'programmeroundcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-programme-round.php',
+
 		);
 	}
 
