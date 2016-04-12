@@ -41,13 +41,13 @@ class PullQuote extends BasePattern {
 	 * @since 0.1.0
 	 *
 	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $parent Optional. String referring to pattern.
+	 * @param string $context Optional. String referring to pattern.
 	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
 	 *
 	 * @throws Exception Throws error when there's no parent set for this caption.
 	 **/
-	function __construct( $input, $parent = '', $modifiers = array() ) {
-		Parent::__construct( $input, $parent, $modifiers );
+	function __construct( $input, $context = '', $modifiers = array() ) {
+		Parent::__construct( $input, $context, $modifiers );
 
 		if ( ! empty( $input['pquote_source_text'] ) ) {
 			$this->text = $input['pquote_text'];

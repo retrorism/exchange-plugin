@@ -93,18 +93,16 @@ class Image extends BasePattern {
 	 * @since 0.1.0
 	 *
 	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $parent Optional. String referring to pattern.
+	 * @param string $context Optional. String referring to pattern.
 	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
 	 **/
-	public function __construct( $input, $parent = '', $modifiers = array() ) {
-		Parent::__construct( $input, $parent, $modifiers );
+	public function __construct( $input, $context = '', $modifiers = array() ) {
+		Parent::__construct( $input, $context, $modifiers );
 
 		$this->set_image_properties( $input, $modifiers );
 
 		$this->output_tag_open( 'figure' );
-
 		$this->output .= $this->build_image_element();
-
 		// Add caption if available.
 		if ( ! empty( $input['caption'] ) ) {
 			$this->set_image_caption( $input, $modifiers );
@@ -113,11 +111,9 @@ class Image extends BasePattern {
 				$this->output .= $this->build_image_caption();
 			}
 		}
-
 		// Close element.
 		$this->output_tag_close( 'figure' );
 
-		// End construct.
 	}
 
 	/**
@@ -128,7 +124,7 @@ class Image extends BasePattern {
 	 * @param array $input ACF input, consisting of image araray.
 	 * @param array $modifiers List of modifiers received from sibling classes.
 	 **/
-	protected function set_image_properties( $input, $modifiers ) {
+	protected function set_image_properties( $input, $context ) {
 		$h = $input['height'];
 		$w = $input['width'];
 		// Get orientation and validate with actual height and width.
@@ -136,13 +132,15 @@ class Image extends BasePattern {
 			$this->set_image_orientation( $h, $w, $modifiers );
 			$this->set_image_quality( $h, $w );
 		};
-		// Set image to header-image size, else switch to to story-portrait or story-landscape.
-		if ( key_exists( 'is_header_image', $modifiers ) ) {
-			if ( true === $modifiers['is_header_image'] ) {
+		// Default base size is story-portrait or story-landscape, switch to different sizes depending on context.
+		$image_size = 'story-' . $this->orientation;
+
+		if ( key_exists( 'context', $modifiers ) ) {
+			if ( 'header' === $context ) {
 				$image_size = 'header-image';
+			} elseif ( 'grid' === $context ) {
+				$image_size = 'post_thumbnail';
 			}
-		} else {
-			$image_size = 'story-' . $this->orientation;
 		}
 
 		// Set src_set from attachment_id.

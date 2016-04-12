@@ -35,33 +35,34 @@ class StoryController extends BaseController {
 	 *
 	 * @throws Exception When no valid post ID is presented.
 	 **/
-
-	public function map_story( $story, $post ) {
+	public function map_story_basics( $story, $post ) {
 
 		// Retrieve post_id variable.
 		$post_id = $post->ID;
 
 		// Throw Exception when the input is not a valid story post type object.
 		if ( ! ( $post_id >= 1 ) || 'story' !== $post->post_type ) {
-			//unset( $story );
+			unset( $story );
 			throw new Exception( 'This is not a valid post' );
 		}
 
-		// Dump ACF variables.
-		$acf_editorial_intro = get_field( 'editorial_intro', $post_id );
-		$acf_storyteller = get_field( 'storyteller', $post_id );
-		$acf_category = get_field( 'category', $post_id );
-		$acf_language = get_field( 'language', $post_id );
-		$acf_terms = get_field( 'terms', $post_id );
-		$acf_sections = get_field( 'sections', $post_id );
-		$acf_header_image = get_field( 'header_image', $post_id );
+		// Set Post ID.
+		$story->post_id = $post_id;
 
+		// Set Published date.
+		$story->date = $post->post_date;
 
 		// Set story title.
-		$story->title = get_the_title( $post_id );
+		$story->title = $post->post_title;
 
-		// Set story type.
-		$story->type = get_post_type( $post_id );
+		// Set featured image.
+		$story->featured_image = $this->get_featured_image( $post_id );
+
+		// Map ACF variables.
+		$acf_editorial_intro = get_field( 'editorial_intro', $post_id );
+		$acf_language = get_field( 'language', $post_id );
+		$acf_storyteller = get_field( 'storyteller', $post_id );
+		$acf_category = get_field( 'category', $post_id );
 
 		// Set editorial introduction.
 		if ( ! empty( $acf_editorial_intro ) ) {
@@ -89,22 +90,51 @@ class StoryController extends BaseController {
 				$story->storyteller->name = $acf_storyteller->post_title;
 			}
 		}
+	}
+	/**
+	 * Return story object with properties taken from ACF Fields.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 *
+	 * @param object $story Newly instantiated Story class object.
+	 * @param object $post Story post object.
+	 *
+	 * @throws Exception When no valid post ID is presented.
+	 **/
+	public function map_full_story( $story, $post ) {
 
-		// Set tags.
-		if ( ! empty( $acf_terms ) ) {
-			foreach ( $terms as $term ) {
-				$story->add_tag( $term->name, get_term_link( $term ) );
-			}
+		// Retrieve post_id variable from basic mapping.
+		$post_id = $story->post_id;
+
+		// Throw Exception when the input is not a valid story post type object.
+		if ( ! ( $post_id >= 1 ) ) {
+			unset( $story );
+			throw new Exception( 'This is not a valid post' );
 		}
 
-		// Set special tags.
-		// if ( $acf['add_special_tags'] ) {
-		// 	if ( in_array( 'location', $acf['add_special_tags'], true ) ) {
-		// 		$story->add_tag( 'TODO location', 'TODO url' );
-		// 	} elseif ( in_array( 'programme_round', $acf['add_special_tags'], true ) ) {
-		// 		$story->add_tag( 'TODO programme_round', 'TODO url' );
-		// 	}
-		// }
+		$acf_sections = get_field( 'sections', $post_id );
+		$acf_header_image = get_field( 'header_image', $post_id );
+		$acf_related_content = get_field( 'related_content', $post_id );
+
+		if ( is_array( $acf_related_content ) && ! empty( $acf_related_content ) ) {
+			$related_content = array();
+			// Store post ID in the unique array so that it won't get added.
+			$unique_ids = array( $post_id );
+			foreach ( $acf_related_content as $item ) {
+				// Tests for WP_Post content types.
+				if ( $this->is_correct_content_type( $item ) ) {
+					// Tests if the items are unique and don't refer to the post itself.
+					if ( ! in_array( $item->ID, $unique_ids, true ) ) {
+						$related_content[] = $item;
+					}
+				}
+			}
+			if ( count( $related_content ) > 0 ) {
+				$story->has_related_content = true;
+				$story->related_content = $this->set_related_content_grid( $related_content );
+			}
+		}
 
 		// Set sections.
 		if ( ! empty( $acf_sections ) ) {
@@ -127,13 +157,13 @@ class StoryController extends BaseController {
 	 *
 	 * @param string $acf_header_image Advanced Custom Fields Header selection option
 	 * @param integer $post_id.
-	 * @return Image object or null
+	 * @return HeaderImage object or null
 	 */
 	protected function get_header_image( $acf_header_image, $post_id ) {
 		switch ( $acf_header_image ) {
 			case 'use_featured_image':
 				// Use ACF function to create array for Image object constructor.
-				$thumb = acf_get_attachment( get_post_thumbnail_id( $post_id ), 'header_image' );
+				$thumb = acf_get_attachment( get_post_thumbnail_id( $post_id ) );
 				break;
 			case 'upload_new_image':
 				$thumb = get_field( 'upload_header_image', $post_id );
@@ -141,9 +171,25 @@ class StoryController extends BaseController {
 			default: break;
 		}
 		if ( is_array( $thumb ) ) {
-			return new HeaderImage( $thumb, 'story', array(
-				'is_header_image' => true,
+			return new Image( $thumb, 'header' );
+		}
+	}
+
+	/**
+	 * Retrieves and attaches featured image to story for use in grids.
+	 *
+	 * @param string $acf_header_image Advanced Custom Fields Header selection option
+	 * @param integer $post_id.
+	 * @return Image object or null
+	 */
+	protected function get_featured_image( $post_id ) {
+		$thumb = acf_get_attachment( get_post_thumbnail_id( $post_id ) );
+		if ( is_array( $thumb ) ) {
+			return new Image( $thumb, '', array(
+				'context' => 'grid',
 			) );
+		} else {
+			return null;
 		}
 	}
 
@@ -153,7 +199,7 @@ class StoryController extends BaseController {
 	 * @param mixed $post_id_or_object Post ID or Object.
 	 * @return Story object or null
 	 */
-	function get_story( $post_id_or_object ) {
+	public static function get_full_story( $post_id_or_object ) {
 		if ( $post_id_or_object ) {
 			$post = get_post( $post_id_or_object );
 			return $this->map_story( $post );

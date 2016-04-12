@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 //add_action( 'admin_enqueue_scripts', 'tandem_admin_enqueue_scripts' );
 
 /* Register admin menu pages upon loading admin menu */
-add_action( 'admin_menu', 'tandem_register_custom_submenu_page' );
+add_action( 'admin_menu', 'tandem_add_and_remove_menu_options' );
 add_action( 'admin_menu', 'tandem_register_settings');
 add_action( 'admin_menu', 'tandem_add_options_page');
 
@@ -31,8 +31,13 @@ function tandem_admin_enqueue_scripts() {
 	wp_enqueue_script( 'tandem-admin-js', plugin_dir_url( EXCHANGE_PLUGIN_FILE )  . '/assets/js/tandem_admin.js', array(), '0.1.0', true );
 }
 
-function tandem_register_custom_submenu_page() {
+function tandem_add_and_remove_menu_options() {
+	if ( ! current_user_can( 'edit_file') ) {
+		remove_menu_page( 'edit.php' ); // Remove Posts editor from menu for editors.
+		remove_menu_page( 'edit-comments.php' ); // Comments from menu for editors.
+	}
 
+	remove_meta_box( 'categorydiv', 'story', 'side');
 	// add_submenu_page(
 	// 	'edit.php?post_type=story',
 	// 	'Languages',
@@ -83,17 +88,17 @@ function tandem_register_custom_submenu_page() {
 }
 
 
-/* Creates  meta box for a story. */
-function tandem_add_meta_boxes_for_story( $post ) {
-	add_meta_box(
-		'tandem-story-parent',
-		__( 'Collaboration?', 'exchange-plugin' ),
-		'tandem_story_parent_meta_box',
-		$post->post_type,
-		'side',
-		'core'
-	);
-}
+// /* Creates  meta box for a story. */
+// function tandem_add_meta_boxes_for_story( $post ) {
+// 	add_meta_box(
+// 		'tandem-story-parent',
+// 		__( 'Collaboration?', 'exchange-plugin' ),
+// 		'tandem_story_parent_meta_box',
+// 		$post->post_type,
+// 		'side',
+// 		'core'
+// 	);
+// }
 
 /* Creates the meta box for project. */
 function tandem_add_meta_boxes_for_collaboration( $post ) {

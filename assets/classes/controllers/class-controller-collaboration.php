@@ -70,9 +70,9 @@ class CollaborationController extends BaseController {
 	}
 
 	public function set_programme_round( $collaboration, $parent_id ) {
-		$parent = get_post( $parent_id );
-		if ( 'programme_round' === $parent->post_type ) {
-			$collaboration->programme_round = new ProgrammeRound( $parent );
+		$context = get_post( $parent_id );
+		if ( 'programme_round' === $context->post_type ) {
+			$collaboration->programme_round = new ProgrammeRound( $context );
 		}
 	}
 }

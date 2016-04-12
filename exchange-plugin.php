@@ -88,16 +88,19 @@ function tandem_auto_load( $class ) {
 			'story'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-story.php',
 			'collaboration'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-collaboration.php',
 			'programmeround'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-programme-round.php',
-			'basepattern' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-pattern-base.php',
 
+			'basepattern' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-pattern-base.php',
+			'basegrid' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-grid-base.php',
+			'relatedgrid' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-grid-related.php',
+			'griditem' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-grid-item.php',
+
+			'baseinterview' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-interview-base.php',
 			'byline' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-byline.php',
 			'editorialintro' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-editorial-intro.php',
-
 			'paragraph' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-paragraph.php',
 			'pullquote' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-quote-pull.php',
 			'blockquote' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-quote-block.php',
 			'video' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-video.php',
-			'baseinterview' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-interview-base.php',
 			'interviewconversation' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-interview-conversation.php',
 			'interviewqa' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-interview-qa.php',
 			'section' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-section.php',

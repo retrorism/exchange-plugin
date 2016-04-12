@@ -32,13 +32,13 @@ class SubHeader extends BasePattern {
 	 * @since 0.1.0
 	 *
 	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $parent Optional. String referring to pattern.
+	 * @param string $context Optional. String referring to pattern.
 	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
 	 *
 	 * @throws Exception Throws error when there's no parent set for this caption.
 	 **/
-	public function __construct( $input, $parent = '', $modifiers = array() ) {
-		Parent::__construct( $input, $parent, $modifiers );
+	public function __construct( $input, $context = '', $modifiers = array() ) {
+		Parent::__construct( $input, $context, $modifiers );
 
 		$this->output_tag_open( 'header' );
 		$this->output .= '<h3>' . $input . '</h3>' . PHP_EOL;

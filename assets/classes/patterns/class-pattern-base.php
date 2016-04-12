@@ -62,13 +62,13 @@ abstract class BasePattern {
 	public $output = '';
 
 	/**
-	 * Parent object in/through which this pattern object has been instantiated.
+	 * Context in/through which this pattern object has been instantiated.
 	 *
 	 * @since 0.1.0
 	 * @access public
-	 * @var mixed $parent Parent object or slug name.
+	 * @var mixed $context Parent object or slug name.
 	 **/
-	public $parent;
+	public $context;
 
 	/**
 	 * Base class name slug.
@@ -88,13 +88,13 @@ abstract class BasePattern {
 	 * @access protected
 	 *
 	 * @param mixed  $input Pattern content.
-	 * @param string $parent String referring to pattern.
+	 * @param string $context String referring to pattern.
 	 * @param array  $modifiers Additional modifiers that influence look and functionality.
 	 **/
-	protected function __construct( $input, $parent = '', $modifiers = array() ) {
+	protected function __construct( $input, $context = '', $modifiers = array() ) {
 
 		$this->set_basename();
-		$this->set_parent_and_base_class( $parent );
+		$this->set_parent_and_base_class( $context );
 
 		if ( ! empty( $modifiers ) ) {
 			$this->process_modifiers( $modifiers );
@@ -118,11 +118,11 @@ abstract class BasePattern {
 	 * @since 0.1.0
 	 * @access protected
 	 *
-	 * @param string $parent Parent basename.
+	 * @param string $context Parent basename.
 	 **/
-	protected function set_parent_and_base_class( $parent ) {
-		if ( ! empty( $parent ) ) {
-			$this->parent = $parent;
+	protected function set_parent_and_base_class( $context ) {
+		if ( ! empty( $context ) ) {
+			$this->parent = $context;
 			// Add generic story element class for all direct children of a section.
 			if ( 'section' === $this->parent ) {
 				$this->classes[] = 'section__slice';
@@ -203,7 +203,7 @@ abstract class BasePattern {
 		if ( ! empty( $this->data ) ) {
 			$list = array();
 			foreach ( $this->data as $key => $val ) {
-				$list[] = 'data-' . $key . '=' . esc_attr( $val );
+				$list[] = 'data-' . $key . '="' . esc_attr( $val ) . '"';
 			}
 			if ( count( $list ) > 0 ) {
 				$string = implode( ' ', $list );
@@ -264,7 +264,7 @@ abstract class BasePattern {
 	 * @since 0.1.0
 	 * @access protected
 	 *
-	 * @global string $parent Parent element may serve to prefix for the entire modifier class.
+	 * @global string $context Parent element may serve to prefix for the entire modifier class.
 	 *
 	 * @param string $key Identifies what (key) is modified.
 	 * @param mixed  $val Contains info on how (val) it is modified.
@@ -370,7 +370,7 @@ abstract class BasePattern {
 	 * Prints escaped pattern output. Make sure not to escape anywhere else.
 	 *
 	 * @since 0.1.0
-	 * @access protected
+	 * @access public
 	 **/
 	public function publish() {
 		echo $this->output;
@@ -381,7 +381,7 @@ abstract class BasePattern {
 	 * Returns escaped pattern output for use in parent object.
 	 *
 	 * @since 0.1.0
-	 *
+	 * @access public
 	 * @return string $output HTML output consisting of tags and content.
 	 **/
 	public function embed() {

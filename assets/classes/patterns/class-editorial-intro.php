@@ -33,11 +33,11 @@ class EditorialIntro extends BasePattern {
 	 * @access public
 	 *
 	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $parent Optional. String referring to pattern.
+	 * @param string $context Optional. String referring to pattern.
 	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
 	 **/
-	function __construct( $input, $parent = '', $modifiers = array() ) {
-		Parent::__construct( $input, $parent, $modifiers );
+	function __construct( $input, $context = '', $modifiers = array() ) {
+		Parent::__construct( $input, $context, $modifiers );
 		if ( is_string( $input ) && ! empty( $input ) ) {
 			$this->output_tag_open();
 			$content = new Paragraph( $input, $this->base );

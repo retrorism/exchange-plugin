@@ -37,8 +37,8 @@ class EmphasisBlock extends BasePattern {
 	 * @since 0.1.0
 	 * @access public
 	 **/
-	function __construct( $input, $parent = '', $modifiers = array() ) {
-		Parent::__construct( $input, $parent, $modifiers );
+	public function __construct( $input, $context = '', $modifiers = array() ) {
+		Parent::__construct( $input, $context, $modifiers );
 		if ( is_array( $input ) && count( $input ) > 0 ) {
 			$this->block_elements = $input;
 			$this->output_tag_open();

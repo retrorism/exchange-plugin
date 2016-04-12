@@ -32,11 +32,11 @@ class Video extends BasePattern {
 	 * @since 0.1.0
 	 *
 	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $parent String referring to pattern.
+	 * @param string $context String referring to pattern.
 	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
 	 **/
-	public function __construct( $input, $parent = '', $modifiers = array() ) {
-		Parent::__construct( $input, $parent, $modifiers );
+	public function __construct( $input, $context = '', $modifiers = array() ) {
+		Parent::__construct( $input, $context, $modifiers );
 		$this->output_tag_open('section');
 		$this->output .= $input . PHP_EOL;
 		$this->output_tag_close('section');

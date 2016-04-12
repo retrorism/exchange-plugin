@@ -41,11 +41,11 @@ class ImageDuo extends BasePattern {
 	 * @since 0.1.0
 	 *
 	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $parent Optional. String referring to pattern.
+	 * @param string $context Optional. String referring to pattern.
 	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
 	 **/
-	function __construct( $input, $parent = '', $modifiers = array() ) {
-		Parent::__construct( $input, $parent, $modifiers );
+	function __construct( $input, $context = '', $modifiers = array() ) {
+		Parent::__construct( $input, $context, $modifiers );
 
 		// Check if there are two images and add them to gallery.
 		if ( 2 === count( $input ) ) {

@@ -77,6 +77,15 @@ class Story {
 	 * @access public
 	 * @var Image $header_image Header image object.
 	 **/
+	public $featured_image;
+
+	/**
+	 * Header image.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var Image $header_image Header image object.
+	 **/
 	public $header_image;
 
 	/**
@@ -93,9 +102,28 @@ class Story {
 	 *
 	 * @since 0.1.0
 	 * @access public
-	 * @var Bool $has_header_image Set to true when header image is set.
+	 * @var Bool $has_editorial_intro Set to true when editorial intro is set.
 	 **/
 	public $has_editorial_intro = false;
+
+	/**
+	 * Has related content check
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var Bool $has_related_content Set when related content is set.
+	 **/
+	public $has_related_content = false;
+
+	/**
+	 * When set, this variable contains a Related Content Grid object.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var object $related_content Related Content Grid object.
+	 *
+	 **/
+	public $related_content;
 
 	/**
 	 * Editorial Intro text taken from excerpt (needs to allow for links).
@@ -114,10 +142,14 @@ class Story {
 	 * @since 0.1.0
 	 * @access public
 	 * @param object $post Story post object.
+	 * @param string $context Context, to allow for partial mapping.
 	 **/
-	public function __construct( $post ) {
+	public function __construct( $post, $context = 'full' ) {
 		$this->set_controller();
-		$this->controller->map_story( $this, $post );
+		$this->controller->map_story_basics( $this, $post );
+		if ( 'grid' !== $context ) {
+			$this->controller->map_full_story( $this, $post );
+		}
 	}
 
 	/**
@@ -211,6 +243,12 @@ class Story {
 		foreach( $this->sections as $s ) {
 			$section = new Section( $s, strtolower( get_class( $this ) ) );
 			$section->publish();
+		}
+	}
+
+	public function publish_related_content() {
+		if ( $this->has_related_content ) {
+			$this->related_content->publish();
 		}
 	}
 }

@@ -32,13 +32,13 @@ class Caption extends BasePattern {
 	 * @since 0.1.0
 	 *
 	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $parent String referring to pattern.
+	 * @param string $context String referring to pattern.
 	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
 	 *
 	 * @throws Exception Throws error when there's no parent set for this caption.
 	 **/
-	public function __construct( $input, $parent = '', $modifiers = array() ) {
-		Parent::__construct( $input, $parent, $modifiers );
+	public function __construct( $input, $context = '', $modifiers = array() ) {
+		Parent::__construct( $input, $context, $modifiers );
 
 		if ( ! empty( $this->parent ) ) {
 			if ( 'image' === $this->parent ) {

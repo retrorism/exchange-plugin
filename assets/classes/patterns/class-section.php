@@ -51,11 +51,11 @@ class Section extends BasePattern {
 	 * @since 0.1.0
 	 *
 	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $parent Optional. String referring to pattern.
+	 * @param string $context Optional. String referring to pattern.
 	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
 	 **/
-	public function __construct( $input, $parent = '', $modifiers = array() ) {
-		Parent::__construct( $input, $parent, $modifiers );
+	public function __construct( $input, $context = '', $modifiers = array() ) {
+		Parent::__construct( $input, $context, $modifiers );
 
 		// Check for background colour modifier and add to classes.
 		if ( isset( $input['background_colour'] ) ) {
@@ -166,8 +166,6 @@ class Section extends BasePattern {
 								} else {
 									$input = $e['block_elements'];
 									$colour = $e['post-it_colour'];
-									var_dump( $e );
-									print_r($colour);
 								}
 								$block_mods['colour'] = $colour;
 								$emphasis_block = new EmphasisBlock( $input, $this->base, $block_mods );
