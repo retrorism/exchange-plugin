@@ -17,6 +17,7 @@
     "type": "wordpress-plugin",
     "source": {
         "url": "https://github.com/retrorism/exchange-plugin.git",
-        "type": "git"
+        "type": "git",
+        "reference": "dev-master"
     }
 }
