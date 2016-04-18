@@ -38,25 +38,7 @@ class StoryController extends BaseController {
 	public function map_story_basics( $story, $post ) {
 
 		// Retrieve post_id variable.
-		$post_id = $post->ID;
-
-		// Throw Exception when the input is not a valid story post type object.
-		if ( ! ( $post_id >= 1 ) || 'story' !== $post->post_type ) {
-			unset( $story );
-			throw new Exception( 'This is not a valid post' );
-		}
-
-		// Set Post ID.
-		$story->post_id = $post_id;
-
-		// Set Published date.
-		$story->date = $post->post_date;
-
-		// Set story title.
-		$story->title = $post->post_title;
-
-		// Set featured image.
-		$story->featured_image = $this->get_featured_image( $post_id );
+		$post_id = $story->post_id;
 
 		// Map ACF variables.
 		$acf_editorial_intro = get_field( 'editorial_intro', $post_id );
@@ -66,6 +48,7 @@ class StoryController extends BaseController {
 
 		// Set editorial introduction.
 		if ( ! empty( $acf_editorial_intro ) ) {
+			$story->has_editorial_intro = true;
 			$story->editorial_intro = new EditorialIntro( $acf_editorial_intro, 'story' );
 		}
 
@@ -85,9 +68,8 @@ class StoryController extends BaseController {
 
 		// Set participant.
 		if ( is_object( $acf_storyteller ) ) {
-			if ( 'WP_Post' === get_class( $acf_storyteller ) ) {
+			if ( 'WP_Post' === get_class( $acf_storyteller ) && $acf_storyteller->post_type = 'participant' ) {
 				$story->storyteller = new Participant( $acf_storyteller );
-				$story->storyteller->name = $acf_storyteller->post_title;
 			}
 		}
 	}
@@ -132,7 +114,7 @@ class StoryController extends BaseController {
 			}
 			if ( count( $related_content ) > 0 ) {
 				$story->has_related_content = true;
-				$story->related_content = $this->set_related_content_grid( $related_content );
+				$this->set_related_content_grid( $story, $related_content );
 			}
 		}
 

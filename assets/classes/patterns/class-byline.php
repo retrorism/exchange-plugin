@@ -41,11 +41,11 @@ class Byline extends BasePattern {
 
 	if ( 'string' === gettype( $input ) && ! empty( $input ) ) {
 
-		$this->output_tag_open('div');
+		$this->output_tag_open();
 
 		$this->output .= $input;
 
-		$this->output_tag_close('div');
+		$this->output_tag_close();
 
 	}
 

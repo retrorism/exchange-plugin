@@ -83,4 +83,10 @@ class Participant {
 	private function set_controller() {
 		$this->controller = new ParticipantController();
 	}
+
+	public function publish_name() {
+		if ( null !== $this->name ) {
+			echo esc_html( $this->name );
+		}
+	}
 }

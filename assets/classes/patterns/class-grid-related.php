@@ -35,7 +35,6 @@ class RelatedGrid extends BaseGrid {
 		Parent::__construct( $input, $context, $modifiers );
 
 		if ( $this->has_grid_items ) {
-
 			$this->output_tag_open( 'aside' );
 			foreach ( $this->grid_items as $item ) {
 				$this->output .= $item->embed();

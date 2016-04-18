@@ -23,16 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 0.1.0
  **/
-class Story {
-
-	/**
-	 * Contains a reference to the Story controller, once instantiated.
-	 *
-	 * @since 0.1.0
-	 * @access private
-	 * @var object $controller Story controller.
-	 **/
-	public $controller;
+class Story extends Exchange {
 
 	/**
 	 * Array to be filled with tags.
@@ -62,24 +53,6 @@ class Story {
 	public $category;
 
 	/**
-	 * Story title.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 * @var string Story title.
-	 **/
-	public $title;
-
-	/**
-	 * Header image.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 * @var Image $header_image Header image object.
-	 **/
-	public $featured_image;
-
-	/**
 	 * Header image.
 	 *
 	 * @since 0.1.0
@@ -87,6 +60,15 @@ class Story {
 	 * @var Image $header_image Header image object.
 	 **/
 	public $header_image;
+
+	/**
+	 * Storyteller
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var Participant object.
+	 **/
+	public $storyteller;
 
 	/**
 	 * Has header image.
@@ -107,25 +89,6 @@ class Story {
 	public $has_editorial_intro = false;
 
 	/**
-	 * Has related content check
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 * @var Bool $has_related_content Set when related content is set.
-	 **/
-	public $has_related_content = false;
-
-	/**
-	 * When set, this variable contains a Related Content Grid object.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 * @var object $related_content Related Content Grid object.
-	 *
-	 **/
-	public $related_content;
-
-	/**
 	 * Editorial Intro text taken from excerpt (needs to allow for links).
 	 *
 	 * @since 0.1.0
@@ -144,22 +107,14 @@ class Story {
 	 * @param object $post Story post object.
 	 * @param string $context Context, to allow for partial mapping.
 	 **/
-	public function __construct( $post, $context = 'full' ) {
-		$this->set_controller();
+	public function __construct( $post, $context = '', $controller = null ) {
+		Parent::__construct( $post );
 		$this->controller->map_story_basics( $this, $post );
-		if ( 'grid' !== $context ) {
+		if ( 'grid' === $context ) {
+			$this->controller->set_featured_image( $this, $post->ID );
+		} else {
 			$this->controller->map_full_story( $this, $post );
 		}
-	}
-
-	/**
-	 * Set controller property to instance of Story controller.
-	 *
-	 * @since 0.1.0
-	 * @access private
-	 **/
-	private function set_controller() {
-		$this->controller = new StoryController();
 	}
 
 	/**
@@ -227,7 +182,7 @@ class Story {
 	}
 
 	public function publish_intro() {
-		if ( null !== $this->editorial_intro ) {
+		if ( $this->has_editorial_intro ) {
 			$this->editorial_intro->publish();
 		}
 	}

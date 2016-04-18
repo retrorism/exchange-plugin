@@ -51,12 +51,12 @@ class ImageDuo extends BasePattern {
 		if ( 2 === count( $input ) ) {
 
 			// Open element.
-			$this->output_tag_open( 'section' );
+			$this->output_tag_open();
 
 			$this->set_gallery( $input );
 
 			// Close element.
-			$this->output_tag_close( 'section ' );
+			$this->output_tag_close();
 		}
 	}
 

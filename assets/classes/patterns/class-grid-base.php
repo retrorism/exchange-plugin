@@ -49,10 +49,10 @@ abstract class BaseGrid extends BasePattern {
 	public function __construct( $input, $context = '', $modifiers = array() ) {
 		Parent::__construct( $input, $context, $modifiers );
 
-		if ( is_array( $input ) && ! empty( $input ) ) {
+		if ( is_array( $input ) &&  count( $input ) > 0 ) {
 			$this->set_grid_items( $input );
 		} else {
-			throw new Exception(__( 'This is not valid grid content' ), EXCHANGE_PLUGIN );
+			throw new Exception( __( 'This is not valid grid content', EXCHANGE_PLUGIN ) );
 		}
 
 	}
@@ -121,7 +121,8 @@ abstract class BaseGrid extends BasePattern {
 	 */
 	protected function create_grid_item( $item ) {
 		$item_mods = self::add_grid_modifiers( $item );
-		return new GridItem( $item, $this->base, $item_mods );
+		$grid_item = new GridItem( $item, $this->base, $item_mods );
+		return $grid_item;
 	}
 	/**
 	 * Add term modifiers to post before creating Pattern object.
@@ -144,7 +145,7 @@ abstract class BaseGrid extends BasePattern {
 		} elseif ( 'collaboration' === $type ) {
 			$tax_list = array( 'topic', 'location', 'discipline', 'output' );
 		}
-		if ( $tax_list ) {
+		if ( isset( $tax_list ) ) {
 			// Empty array to store 'all-purpose-tags'.
 			$tag_ids = array();
 			foreach ( $tax_list as $tax ) {

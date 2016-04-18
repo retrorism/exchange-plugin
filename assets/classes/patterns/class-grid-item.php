@@ -51,8 +51,8 @@ class GridItem extends BasePattern {
 	 *
 	 * @param array $input List of ACF fields.
 	 **/
-	protected function build_grid_item( $post, $modifiers ) {
-		$type = $modifiers['type'];
+	protected function build_grid_item( $post_object, $modifiers ) {
+		$type = $post_object->post_type;
 		if ( ! empty( $type ) && locate_template( 'parts/grid-' . $type . '.php' ) !== '') {
 			$template = $type;
 		} elseif ( locate_template( 'parts/grid-default.php' ) !== '') {

@@ -94,7 +94,7 @@ abstract class BasePattern {
 	protected function __construct( $input, $context = '', $modifiers = array() ) {
 
 		$this->set_basename();
-		$this->set_parent_and_base_class( $context );
+		$this->set_context_and_base_class( $context );
 
 		if ( ! empty( $modifiers ) ) {
 			$this->process_modifiers( $modifiers );
@@ -120,15 +120,15 @@ abstract class BasePattern {
 	 *
 	 * @param string $context Parent basename.
 	 **/
-	protected function set_parent_and_base_class( $context ) {
+	protected function set_context_and_base_class( $context ) {
 		if ( ! empty( $context ) ) {
-			$this->parent = $context;
+			$this->context = $context;
 			// Add generic story element class for all direct children of a section.
-			if ( 'section' === $this->parent ) {
+			if ( 'section' === $this->context ) {
 				$this->classes[] = 'section__slice';
 				$this->classes[] = $this->base;
 			} else {
-				$this->classes[] = $this->parent . '__' . $this->base;
+				$this->classes[] = $this->context . '__' . $this->base;
 			}
 		} else {
 			// Fallback to setting generic class element.
@@ -367,13 +367,23 @@ abstract class BasePattern {
 	}
 
 	/**
-	 * Prints escaped pattern output. Make sure not to escape anywhere else.
+	 * Prints escaped pattern output. Make sure to escape anywhere else.
 	 *
 	 * @since 0.1.0
 	 * @access public
 	 **/
 	public function publish() {
-		echo $this->output;
+		echo $this->output . PHP_EOL;
+	}
+
+	/**
+	 * Prints untagged.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 **/
+	public function publish_stripped() {
+		echo strip_tags( $this->output, '<div><p><em>' ) . PHP_EOL;
 	}
 
 

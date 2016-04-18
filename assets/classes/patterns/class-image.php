@@ -99,7 +99,7 @@ class Image extends BasePattern {
 	public function __construct( $input, $context = '', $modifiers = array() ) {
 		Parent::__construct( $input, $context, $modifiers );
 
-		$this->set_image_properties( $input, $modifiers );
+		$this->set_image_properties( $input, $context, $modifiers );
 
 		$this->output_tag_open( 'figure' );
 		$this->output .= $this->build_image_element();
@@ -124,7 +124,7 @@ class Image extends BasePattern {
 	 * @param array $input ACF input, consisting of image araray.
 	 * @param array $modifiers List of modifiers received from sibling classes.
 	 **/
-	protected function set_image_properties( $input, $context ) {
+	protected function set_image_properties( $input, $context, $modifiers ) {
 		$h = $input['height'];
 		$w = $input['width'];
 		// Get orientation and validate with actual height and width.

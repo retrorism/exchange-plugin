@@ -31,10 +31,7 @@ function tandem_hex_to_slug( $hex ) {
 }
 
 function tandem_create_link( $obj ) {
-	if ( is_object( $obj ) && 'WP_Post' === get_class( $obj ) ) {
-		$url = get_permalink( $obj );
-		$title = $obj->post_title;
-	} else {
+	if ( BaseController::is_correct_content_type( $obj ) ) {
 		$url = $obj->link;
 		$title = $obj->title;
 	}

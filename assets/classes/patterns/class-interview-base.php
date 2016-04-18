@@ -34,9 +34,9 @@ abstract class BaseInterview extends BasePattern {
 	 **/
 	public function __construct( $input, $context = '', $modifiers = array() ) {
 		Parent::__construct( $input, $context, $modifiers );
-		$this->output_tag_open('section');
+		$this->output_tag_open();
 		$this->output .= $this->build_interview( $input ) . PHP_EOL;
-		$this->output_tag_close('section');
+		$this->output_tag_close();
 	}
 
 }

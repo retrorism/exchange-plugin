@@ -84,10 +84,11 @@ function tandem_auto_load( $class ) {
 
 	if ( null === $classes ) {
 		$classes = array(
-			'participant'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-participant.php',
+			'exchange'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-exchange-base.php',
 			'story'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-story.php',
 			'collaboration'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-collaboration.php',
 			'programmeround'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-programme-round.php',
+			'participant'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-participant.php',
 
 			'basepattern' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-pattern-base.php',
 			'basegrid' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-grid-base.php',

@@ -23,37 +23,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 0.1.0
  **/
-class Collaboration {
+class Collaboration extends Exchange {
 
 	/**
-	 * Contains a reference to the Collaboration controller, once instantiated.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 * @var object $controller Collaboration controller.
-	 **/
-	public $controller;
-
-	/**
-	 * Title.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 * @var string Title.
-	 **/
-	public $title;
-
-	/**
-	 * The permalink.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 * @var string Link.
-	 **/
-	public $link;
-
-	/**
-	 * The programme round this collaboration happened in.
+	 * The programme round this collaboration was a part of.
 	 *
 	 * @since 0.1.0
 	 * @access public
@@ -67,24 +40,11 @@ class Collaboration {
 	 * @since 0.1.0
 	 * @access public
 	 * @param object $post Collaboration post object.
+	 * @param string $context Optional. Added context for modifications.
+	 * @param object $controller Optional. Add existing controller if you want.
 	 **/
-	public function __construct( $postobj, $controller = null ) {
-		$this->set_controller( $controller );
-		$this->controller->map_collaboration( $this, $postobj );
-	}
-
-	/**
-	 * Set controller property to a new instance of Collaboration controller.
-	 *
-	 * @since 0.1.0
-	 * @access private
-	 * @param object $controller Controller object (or null);
-	 **/
-	private function set_controller( $controller ) {
-		if ( null === $controller || 'collaborationcontroller' !== get_class( $controller ) ) {
-			$this->controller = new CollaborationController();
-		} else {
-			$this->controller = $controller;
-		}
+	public function __construct( $post, $context = '', $controller = null ) {
+		Parent::__construct( $post, $context, $controller );
+		$this->controller->map_collaboration_basics( $this, $post );
 	}
 }

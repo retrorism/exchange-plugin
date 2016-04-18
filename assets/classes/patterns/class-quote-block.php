@@ -61,8 +61,8 @@ class BlockQuote extends BasePattern {
 			$source_info = $input['bquote_source_info'];
 
 			// Open element.
-			$this->output_tag_open( 'blockquote' );
-			$this->output .= '<p>' . $input['bquote_text'] . '</p>';
+			$this->output_tag_open();
+			$this->output .= '<blockquote>' . $input['bquote_text'] . '</blockquote>';
 
 			// Prepare caption.
 			if ( ! empty( $source_ind ) || ! empty( $source_info ) ) {
@@ -73,7 +73,7 @@ class BlockQuote extends BasePattern {
 			}
 
 			// Close element.
-			$this->output_tag_close( 'blockquote' );
+			$this->output_tag_close();
 		}
 	}
 

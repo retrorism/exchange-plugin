@@ -40,9 +40,9 @@ class SubHeader extends BasePattern {
 	public function __construct( $input, $context = '', $modifiers = array() ) {
 		Parent::__construct( $input, $context, $modifiers );
 
-		$this->output_tag_open( 'header' );
+		$this->output_tag_open();
 		$this->output .= '<h3>' . $input . '</h3>' . PHP_EOL;
-		$this->output_tag_close( 'header' );
+		$this->output_tag_close();
 
 	}
 }

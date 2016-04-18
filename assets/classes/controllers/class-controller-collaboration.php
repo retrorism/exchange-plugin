@@ -46,26 +46,25 @@ class CollaborationController extends BaseController {
 		}
 	}
 
-	public function map_collaboration( $collaboration, $postobj ) {
-		$post_id = $postobj->ID;
-		if ( ! ( $post_id >= 1 ) || ! ( 'collaboration' === $postobj->post_type  ) ) {
+	public function map_collaboration_basics( $collaboration, $post ) {
+
+		if ( $post->post_parent >= 1 ) {
+			$this->set_programme_round( $collaboration, $post->post_parent );
+		}
+
+	}
+
+	public function map_full_collaboration( $collaboration, $post ) {
+		$post_id = $collaboration->post_id;
+		if ( ! ( $post_id >= 1 ) || ! ( 'collaboration' === $collaboration->post_type  ) ) {
 			unset( $collaboration );
 			throw new Exception( 'This is not a valid collaboration' );
 		}
 		// Dump ACF variables.
-		$acf = get_fields( $post_id );
-		$link = get_permalink( $post_id );
+		$acf_related_content = get_field( 'related_content', $post_id );
 
-		if ( ! empty( $postobj->post_title ) ) {
-			$collaboration->title = $postobj->post_title;
-		}
-
-		if ( $postobj->post_parent >= 1 ) {
-			$this->set_programme_round( $collaboration, $postobj->post_parent );
-		}
-
-		if ( !empty( $link ) ) {
-			$collaboration->link = $link;
+		if ( is_array( $acf_related_content ) && ! empty( $acf_related_content ) ) {
+			$this->set_related_content_grid( $collaboration, $acf_related_content );
 		}
 	}
 

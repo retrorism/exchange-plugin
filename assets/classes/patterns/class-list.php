@@ -42,9 +42,11 @@ class BaseList extends BasePattern {
 	public function __construct( $input, $context = '', $modifiers = array() ) {
 		Parent::__construct( $input, $context, $modifiers );
 
-		$this->output_tag_open( 'ul' );
+		$this->output_tag_open();
+		$this->output .='<ul>';
 		$this->output .= $this->build_list( $input['list_items'] ) . PHP_EOL;
-		$this->output_tag_close( 'ul' );
+		$this->output .='<ul>';
+		$this->output_tag_close();
 	}
 
 	/**
