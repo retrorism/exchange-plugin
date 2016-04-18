@@ -13,11 +13,15 @@
         "homepage": "http://www.somtijds.nl"
       }
     ],
-    "version": "0.1.0",
     "type": "wordpress-plugin",
     "source": {
         "url": "https://github.com/retrorism/exchange-plugin.git",
         "type": "git",
         "reference": "dev-master"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+        }
     }
 }
