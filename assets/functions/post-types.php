@@ -46,7 +46,7 @@ function tandem_create_story() {
 		'labels'              => $labels,
 		'has_archive'         => true,
 		'menu_icon'           => 'dashicons-book',
-		'menu_position'       => 1,
+		'menu_position'       => 11, // Dashboard is 2, Separator 4, Posts = 5, Media = 10,
 		'public'              => true,
 		'exclude_from_search' => false,
 		'capability_type'     => 'post',
@@ -83,7 +83,7 @@ function tandem_create_collaboration() {
 		'labels' => $labels,
 		'has_archive' => true,
 		'menu_icon' => 'dashicons-editor-paste-text',
-		'menu_position' => 2,
+		'menu_position' => 12,
 		'public' => true,
 		'hierarchical' => true,
 		// Other items that are available for this array: 'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'.
@@ -122,7 +122,7 @@ function tandem_create_participant() {
 		'labels'              => $labels,
 		'has_archive'         => false,
 		'menu_icon'           => 'dashicons-groups',
-		'menu_position'       => 4,
+		'menu_position'       => 13,
 		'public'              => true,
 		// Other items that are available for this array: 'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'.
 		'supports'            => array( 'title' ),
@@ -157,7 +157,7 @@ function tandem_create_programme_round() {
 		'labels'              => $labels,
 		'has_archive'         => true,
 		'menu_icon'           => 'dashicons-chart-pie',
-		'menu_position'       => 5,
+		'menu_position'       => 14,
 		'public'              => true,
 		'hierarchical'        => true,
 		// Supports can hold: 'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'.

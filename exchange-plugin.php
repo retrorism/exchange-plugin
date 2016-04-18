@@ -2,17 +2,16 @@
 /**
  * Plugin for Tandem Exchange WordPress theme
  *
- * @link    http//github.com/retrorism/exchange
+ * @link    https://github.com/retrorism/exchange-plugin
  * @package Exchange Plugin
  * @version 0.1.0
  *
- * Plugin Name: Tandem
- * Plugin URI:  http://www.badjo.nl/plugins/exchange-plugin/
+ * Plugin Name: Exchange Plugin
+ * Plugin URI:  https://github.com/retrorism/exchange-plugin
  * Description: This plugin adds all necessary functionality for the Exchange Theme
- * Author:      Bart Bloemers
- * Author:      Willem Prins
+ * Author:      Bart Bloemers & Willem Prins
  * Version:     0.1.0
- * Author URI:  http://www.badjo.nl/
+ * Author URI:  http://www.somtijds.nl
  **/
 
 if ( ! function_exists( 'add_filter' ) ) {

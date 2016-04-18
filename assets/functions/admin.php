@@ -22,6 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_action( 'admin_menu', 'tandem_add_and_remove_menu_options' );
 add_action( 'admin_menu', 'tandem_register_settings');
 add_action( 'admin_menu', 'tandem_add_options_page');
+add_action( 'admin_init', 'set_admin_menu_separator' );
 
 /* Hook meta boxes to the 'story' and 'collaboration' post types. */
 // add_action( 'add_meta_boxes_story', 'tandem_add_meta_boxes_for_story' );
@@ -31,6 +32,33 @@ function tandem_admin_enqueue_scripts() {
 	wp_enqueue_script( 'tandem-admin-js', plugin_dir_url( EXCHANGE_PLUGIN_FILE )  . '/assets/js/tandem_admin.js', array(), '0.1.0', true );
 }
 
+/* https://github.com/tommcfarlin/WordPress-Custom-Menu-Separator */
+function set_admin_menu_separator() {
+	global $menu;
+	// Replace Media Upload item nothing and surround the Pages item with separators.
+	$separators = array( 19 );
+	foreach ( $separators as $sep_position ) {
+		$menu [ $sep_position ] = array(
+			0	=>	'',							// The text of the menu item
+			1	=>	'read',						// Permission level required to view the item
+			2	=>	'separator' . $sep_position,	// The ID of the menu item
+			3	=>	'',							// Empty by default.
+			4	=>	'wp-menu-separator'			// Custom class names for the menu item
+		);
+	};
+	unset( $menu[ 10 ] );
+	$menu[ 3 ] = array(
+		0 => 'Media',
+		1 => 'upload_files',
+		2 => 'upload.php',
+		3 => '',
+		4 => 'menu-top menu-icon-media menu-top-first',
+		5 => 'menu-media',
+		6 => 'dashicons-admin-media',
+	);
+	ksort( $menu );
+}
+
 function tandem_add_and_remove_menu_options() {
 	if ( ! current_user_can( 'edit_file') ) {
 		remove_menu_page( 'edit.php' ); // Remove Posts editor from menu for editors.
@@ -38,6 +66,8 @@ function tandem_add_and_remove_menu_options() {
 	}
 
 	remove_meta_box( 'categorydiv', 'story', 'side');
+
+ // end set_admin_menu_separator
 	// add_submenu_page(
 	// 	'edit.php?post_type=story',
 	// 	'Languages',
