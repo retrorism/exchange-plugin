@@ -86,7 +86,7 @@ function tandem_auto_load( $class ) {
 			'exchange'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-exchange-base.php',
 			'story'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-story.php',
 			'collaboration'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-collaboration.php',
-			'programmeround'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-programme-round.php',
+			'programme_round'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-programme-round.php',
 			'participant'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-participant.php',
 
 			'basepattern' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-pattern-base.php',
@@ -114,12 +114,14 @@ function tandem_auto_load( $class ) {
 			'button' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-button.php',
 			'blocklist' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-block-list.php',
 			'imagesvg' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-image-svg.php',
+			'tag' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-tag.php',
+
 
 			'basecontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-base.php',
 			'storycontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-story.php',
 			'participantcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-participant.php',
 			'collaborationcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-collaboration.php',
-			'programmeroundcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-programme-round.php',
+			'programme_roundcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-programme-round.php',
 
 		);
 	}

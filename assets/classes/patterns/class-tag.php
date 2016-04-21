@@ -45,12 +45,13 @@ class Tag extends BasePattern {
 	 **/
 	 public function __construct( $input, $context = '', $modifiers = array() ) {
  		Parent::__construct( $input, $context, $modifiers );
-		$el = 'span';
-		if ( ! empty( $modifiers['link_attributes'] ) ) {
+		if ( 'grid' === $context ) {
+			$el = 'span';
+		} else {
 			$el = 'a';
 		}
  		$this->output_tag_open( $el );
- 		$this->output .= $input['Tag_text'];
+ 		$this->output .= $input->name;
  		$this->output_tag_close( $el );
  		// End construct.
  	}

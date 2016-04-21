@@ -16,21 +16,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 };
 
 /* Hook taxonomy creation to init. */
-add_action( 'init', 'tandem_connect_category_to_story' );
-add_action( 'init', 'tandem_create_tax_language' );
-add_action( 'init', 'tandem_create_tax_location' );
-add_action( 'init', 'tandem_create_tax_topic' );
-add_action( 'init', 'tandem_create_tax_discipline' );
-add_action( 'init', 'tandem_create_tax_methodology' );
-add_action( 'init', 'tandem_create_tax_output' );
+add_action( 'init', 'exchange_connect_category_to_story' );
+add_action( 'init', 'exchange_create_tax_language' );
+add_action( 'init', 'exchange_create_tax_location' );
+add_action( 'init', 'exchange_create_tax_topic' );
+add_action( 'init', 'exchange_create_tax_discipline' );
+add_action( 'init', 'exchange_create_tax_methodology' );
+add_action( 'init', 'exchange_create_tax_output' );
+
+add_action( 'save_post_programme_round', 'exchange_create_tax_for_programme_round', 10, 3 );
 
 
-function tandem_connect_category_to_story() {
+
+function exchange_connect_category_to_story() {
 	register_taxonomy_for_object_type( 'category', 'story' );
 }
 
 // Register language as taxonomy.
-function tandem_create_tax_language() {
+function exchange_create_tax_language() {
 	register_taxonomy(
 		'language',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
 		'story',	// Post type name.
@@ -56,7 +59,7 @@ function tandem_create_tax_language() {
 }
 
 // Register theme as taxonomy.
-function tandem_create_tax_topic() {
+function exchange_create_tax_topic() {
 	register_taxonomy(
 		'topic',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
 		array( 'collaboration', 'story' ), // Post type name.
@@ -80,7 +83,7 @@ function tandem_create_tax_topic() {
 }
 
 // Register methodologies as taxonomy.
-function tandem_create_tax_methodology() {
+function exchange_create_tax_methodology() {
 	register_taxonomy(
 		'methodology',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
 		array( 'collaboration' ), // Post type name.
@@ -103,7 +106,7 @@ function tandem_create_tax_methodology() {
 }
 
 // Register discipline as taxonomy.
-function tandem_create_tax_discipline() {
+function exchange_create_tax_discipline() {
 	register_taxonomy(
 		'discipline',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
 		array( 'collaboration' ),	// Post type name.
@@ -129,7 +132,7 @@ function tandem_create_tax_discipline() {
 }
 
 // Register output as taxonomy.
-function tandem_create_tax_output() {
+function exchange_create_tax_output() {
 	register_taxonomy(
 		'output', // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
 		'collaboration', // Post type name.
@@ -152,7 +155,7 @@ function tandem_create_tax_output() {
 }
 
 // Register location as taxonomy.
-function tandem_create_tax_location() {
+function exchange_create_tax_location() {
 	register_taxonomy(
 		'location',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
 		array( 'collaboration', 'story' ), // Post type name.
@@ -174,4 +177,21 @@ function tandem_create_tax_location() {
 	);
 }
 
-// Connect taxonomies to story and collab CPTs
+// Add taxonomies by checking against a sluggified $term name.
+function add_taxo( $taxonomy, $term ) {
+	$term_id = term_exists( htmlspecialchars( $term ), $taxonomy );
+	if ( $term_id > 0 ) {
+		//echo "existing term found";
+		return $term_id;
+	} else {
+		//echo "adding " . $term . " to " . $taxonomy ;
+		$result = wp_insert_term( htmlspecialchars( $term ), $taxonomy );
+	}
+}
+
+
+// Create a new term when a new programme round is saved.
+function exchange_create_tax_for_programme_round( $post_id, $post, $update ) {
+	$name = $post->post_title;
+	add_taxo( 'topic', $name );
+};

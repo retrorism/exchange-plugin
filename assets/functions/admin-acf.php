@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Add_action( 'save_post_participant', 'save_post_participant_meta', 10, 3 );
 // Vervangen door onderststaande functie.
 add_action( 'acf/save_post', 'save_post_with_each_acf_update', 20 );
-add_action( 'acf/input/admin_head', 'tandem_change_acf_color_picker' );
+add_action( 'acf/input/admin_head', 'exchange_change_acf_color_picker' );
 
 /**
  * Save post metadata when a post is saved.
@@ -67,22 +67,22 @@ function save_post_with_each_acf_update( $post_id ) {
 	}
 }
 
-function tandem_change_acf_color_picker() {
+function exchange_change_acf_color_picker() {
 
 	$client_colors_bg_array = array();
 	$client_colors_accents_array = array();
 	$client_colors_boxes_array = array();
 
 	foreach ( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['bg'] as $value ) {
-	$client_colors_bg_array[] = '#'.$value;
+		$client_colors_bg_array[] = '#'.$value;
 	}
 
 	foreach ( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['accents'] as $value ) {
-	$client_colors_accents_array[] = '#'.$value;
+		$client_colors_accents_array[] = '#'.$value;
 	}
 
 	foreach ( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['boxes'] as $value ) {
-	$client_colors_boxes_array[] = '#'.$value;
+		$client_colors_boxes_array[] = '#'.$value;
 	}
 
 	$client_colors_bg_jquery = json_encode($client_colors_bg_array);

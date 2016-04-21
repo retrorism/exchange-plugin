@@ -50,7 +50,7 @@ function tandem_create_story() {
 		'public'              => true,
 		'exclude_from_search' => false,
 		'capability_type'     => 'post',
-		'supports'            => array( 'title', 'thumbnail', 'revisions' ),
+		'supports'            => array( 'title', 'editor', 'thumbnail', 'revisions' ),
 		'taxonomies'          => array( 'category' ),
 		'rewrite'             => array( 'slug' => 'stories' ),
 		// Removed 'taxonomies' => array( 'category','post_tag').
@@ -87,7 +87,7 @@ function tandem_create_collaboration() {
 		'public' => true,
 		'hierarchical' => true,
 		// Other items that are available for this array: 'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'.
-		'supports' => array( 'title', 'thumbnail', 'revisions' ),
+		'supports' => array( 'title', 'thumbnail', 'editor', 'revisions' ),
 		// Removed: 'taxonomies' => array( 'output', 'theme', 'discipline' ).
 		'exclude_from_search' => false,
 		'capability_type' => 'post',
@@ -161,7 +161,7 @@ function tandem_create_programme_round() {
 		'public'              => true,
 		'hierarchical'        => true,
 		// Supports can hold: 'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'.
-		'supports'            => array( 'title','editor' ),
+		'supports'            => array( 'title','editor', 'thumbnail' ),
 		'exclude_from_search' => false,
 		'capability_type'     => 'page',
 		'rewrite'             => array( 'slug' => 'programme-rounds' ),

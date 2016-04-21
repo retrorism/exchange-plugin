@@ -120,8 +120,9 @@ abstract class BaseGrid extends BasePattern {
 	 * @param integer $item Post object to be represented by grid item.
 	 */
 	protected function create_grid_item( $item ) {
-		$item_mods = self::add_grid_modifiers( $item );
-		$grid_item = new GridItem( $item, $this->base, $item_mods );
+		$exchange = BaseController::exchange_factory( $item, 'grid' );
+		$item_mods = self::add_grid_modifiers( $exchange );
+		$grid_item = new GridItem( $exchange, $this->base, $item_mods );
 		return $grid_item;
 	}
 	/**
@@ -133,49 +134,36 @@ abstract class BaseGrid extends BasePattern {
 	 * @return array $modifiers Modifiers with / without updated term list.
 	 */
 
-	public static function add_grid_modifiers( $post, $modifiers = array() ) {
+	public static function add_grid_modifiers( $exchange, $modifiers = array() ) {
 		if ( ! is_array( $modifiers ) ) {
 			throw Exception( __( 'This is not a valid modifiers array' ) );
 		}
-		$type = $post->post_type;
-		$modifiers['type'] = $type;
-		$modifiers['data']['date'] = $post->post_date;
-		if ( 'story' ===  $type ) {
-			$tax_list = array( 'topic', 'location', 'language', 'category' );
-		} elseif ( 'collaboration' === $type ) {
-			$tax_list = array( 'topic', 'location', 'discipline', 'output' );
-		}
-		if ( isset( $tax_list ) ) {
+		$modifiers['type'] = $exchange->type;
+		$modifiers['data']['date'] = $exchange->date;
+		if ( $exchange->has_tags ) {
 			// Empty array to store 'all-purpose-tags'.
 			$tag_ids = array();
-			foreach ( $tax_list as $tax ) {
-				$terms = get_the_terms( $post->ID, $tax );
-				if ( is_array( $terms ) && count( $terms ) > 0 ) {
-					// Check if data key already exists to prevent overwriting.
-					if ( ! array_key_exists( 'data', $modifiers ) ) {
-						$modifiers['data'] = array();
-					}
-					foreach ( $terms as $term ) {
-						switch ( $term->taxonomy ) {
-							case 'language':
-							case 'category':
-							case 'location':
-								$modifiers['data'][ $term->taxonomy ] = $term->term_id;
-								break;
-							case 'topic':
-							case 'discipline':
-							case 'output':
-								$tag_ids[] = $term->term_id;
-								break;
-						}
-					}
-
+			if ( ! array_key_exists( 'data', $modifiers ) ) {
+				$modifiers['data'] = array();
+			}
+			foreach ( $exchange->tag_list as $term ) {
+				switch ( $term->taxonomy ) {
+					case 'language':
+					case 'category':
+					case 'location':
+						$modifiers['data'][ $term->taxonomy ] = $term->term_id;
+						break;
+					case 'topic':
+					case 'discipline':
+					case 'output':
+						$tag_ids[] = $term->term_id;
+						break;
 				}
 			}
 			if ( count( $tag_ids ) > 0 ) {
 				$modifiers['data']['tags'] = implode(',', $tag_ids );
 			}
 		}
-	return $modifiers;
+		return $modifiers;
 	}
 }

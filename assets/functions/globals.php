@@ -43,6 +43,19 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 			/* 'hq-norm' => 381024,  756 * 504 */
 			'hq-norm'       => 393216, /* 768 * 512 */
 			'size-in-story' => 'medium_large',
+			'fallback_image_att_id' => 970,
+		),
+		'TAXONOMIES' => array(
+			// Priority in taxonomy types, listed by ACF Field label.
+			'display_priority' => array(
+				1 => 'topics',
+				2 => 'disciplines',
+				3 => 'methodologies',
+				4 => 'outputs',
+				5 => 'locations',
+			),
+			// Maximum number of tags on grid items
+			'grid_tax_max' => 3,
 		),
 	);
 }

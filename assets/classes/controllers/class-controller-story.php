@@ -30,15 +30,15 @@ class StoryController extends BaseController {
 	 * @since 0.1.0
 	 * @access public
 	 *
-	 * @param object $story Newly instantiated Story class object.
+	 * @param object $this->container Newly instantiated Story class object.
 	 * @param object $post Story post object.
 	 *
 	 * @throws Exception When no valid post ID is presented.
 	 **/
-	public function map_story_basics( $story, $post ) {
+	public function map_story_basics() {
 
 		// Retrieve post_id variable.
-		$post_id = $story->post_id;
+		$post_id = $this->container->post_id;
 
 		// Map ACF variables.
 		$acf_editorial_intro = get_field( 'editorial_intro', $post_id );
@@ -48,28 +48,28 @@ class StoryController extends BaseController {
 
 		// Set editorial introduction.
 		if ( ! empty( $acf_editorial_intro ) ) {
-			$story->has_editorial_intro = true;
-			$story->editorial_intro = new EditorialIntro( $acf_editorial_intro, 'story' );
+			$this->container->has_editorial_intro = true;
+			$this->container->editorial_intro = new EditorialIntro( $acf_editorial_intro, 'story' );
 		}
 
 		// Set language.
 		if ( is_object( $acf_language ) ) {
 			if ( 'WP_Term' === get_class( $acf_language ) ) {
-				$story->language = $acf_language->name;
+				$this->container->language = $acf_language->name;
 			}
 		}
 
 		// Set category.
 		if ( is_object( $acf_category ) ) {
 			if ( 'WP_Term' === get_class( $acf_category ) ) {
-				$story->category = $acf_category->name;
+				$this->container->category = $acf_category->name;
 			}
 		}
 
 		// Set participant.
 		if ( is_object( $acf_storyteller ) ) {
 			if ( 'WP_Post' === get_class( $acf_storyteller ) && $acf_storyteller->post_type = 'participant' ) {
-				$story->storyteller = new Participant( $acf_storyteller );
+				$this->container->storyteller = new Participant( $acf_storyteller );
 			}
 		}
 	}
@@ -79,24 +79,22 @@ class StoryController extends BaseController {
 	 * @since 0.1.0
 	 * @access public
 	 *
-	 * @param object $story Newly instantiated Story class object.
-	 * @param object $post Story post object.
-	 *
 	 * @throws Exception When no valid post ID is presented.
+	 * @return void;
 	 **/
-	public function map_full_story( $story, $post ) {
+	public function map_full_story() {
 
 		// Retrieve post_id variable from basic mapping.
-		$post_id = $story->post_id;
+		$post_id = $this->container->post_id;
+
 
 		// Throw Exception when the input is not a valid story post type object.
 		if ( ! ( $post_id >= 1 ) ) {
-			unset( $story );
+			unset( $this->container );
 			throw new Exception( 'This is not a valid post' );
 		}
 
 		$acf_sections = get_field( 'sections', $post_id );
-		$acf_header_image = get_field( 'header_image', $post_id );
 		$acf_related_content = get_field( 'related_content', $post_id );
 
 		if ( is_array( $acf_related_content ) && ! empty( $acf_related_content ) ) {
@@ -113,47 +111,56 @@ class StoryController extends BaseController {
 				}
 			}
 			if ( count( $related_content ) > 0 ) {
-				$story->has_related_content = true;
-				$this->set_related_content_grid( $story, $related_content );
+				$this->container->has_related_content = true;
+				$this->set_related_content_grid( $this->container, $related_content );
 			}
 		}
 
 		// Set sections.
 		if ( ! empty( $acf_sections ) ) {
-			$story->sections = $acf_sections;
+			$this->container->sections = $acf_sections;
 		}
 
 		// Set header image.
-		if ( 'none' !== $acf_header_image ) {
-			$story->header_image = $this->get_header_image( $acf_header_image, $post_id );
-			$story->has_header_image = true;
+		$this->set_header_image( $post_id );
+
+		$this->set_byline();
+	}
+
+
+	protected function get_header_image_source( $post_id ) {
+		return get_field( 'header_image' );
+	}
+
+	protected function get_header_image( $post_id ) {
+		switch ( $this->get_header_image_source( $post_id ) ) {
+			case 'upload_new_image':
+				$thumb = get_field( 'upload_header_image', $post_id );
+				break;
+			case 'use_featured_image':
+			default:
+				$thumb_id = get_post_thumbnail_id( $post_id );
+				// Use ACF function to create array for Image object constructor.
+				$thumb = acf_get_attachment( $thumb_id );
+				break;
 		}
-
-		$this->set_byline( $story );
-
-		return $story;
+		if ( is_array( $thumb ) ) {
+			return new Image( $thumb, 'header' );
+		}
 	}
 
 	/**
-	 * Retrieves and attaches header image to story
+	 * Attaches header image to story
 	 *
 	 * @param string $acf_header_image Advanced Custom Fields Header selection option
 	 * @param integer $post_id.
 	 * @return HeaderImage object or null
 	 */
-	protected function get_header_image( $acf_header_image, $post_id ) {
-		switch ( $acf_header_image ) {
-			case 'use_featured_image':
-				// Use ACF function to create array for Image object constructor.
-				$thumb = acf_get_attachment( get_post_thumbnail_id( $post_id ) );
-				break;
-			case 'upload_new_image':
-				$thumb = get_field( 'upload_header_image', $post_id );
-				break;
-			default: break;
-		}
-		if ( is_array( $thumb ) ) {
-			return new Image( $thumb, 'header' );
+	protected function set_header_image( $post_id ) {
+		$image = $this->get_header_image( $post_id );
+		if ( is_object( $image ) && is_a($image, 'Image') ) {
+			$this->container->header_image = $image;
+			$this->container->has_header_image = true;
 		}
 	}
 
@@ -314,28 +321,27 @@ class StoryController extends BaseController {
 	 * If storyteller is set, Replace placeholders in template with personal details connected to the storyteller.
 	 *
 	 * @since 0.1.0
-	 * @access public
-	 * @param story object
+	 * @access protected
 	 * @return string $byline Byline object built from byline template.
 	 **/
-	public function set_byline( $story ) {
-		if ( is_object( $story->storyteller ) && is_object( $story->storyteller->collaboration ) ) {
+	protected function set_byline() {
+		if ( is_object( $this->container->storyteller ) && is_object( $this->container->storyteller->collaboration ) ) {
 			$templates = $this->get_byline_templates();
 
-			if ( $story->storyteller->is_active ) {
+			if ( $this->container->storyteller->is_active ) {
 				$byline_template = $templates['present'];
 			} else {
 				$byline_template = $templates['past'];
 			}
-			$byline_template = str_replace( '[[storyteller]]', $story->storyteller->name, $byline_template );
-			$byline_template = str_replace( '[[programme_round]]', tandem_create_link( $story->storyteller->collaboration->programme_round ), $byline_template );
-			$byline = str_replace( '[[collaboration]]', tandem_create_link( $story->storyteller->collaboration ), $byline_template );
+			$byline_template = str_replace( '[[storyteller]]', $this->container->storyteller->name, $byline_template );
+			$byline_template = str_replace( '[[programme_round]]', tandem_create_link( $this->container->storyteller->collaboration->programme_round ), $byline_template );
+			$byline = str_replace( '[[collaboration]]', tandem_create_link( $this->container->storyteller->collaboration ), $byline_template );
 
-			$story->byline = new Byline( $byline, 'footer' );
+			$this->container->byline = new Byline( $byline, 'footer' );
 		}
 
 		else {
-			$story->byline = null;
+			$this->container->byline = null;
 		}
 	}
 }

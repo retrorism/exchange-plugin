@@ -42,11 +42,8 @@ class EmphasisBlock extends BasePattern {
 		if ( is_array( $input ) && count( $input ) > 0 ) {
 			$this->block_elements = $input;
 			$this->output_tag_open();
-			if ( 'cta_tandem' === $modifiers['type'] ) {
-				$this->output .= $this->build_cta_elements( $this->block_elements );
-			} elseif ( 'other' === $modifiers['type'] ) {
-				$this->output .= $this->build_block_elements( $this->block_elements );
-			}
+			$type = isset( $modifiers['type'] ) ? $modifiers['type'] : 'post-it';
+			$this->output .= $this->build_block_elements( $this->block_elements, $type );
 			$this->output_tag_close();
 		}
 	}
@@ -60,29 +57,31 @@ class EmphasisBlock extends BasePattern {
 	 *
 	 * @TODO proper Error notifications.
 	 **/
-	protected function build_cta_elements( $input ) {
-		// Check for CTA elements.
-		foreach ( $input as $e ) {
-			// Loop through elements.
-			switch ( $e['acf_fc_layout'] ) {
+	protected function build_block_elements( $block_elements, $type ) {
 
-				case 'block_graphic':
+		// Check for CTA elements.
+		foreach ( $block_elements as $e ) {
+			// Loop through elements.
+			$layout = str_replace($type, '', $e['acf_fc_layout'] );
+			switch ( $layout ) {
+
+				case '_block_graphic':
 					$image_mods = array();
-					$image = new ImageSVG( $e['select_block_graphic'],$this->base, $image_mods );
+					$image = new ImageSVG( $e[ $type . '_block_graphic_select' ],$this->base, $image_mods );
 					$this->output .= $image->embed();
 					break;
 
-				case 'block_paragraph':
-					$paragraph = new Paragraph( $e['block_paragraph_text'], $this->base );
+				case '_block_paragraph':
+					$paragraph = new Paragraph( $e[ $type . '_block_paragraph_text'], $this->base );
 					$this->output .= $paragraph->embed();
 					break;
 
-				case 'block_header':
-					$subheader = new SubHeader( $e['block_header_text'], $this->base );
+				case '_block_header':
+					$subheader = new SubHeader( $e[ $type . '_block_header_text'], $this->base );
 					$this->output .= $subheader->embed();
 					break;
 
-				case 'block_button':
+				case '_block_button':
 					$button_mods = array(
 						'link_attributes' => array(),
 						'data_attributes' => array(),
@@ -101,45 +100,6 @@ class EmphasisBlock extends BasePattern {
 					}
 					$button = new Button( $e, $this->base, $button_mods );
 					$this->output .= $button->embed();
-					break;
-
-				default:
-					$this->output .= ( 'Unknown layout' );
-					break;
-			}
-		}
-	}
-
-	/**
-	 * For each block element in array, embed the right pattern class instantiation.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param array $input List of ACF content elements for which different patterns have been selected.
-	 *
-	 * @TODO proper Error notifications.
-	 **/
-	protected function build_block_elements( $input ) {
-		// Check for Block elements.
-		foreach ( $input as $e ) {
-			// Loop through elements.
-			switch ( $e['acf_fc_layout'] ) {
-
-				case 'block_header':
-					$subheader = new SubHeader( $e['block_header'], $this->base );
-					$this->output .= $subheader->embed();
-					break;
-
-				case 'block_graphic':
-					$image_mods = array();
-					print_r( $e['select_block_graphic'] );
-					$image = new ImageSVG( $e['select_block_graphic'],$this->base, $image_mods );
-					$this->output .= $image->embed();
-					break;
-
-				case 'block_rich_text':
-					$list = new Paragraph( $e['block_rich_text_content'],$this->base );
-					$this->output .= $list->embed();
 					break;
 
 				default:

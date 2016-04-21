@@ -26,13 +26,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Story extends Exchange {
 
 	/**
-	 * Array to be filled with tags.
+	 * Ordered array for use in grid / single display.
 	 *
 	 * @since 0.1.0
 	 * @access public
-	 * @var array Tag-list.
+	 * @var array Ordered tag-list.
 	 **/
-	private $tag_list = array();
+	public $ordered_tag_list = array();
 
 	/**
 	 * Language.
@@ -53,15 +53,6 @@ class Story extends Exchange {
 	public $category;
 
 	/**
-	 * Header image.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 * @var Image $header_image Header image object.
-	 **/
-	public $header_image;
-
-	/**
 	 * Storyteller
 	 *
 	 * @since 0.1.0
@@ -69,15 +60,6 @@ class Story extends Exchange {
 	 * @var Participant object.
 	 **/
 	public $storyteller;
-
-	/**
-	 * Has header image.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 * @var Bool $has_header_image Set to true when header image is set.
-	 **/
-	public $has_header_image = false;
 
 	/**
 	 * Has editorial intro check
@@ -109,101 +91,35 @@ class Story extends Exchange {
 	 **/
 	public function __construct( $post, $context = '', $controller = null ) {
 		Parent::__construct( $post );
-		$this->controller->map_story_basics( $this, $post );
+		$this->controller->map_story_basics( $context );
 		if ( 'grid' === $context ) {
-			$this->controller->set_featured_image( $this, $post->ID );
+			$this->controller->set_featured_image();
+			$this->controller->set_ordered_tag_list();
 		} else {
-			$this->controller->map_full_story( $this, $post );
+			$this->controller->map_full_story();
 		}
 	}
 
 	/**
-	 * Set story properties.
+	 * Publish editorial intro, if available.
 	 *
-	 * @since 0.1.0
-	 * @access public
-	 **/
-
-	/**
-	 * Add tag to tag list, accompanied by its archive link.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 *
-	 * @param string $name Term name.
-	 * @param string $link Archive link.
-	 **/
-	public function add_tag( $name, $link ) {
-		$this->taglist[] = array(
-			'name' => $name,
-			'link' => $link,
-		);
-	}
-
-	/**
-	 * Returns all tags for this story.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 *
-	 * @return array $taglist List of tags.
-	 **/
-	public function get_tag_list() {
-		return $this->tag_list;
-	}
-
-	/**
-	 * Returns short list of tags (no more than 2) for this story.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 *
-	 * @return array $shortlist List of tags.
-	 *
-	 * @TODO Turn limit into theme option.
-	 **/
-	public function get_tag_short_list() {
-		$shortlist = array();
-
-		foreach ( $this->tag_list as $tag ) {
-			if ( count( $shortlist ) > 2 ) {
-				continue;
-			}
-
-			$shortlist[] = $tag;
-		}
-		return $shortlist;
-	}
-
-	public function publish_header_image() {
-		if ( null !== $this->header_image ) {
-			$this->header_image->publish();
-		}
-	}
-
-	public function publish_intro() {
+	 * @param string $context Optional. Context for the object.
+	 * @return void
+	 */
+	public function publish_intro( $context = '' ) {
 		if ( $this->has_editorial_intro ) {
 			$this->editorial_intro->publish();
 		}
 	}
 
+	/**
+	 * Publish byline
+	 *
+	 * @return void
+	 */
 	public function publish_byline() {
-		if ( null != $this->byline ) {
+		if ( isset( $this->byline ) ) {
 			$this->byline->publish();
-		}
-	}
-
-	public function publish_sections() {
-		// Loop through sections.
-		foreach( $this->sections as $s ) {
-			$section = new Section( $s, strtolower( get_class( $this ) ) );
-			$section->publish();
-		}
-	}
-
-	public function publish_related_content() {
-		if ( $this->has_related_content ) {
-			$this->related_content->publish();
 		}
 	}
 }

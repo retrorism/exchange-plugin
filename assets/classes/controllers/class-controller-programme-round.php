@@ -22,13 +22,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 0.1.0
  **/
-class ProgrammeRoundController extends BaseController {
+class Programme_RoundController extends BaseController {
 
-	public function map_programme_round( $programme_round, $postobj ) {
+	public function map_programme_round_full( $programme_round, $post_obj ) {
 
-		$post_id = $postobj->ID;
+		$post_id = $post_obj->ID;
 
-		if ( ! ( $post_id >= 1 ) || ! ( 'programme_round' === $postobj->post_type  ) ) {
+		if ( ! ( $post_id >= 1 ) || ! ( 'programme_round' === $post_obj->post_type  ) ) {
 			unset( $programme_round );
 			throw new Exception( 'This is not a valid programme round' );
 		}

@@ -125,13 +125,15 @@ class Image extends BasePattern {
 	 * @param array $modifiers List of modifiers received from sibling classes.
 	 **/
 	protected function set_image_properties( $input, $context, $modifiers ) {
-		$h = $input['height'];
-		$w = $input['width'];
-		// Get orientation and validate with actual height and width.
-		if ( is_int( $h ) && is_int( $w ) ) {
-			$this->set_image_orientation( $h, $w, $modifiers );
-			$this->set_image_quality( $h, $w );
-		};
+		if ( isset( $input['height'] ) ) {
+			$h = $input['height'];
+			$w = $input['width'];
+			// Get orientation and validate with actual height and width.
+			if ( is_int( $h ) && is_int( $w ) ) {
+				$this->set_image_orientation( $h, $w, $modifiers );
+				$this->set_image_quality( $h, $w );
+			}
+		}
 		// Default base size is story-portrait or story-landscape, switch to different sizes depending on context.
 		$image_size = 'story-' . $this->orientation;
 
@@ -143,7 +145,7 @@ class Image extends BasePattern {
 			}
 		}
 
-		// Set src_set from attachment_id.
+		//Set src_set from attachment_id.
 		if ( ! empty( $input['ID'] ) ) {
 			$this->src_set = wp_get_attachment_image_srcset( $input['ID'], $image_size );
 		}
@@ -245,20 +247,14 @@ class Image extends BasePattern {
 	 **/
 	protected function set_image_orientation( $h, $w, $modifiers ) {
 		// Check for orientation modifier.
-		if ( ! empty( $modifiers['orientation'] ) ) {
-			if ( 'portrait' === $modifiers['orientation'] ) {
-				$this->orientation = 'portrait';
-			} else {
-				$this->orientation = 'landscape';
-			}
-		}
-		// Calculate it from image dimensions otherwise.
-		if ( empty( $this->orientation ) ) {
-			if ( $h > $w ) {
-				$this->orientation = 'portrait';
-			} else {
-				$this->orientation = 'landscape';
-			}
+		if ( empty( $modifiers['orientation'] ) ) {
+			$this->orientation = $h > $w ?
+				'portrait' :
+				'landscape';
+		} else {
+			$this->orientation = 'portrait' === $modifiers['orientation'] ?
+				'portrait' :
+				'landscape';
 		}
 	}
 

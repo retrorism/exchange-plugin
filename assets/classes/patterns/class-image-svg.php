@@ -22,5 +22,5 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 0.1.0
  **/
-class ImageSVG extends Image {
+class ImageSVG extends BasePattern {
 }

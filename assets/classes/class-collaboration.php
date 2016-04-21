@@ -26,6 +26,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Collaboration extends Exchange {
 
 	/**
+	 * Ordered array for use in grid / single display.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var array Ordered tag-list.
+	 **/
+	public $ordered_tag_list = array();
+
+	/**
 	 * The programme round this collaboration was a part of.
 	 *
 	 * @since 0.1.0
@@ -45,6 +54,12 @@ class Collaboration extends Exchange {
 	 **/
 	public function __construct( $post, $context = '', $controller = null ) {
 		Parent::__construct( $post, $context, $controller );
-		$this->controller->map_collaboration_basics( $this, $post );
+		$this->controller->map_collaboration_basics( $post );
+		if ( 'grid' === $context ) {
+			$this->controller->set_featured_image();
+			$this->controller->set_ordered_tag_list();
+		} else {
+			$this->controller->map_full_collaboration();
+		}
 	}
 }

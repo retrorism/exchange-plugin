@@ -72,6 +72,51 @@ class Exchange {
 	public $has_featured_image = false;
 
 	/**
+	 * Header image.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var Image $header_image Header image object.
+	 **/
+	public $header_image;
+
+	/**
+	 * Has header image.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var Bool $has_header_image Set to true when header image is set.
+	 **/
+	public $has_header_image = false;
+
+	/**
+	 * Array to be filled with tags.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var array Tag-list.
+	 **/
+	public $tag_list = array();
+
+	/**
+	 * Has tags
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var Bool $has_tags Set to true when tags are set.
+	 **/
+	public $has_tags;
+
+	/**
+	 * List of sections.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var array $sections Sections list, built up out of pattern classes.
+	 **/
+	public $sections = array();
+
+	/**
 	 * Has related content check
 	 *
 	 * @since 0.1.0
@@ -117,11 +162,106 @@ class Exchange {
 		} else {
 			$this->controller = $controller;
 		}
+		$this->controller->set_container( $this );
 	}
 
 	public function publish_featured_image() {
 		if ( $this->has_featured_image ) {
 			$this->featured_image->publish();
+		}
+	}
+
+
+	// /**
+	//  * Add tag to tag list, accompanied by its archive link.
+	//  *
+	//  * @since 0.1.0
+	//  * @access public
+	//  *
+	//  * @param string $name Term name.
+	//  * @param string $link Archive link.
+	//  **/
+	// public function add_tag( $name, $link ) {
+	// 	$this->tag_list[] = array(
+	// 		'name' => $name,
+	// 		'link' => $link,
+	// 	);
+	// }
+
+	/**
+	 * Returns all tags for this story.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 *
+	 * @return array $taglist List of tags.
+	 **/
+	public function get_tag_list() {
+		return $this->tag_list;
+	}
+
+	/**
+	 * Returns short list of tags (no more than 2) for this story.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 *
+	 * @return array $shortlist List of tags.
+	 *
+	 * @TODO Expand selection options.
+	 **/
+	public function get_tag_short_list() {
+		$i = 0;
+		$shortlist = array();
+		$tax_order = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['display_priority'];
+		foreach ( $tax_order as $taxonomy ) {
+			if ( array_key_exists( $taxonomy, $this->ordered_tag_list ) ) {
+				foreach ( $this->ordered_tag_list[$taxonomy] as $term ) {
+					if ( $i < $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['grid_tax_max'] ) {
+						$shortlist[] = $term;
+						$i++;
+					} else {
+						continue 2;
+					}
+				}
+			}
+		}
+		return $shortlist;
+	}
+
+	public function publish_header_image() {
+		if ( null !== $this->header_image ) {
+			$this->header_image->publish();
+		}
+	}
+
+	public function publish_sections() {
+		if ( count( $this->sections ) > 0 ) {
+			// Loop through sections.
+			foreach( $this->sections as $s ) {
+				$section = new Section( $s, strtolower( get_class( $this ) ) );
+				$section->publish();
+			}
+		}
+	}
+
+	public function publish_related_content() {
+		if ( $this->has_related_content ) {
+			$this->related_content->publish();
+		}
+	}
+
+	public function publish_tags( $context = '' ) {
+		if ( $this->has_tags ) {
+			$output = "<ol>" . PHP_EOL;
+			$shortlist = $this->get_tag_short_list();
+			foreach ( $shortlist as $term ) {
+				$tag_mods = $this->controller->prepare_tag_modifiers( $term );
+				$tag = new Tag( $term, $context, $tag_mods );
+				$output .= "<li>" . $tag->embed() . "</li>" . PHP_EOL;
+			}
+			$output .= "</ol>" . PHP_EOL;
+			echo $output;
 		}
 	}
 }

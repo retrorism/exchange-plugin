@@ -158,17 +158,10 @@ class Section extends BasePattern {
 						case 'emphasis_block':
 							$block_mods = array();
 							$type = $e['block_type'];
-							if ( ! empty( $type ) ) {
+							if ( isset( $type ) && in_array( $type, array( 'cta','post-it', true ) ) ) {
 								$block_mods['type'] = $type;
-								if ( 'cta_tandem' === $type ) {
-									$input = $e['cta_elements'];
-									$colour = $e['cta_colour'];
-								} else {
-									$input = $e['block_elements'];
-									$colour = $e['post-it_colour'];
-								}
-								$block_mods['colour'] = $colour;
-								$emphasis_block = new EmphasisBlock( $input, $this->base, $block_mods );
+								$block_mods['colour'] = $e[ $type . '_colour'];
+								$emphasis_block = new EmphasisBlock( $e[ $type . '_block_elements'], $this->base, $block_mods );
 								$this->output .= $emphasis_block->embed();
 							}
 							break;

@@ -38,7 +38,6 @@ class GridItem extends BasePattern {
 	 public function __construct( $input, $context = '', $modifiers = array() ) {
  		Parent::__construct( $input, $context, $modifiers );
  		$this->output_tag_open();
-		$this->output .= '<hr />';
  		$this->output .= $this->build_grid_item( $input, $modifiers );
  		$this->output_tag_close();
  		// End construct.
@@ -51,10 +50,9 @@ class GridItem extends BasePattern {
 	 *
 	 * @param array $input List of ACF fields.
 	 **/
-	protected function build_grid_item( $post_object, $modifiers ) {
-		$type = $post_object->post_type;
-		if ( ! empty( $type ) && locate_template( 'parts/grid-' . $type . '.php' ) !== '') {
-			$template = $type;
+	protected function build_grid_item( $exchange, $modifiers ) {
+		if ( locate_template( 'parts/grid-' . $exchange->type . '.php' ) !== '') {
+			$template = $exchange->type;
 		} elseif ( locate_template( 'parts/grid-default.php' ) !== '') {
 			$template = 'default';
 		} else {

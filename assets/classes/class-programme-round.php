@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 0.1.0
  **/
-class ProgrammeRound extends Exchange {
+class Programme_Round extends Exchange {
 
 	/**
 	 * Constructor for Programme Round objects. If available, the constructor can use
@@ -36,11 +36,11 @@ class ProgrammeRound extends Exchange {
 	 **/
 	public function __construct( $post, $context = '', $controller = null ) {
 		Parent::__construct( $post, $context, $controller );
-		$this->controller->map_collaboration_round_basics( $this, $post );
+		$this->controller->map_basics( $this, $post );
 		if ( 'grid' === $context ) {
 			$this->controller->set_featured_image( $this, $post->ID );
 		} else {
-			$this->controller->map_programme_round( $this, $post );
+			$this->controller->map_programme_round_full( $this, $post );
 		}
 	}
 }

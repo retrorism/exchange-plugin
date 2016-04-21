@@ -46,32 +46,27 @@ class CollaborationController extends BaseController {
 		}
 	}
 
-	public function map_collaboration_basics( $collaboration, $post ) {
-
+	public function map_collaboration_basics( $post ) {
 		if ( $post->post_parent >= 1 ) {
-			$this->set_programme_round( $collaboration, $post->post_parent );
-		}
-
-	}
-
-	public function map_full_collaboration( $collaboration, $post ) {
-		$post_id = $collaboration->post_id;
-		if ( ! ( $post_id >= 1 ) || ! ( 'collaboration' === $collaboration->post_type  ) ) {
-			unset( $collaboration );
-			throw new Exception( 'This is not a valid collaboration' );
-		}
-		// Dump ACF variables.
-		$acf_related_content = get_field( 'related_content', $post_id );
-
-		if ( is_array( $acf_related_content ) && ! empty( $acf_related_content ) ) {
-			$this->set_related_content_grid( $collaboration, $acf_related_content );
+			$this->set_programme_round( $post->post_parent );
 		}
 	}
 
-	public function set_programme_round( $collaboration, $parent_id ) {
-		$context = get_post( $parent_id );
-		if ( 'programme_round' === $context->post_type ) {
-			$collaboration->programme_round = new ProgrammeRound( $context );
+	public function map_full_collaboration() {
+		$post_id = $this->container->post_id;
+
+		// // Dump ACF variables.
+		// $acf_related_content = get_field( 'related_content', $post_id );
+		//
+		// if ( is_array( $acf_related_content ) && count( $acf_related_content ) > 0 ) {
+		// 	$this->set_related_content_grid( $collaboration, $acf_related_content );
+		// }
+	}
+
+	public function set_programme_round( $parent_id ) {
+		$parent = get_post( $parent_id );
+		if ( 'programme_round' === $parent->post_type ) {
+			$this->container->programme_round = new Programme_Round( $parent );
 		}
 	}
 }

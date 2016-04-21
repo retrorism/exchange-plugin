@@ -27,6 +27,83 @@ if ( ! defined( 'ABSPATH' ) ) {
 class BaseController {
 
 	/**
+	 * Container - reference to the Exchange object that has instantiated this controller.
+	 *
+	 * @access protected
+	 * @var object $container This controller's container.
+	 */
+	protected $container;
+
+	/**
+	 * Attaches a reference to the instantiating object.
+	 *
+	 * @access public
+	 * @param object (reference);
+	 * @return void
+	 **/
+	public function set_container( $object ) {
+		if ( is_subclass_of( $object, 'Exchange', false ) ) {
+			$this->container = &$object;
+		}
+	}
+
+	/**
+	 * Checks the post type against a list of appropriate post types.
+	 *
+	 * Prevents the creation of grid items from non-content post types.
+	 * @access public
+	 * @param WP_Post $post_object WP_Post types passed in function.
+	 * @param string $type Optional. Class name to be checked against.
+	 * @return content type, if the post is right for content creation.
+	 **/
+	public static function is_correct_content_type( $post_object, $type = null ) {
+		if ( is_object( $post_object ) ) {
+			if ( 'WP_Post' === get_class( $post_object ) ) {
+				$allowed_types = array( 'story', 'collaboration', 'programme_round', 'page', 'grid_breaker' );
+				if ( in_array( $post_object->post_type, $allowed_types, true ) ) {
+					if ( $post_object->post_type === $type || null === $type ) {
+						return $post_object->post_type;
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Returns an Exchange class object based upon post type.
+	 *
+	 * @access public
+	 * @param WP_Post $post WP_Post types passed in function.
+	 * @param string $context Optional. Context in which the object will be instantiated.
+	 *
+	 * @throws Exception when wrong post type is supplied.
+	 **/
+	public static function exchange_factory( $post_object, $context = '' ) {
+		$type = self::is_correct_content_type( $post_object );
+		if ( ! empty( $type ) ) {
+			$args = array( $post_object, $context );
+			switch ( $type ) {
+				case 'collaboration':
+					return new Collaboration( ...$args );
+				case 'programme_round':
+					return new Programme_Round( ...$args );
+				case 'grid_breaker':
+					// Context grid is required for now.
+					if ( 'grid' === $context ) {
+						return new Grid_Breaker( ...$args );
+					}
+					break;
+				case 'story':
+				case 'page':
+				default:
+					return new Story( ...$args );
+			}
+		} else {
+			throw new Exception( __( 'The factory disagrees' ) );
+		}
+	}
+
+	/**
 	 * Set properties that need to be available for all content types and
 	 * can be mapped directly depend on the WP_Post.
 	 *
@@ -36,12 +113,10 @@ class BaseController {
 	 * @param object $post WP_post object to be mapped;
 	 *
 	 * @throws Exception when this is not the right content type.
-	 * @TODO Fix name for programme rounds
 	 **/
 	public function map_basics( $exchange, $post ) {
-
-		// Throw Exception when the input is not a valid exchange object.
-		if ( ! BaseController::is_correct_content_type( $post, strtolower( get_class( $exchange ) ) ) ) {
+		$class_lower = strtolower( get_class( $exchange ) );
+		if ( empty( self::is_correct_content_type( $post, $class_lower ) ) ) {
 			unset( $exchange );
 			throw new Exception( 'This is not a valid post' );
 		}
@@ -62,44 +137,38 @@ class BaseController {
 
 		// Set permalink.
 		$exchange->link = get_permalink( $post );
+
+		// Set tags.
+		$this->set_tag_list();
 	}
 
 	/**
-	 * Checks the post type against a list of appropriate post types.
+	 * Retrieves featured image to story (for example for use in grid views).
 	 *
-	 * Prevents the creation of grid items from non-content post types.
-	 * @access public
-	 * @param WP_Post $post WP_Post types passed in function.
-	 * @param string $type Optional. Class name to be checked against.
-	 * @return content type, if the post is right for content creation.
-	 **/
-	public static function is_correct_content_type( $post, $type = null ) {
-		if ( 'WP_Post' === get_class( $post ) ) {
-			$allowed_types = array( 'story', 'collaboration', 'programme_round', 'page', 'grid_breaker' );
-			if ( in_array( $post->post_type, $allowed_types, true ) ) {
-				if ( $post->post_type === $type || null === $type ) {
-					return $post->post_type;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Retrieves featured image to story for use in grids.
-	 *
-	 * @param string $acf_header_image Advanced Custom Fields Header selection option
 	 * @param integer $post_id.
-	 * @return Image object or null
+	 * @return null or Image object;
 	 **/
 	protected function get_featured_image( $post_id ) {
-		$thumb = acf_get_attachment( get_post_thumbnail_id( $post_id ) );
-		if ( is_array( $thumb ) ) {
-			return new Image( $thumb, '', array(
+		$thumb_props = $this->get_featured_image_props( $post_id );
+		if ( ! empty( $thumb_props ) ) {
+			return new Image( $thumb_props, '', array(
 				'context' => 'grid',
 			) );
 		} else {
-			return null;
+			echo "why is this empty?" . get_post( $post_id )->post_title;
 		}
+	}
+
+	protected function get_featured_image_props( $post_id ) {
+		if ( ! has_post_thumbnail( $post_id ) ) {
+			$thumb_props = acf_get_attachment( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['IMAGES']['fallback_image_att_id'] );
+		} else {
+			$thumb_id = get_post_thumbnail_id( $post_id );
+			if ( 'attachment' === get_post( $thumb_id )->post_type ) {
+				$thumb_props = acf_get_attachment( $thumb_id );
+			}
+		}
+		return $thumb_props;
 	}
 
 	/**
@@ -107,16 +176,109 @@ class BaseController {
 	 *
 	 * @param string $acf_header_image Advanced Custom Fields Header selection option
 	 * @param object $exchange Content type to attach featured image to.
-	 * @param integer $post_id.
+	 *
+	 * @return void.
 	 **/
-	 public function set_featured_image( $exchange, $post_id ) {
-		 $image = $this->get_featured_image( $post_id );
-		 if ( is_object( $image ) ) {
-			 $exchange->has_featured_image = true;
-			 $exchange->featured_image = $image;
-		 }
-	 }
+	public function set_featured_image() {
+		$image = $this->get_featured_image( $this->container->post_id );
+		if ( is_a( $image, 'Image' ) ) {
+			$this->container->has_featured_image = true;
+			$this->container->featured_image = $image;
+		}
+	}
 
+	/**
+	 * Retrieves tag list.
+	 *
+	 * @return array of tags or void.
+	 **/
+	protected function get_tag_list() {
+		$taxonomies = get_object_taxonomies( $this->container->type );
+		$term_results = array();
+		foreach ( $taxonomies as $taxonomy ) {
+			$tax_terms = get_the_terms( $this->container->post_id, $taxonomy );
+			if ( ! empty( $tax_terms ) ) {
+				$term_results = array_merge( $term_results, $tax_terms );
+			}
+		}
+		if ( count( $term_results ) > 0 ) {
+			return $term_results;
+		}
+	}
+
+	/**
+	 * Attaches tags.
+	 *
+	 * @param string $acf_header_image Advanced Custom Fields Header selection option
+	 * @param object $exchange Content type to attach featured image to.
+	 *
+	 * @return void.
+	 **/
+	protected function set_tag_list() {
+		$tag_list = $this->get_tag_list();
+		if ( $tag_list ) {
+			$this->container->tag_list = $tag_list;
+			$this->container->has_tags = true;
+		}
+	}
+
+	 /**
+	 * Sets ordered tag_list
+	 *
+	 * Retrieves WP Term objects and adds them to the Exchange object as a property
+	 *
+	 * @param object $exchange Exchange Content Type
+	 *
+	 * @return void.
+	 **/
+	protected function get_ordered_tag_list() {
+		$tax_list = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['display_priority'];
+
+		switch ( $this->container->type ) {
+			case 'story':
+				foreach( $tax_list as $taxonomy ) {
+					if ( $taxonomy === 'topics' || 'locations' ) {
+						$tax_results = get_field( $taxonomy, $this->container->post_id );
+						if ( $tax_results ) {
+							$results[$taxonomy] = $tax_results;
+						}
+					}
+				}
+				$results[] = $this->container->language;
+				break;
+			case 'collaboration':
+				$results[] = get_term_by( 'name', $this->container->programme_round->title, 'topic' );
+				foreach( $tax_list as $taxonomy ) {
+					$tax_results = get_field( $taxonomy, $this->container->post_id );
+					if ( $tax_results ) {
+						$results[$taxonomy] = $tax_results;
+					}
+				}
+				break;
+			default:
+				$results = false;
+				break;
+		}
+		if ( ! empty( $results ) ) {
+			return $results;
+		}
+	}
+
+	/**
+	 * Sets ordered tag list
+	 *
+	 * @param string $acf_header_image Advanced Custom Fields Header selection option
+	 * @param object $exchange Content type to attach featured image to.
+	 *
+	 * @return void.
+	 **/
+	public function set_ordered_tag_list() {
+		$ordered_tag_list = $this->get_ordered_tag_list();
+		if ( $ordered_tag_list ) {
+			$this->container->ordered_tag_list = $ordered_tag_list;
+			$this->container->has_tags = true;
+		}
+	}
 
 
 	/**
@@ -148,4 +310,23 @@ class BaseController {
 			$exchange->related_content = $grid;
 		}
 	}
+
+	public function prepare_tag_modifiers( $term ) {
+		if ( 'WP_Term' !== get_class( $term ) ) {
+			throw new Exception( __('This is not a valid tag') );
+		}
+		$desc = ! empty( $term->description ) ? $tag->description : $term->name;
+		$term_mods = array(
+				'data' => array(
+				'term_id'     => $term->term_id,
+			),
+			'link_attributes' => array(
+				'title'       => $desc,
+				'href'        => '#',
+			)
+		);
+		return $term_mods;
+	}
+
+
 }
