@@ -97,23 +97,9 @@ class StoryController extends BaseController {
 		$acf_sections = get_field( 'sections', $post_id );
 		$acf_related_content = get_field( 'related_content', $post_id );
 
-		if ( is_array( $acf_related_content ) && ! empty( $acf_related_content ) ) {
-			$related_content = array();
-			// Store post ID in the unique array so that it won't get added.
-			$unique_ids = array( $post_id );
-			foreach ( $acf_related_content as $item ) {
-				// Tests for WP_Post content types.
-				if ( $this->is_correct_content_type( $item ) ) {
-					// Tests if the items are unique and don't refer to the post itself.
-					if ( ! in_array( $item->ID, $unique_ids, true ) ) {
-						$related_content[] = $item;
-					}
-				}
-			}
-			if ( count( $related_content ) > 0 ) {
-				$this->container->has_related_content = true;
-				$this->set_related_content_grid( $this->container, $related_content );
-			}
+		// Set related content.
+		if ( is_array( $acf_related_content ) && count( $acf_related_content ) > 0 ) {
+			$this->set_related_grid_content( $acf_related_content );
 		}
 
 		// Set sections.
@@ -122,7 +108,7 @@ class StoryController extends BaseController {
 		}
 
 		// Set header image.
-		$this->set_header_image( $post_id );
+		$this->set_header_image( $post_id, 'story__header' );
 
 		$this->set_byline();
 	}
@@ -132,7 +118,7 @@ class StoryController extends BaseController {
 		return get_field( 'header_image' );
 	}
 
-	protected function get_header_image( $post_id ) {
+	protected function get_header_image( $post_id, $context ) {
 		switch ( $this->get_header_image_source( $post_id ) ) {
 			case 'upload_new_image':
 				$thumb = get_field( 'upload_header_image', $post_id );
@@ -145,7 +131,7 @@ class StoryController extends BaseController {
 				break;
 		}
 		if ( is_array( $thumb ) ) {
-			return new Image( $thumb, 'header' );
+			return new Image( $thumb, $context );
 		}
 	}
 
@@ -156,29 +142,11 @@ class StoryController extends BaseController {
 	 * @param integer $post_id.
 	 * @return HeaderImage object or null
 	 */
-	protected function set_header_image( $post_id ) {
-		$image = $this->get_header_image( $post_id );
+	protected function set_header_image( $post_id, $context = '' ) {
+		$image = $this->get_header_image( $post_id, $context );
 		if ( is_object( $image ) && is_a($image, 'Image') ) {
 			$this->container->header_image = $image;
 			$this->container->has_header_image = true;
-		}
-	}
-
-	/**
-	 * Retrieves and attaches featured image to story for use in grids.
-	 *
-	 * @param string $acf_header_image Advanced Custom Fields Header selection option
-	 * @param integer $post_id.
-	 * @return Image object or null
-	 */
-	protected function get_featured_image( $post_id ) {
-		$thumb = acf_get_attachment( get_post_thumbnail_id( $post_id ) );
-		if ( is_array( $thumb ) ) {
-			return new Image( $thumb, '', array(
-				'context' => 'grid',
-			) );
-		} else {
-			return null;
 		}
 	}
 

@@ -37,8 +37,8 @@ class InterviewQA extends BaseInterview {
 				if ( ! empty( $qa['question'] ) && ! empty( $qa['answer'] ) ) {
 					$modifiers_q = array( 'style' => 'question' );
 					$modifiers_a = array( 'style' => 'answer' );
-					$question = new Paragraph( $qa['question'], $this->base, $modifiers_q  );
-					$answer = new Paragraph( $qa['answer'], $this->base, $modifiers_a );
+					$question = new Paragraph( $qa['question'], $this->element, $modifiers_q  );
+					$answer = new Paragraph( $qa['answer'], $this->element, $modifiers_a );
 					$output .= $question->embed();
 					$output .= $answer->embed();
 				}

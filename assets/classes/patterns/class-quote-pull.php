@@ -68,7 +68,7 @@ class PullQuote extends BasePattern {
 
 		// If source is set, add quote source name as caption.
 		if ( ! empty( $this->source ) ) {
-			$caption = new Caption( $this->source, $this->base );
+			$caption = new Caption( $this->source, $this->element );
 			$this->output .= $caption->embed();
 		}
 

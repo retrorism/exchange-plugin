@@ -40,7 +40,7 @@ class EditorialIntro extends BasePattern {
 		Parent::__construct( $input, $context, $modifiers );
 		if ( is_string( $input ) && ! empty( $input ) ) {
 			$this->output_tag_open();
-			$content = new Paragraph( $input, $this->base );
+			$content = new Paragraph( $input, $this->element );
 			$this->output .= $content->embed();
 			$this->output_tag_close();
 		}

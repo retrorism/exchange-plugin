@@ -89,7 +89,7 @@ class BaseController {
 					return new Programme_Round( ...$args );
 				case 'grid_breaker':
 					// Context grid is required for now.
-					if ( 'grid' === $context ) {
+					if ( 'griditem' === $context ) {
 						return new Grid_Breaker( ...$args );
 					}
 					break;
@@ -148,14 +148,10 @@ class BaseController {
 	 * @param integer $post_id.
 	 * @return null or Image object;
 	 **/
-	protected function get_featured_image( $post_id ) {
+	protected function get_featured_image( $post_id, $context ) {
 		$thumb_props = $this->get_featured_image_props( $post_id );
 		if ( ! empty( $thumb_props ) ) {
-			return new Image( $thumb_props, '', array(
-				'context' => 'grid',
-			) );
-		} else {
-			echo "why is this empty?" . get_post( $post_id )->post_title;
+			return new Image( $thumb_props, 'griditem' );
 		}
 	}
 
@@ -179,8 +175,8 @@ class BaseController {
 	 *
 	 * @return void.
 	 **/
-	public function set_featured_image() {
-		$image = $this->get_featured_image( $this->container->post_id );
+	public function set_featured_image( $context ) {
+		$image = $this->get_featured_image( $this->container->post_id, $context );
 		if ( is_a( $image, 'Image' ) ) {
 			$this->container->has_featured_image = true;
 			$this->container->featured_image = $image;
@@ -280,6 +276,33 @@ class BaseController {
 		}
 	}
 
+	/**
+	 * Gets grid content
+	 *
+	 * Taking an array of objects this function gets the related grid content
+	 *
+	 * @param object $exchange Exchange Content Type
+	 * @param array $related_content
+	 *
+	 * @throws Exception when there are no items to put in the grid.
+	 **/
+	protected function get_grid_content( $grid_items ) {
+		$content = array();
+		// Store post ID in the unique array so that it won't get added.
+		$unique_ids = array( $this->container->post_id );
+		foreach ( $grid_items as $item ) {
+			// Tests for WP_Post content types.
+			if ( BaseController::is_correct_content_type( $item ) ) {
+				// Tests if the items are unique and don't refer to the post itself.
+				if ( ! in_array( $item->ID, $unique_ids, true ) ) {
+					$grid_content[] = $item;
+				}
+			}
+		}
+		if ( count( $grid_content ) > 0 ) {
+			return $grid_content;
+		}
+	}
 
 	/**
 	 * Sets related content grid.
@@ -291,23 +314,12 @@ class BaseController {
 	 *
 	 * @throws Exception when there are no items to put in the grid.
 	 **/
-	protected function set_related_content_grid( $exchange, $related_content ) {
-		$grid_content = array();
-		// Store post ID in the unique array so that it won't get added.
-		$unique_ids = array( $exchange->post_id );
-		foreach ( $related_content as $item ) {
-			// Tests for WP_Post content types.
-			if ( BaseController::is_correct_content_type( $item ) ) {
-				// Tests if the items are unique and don't refer to the post itself.
-				if ( ! in_array( $item->ID, $unique_ids, true ) ) {
-					$grid_content[] = $item;
-				}
-			}
-		}
-		if ( count( $related_content ) > 0 ) {
-			$exchange->has_related_content = true;
+	protected function set_related_grid_content( $related_content ) {
+		$grid_content = $this->get_grid_content( $related_content );
+		if ( isset( $grid_content ) ) {
+			$this->container->has_related_content = true;
 			$grid = new RelatedGrid( $grid_content );
-			$exchange->related_content = $grid;
+			$this->container->related_content = $grid;
 		}
 	}
 

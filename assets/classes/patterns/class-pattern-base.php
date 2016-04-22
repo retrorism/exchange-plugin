@@ -71,13 +71,13 @@ abstract class BasePattern {
 	public $context;
 
 	/**
-	 * Base class name slug.
+	 * Base class name slug as element.
 	 *
 	 * @since 0.1.0
 	 * @access public
-	 * @var string $base Class-name as slug to be used in css-class.
+	 * @var string $base Class-name as slug to be used as 'element' in BEM css-class.
 	 **/
-	public $base;
+	public $element;
 
 	/**
 	 * Constructor for Pattern Base class.
@@ -109,7 +109,7 @@ abstract class BasePattern {
 	 * @since 0.1.0
 	 **/
 	protected function set_basename() {
-		$this->base = strtolower( get_class( $this ) );
+		$this->element = strtolower( get_class( $this ) );
 	}
 
 	/**
@@ -118,21 +118,23 @@ abstract class BasePattern {
 	 * @since 0.1.0
 	 * @access protected
 	 *
-	 * @param string $context Parent basename.
+	 * @param string $context Context (usually the parent element's element / basename).
 	 **/
 	protected function set_context_and_base_class( $context ) {
-		if ( ! empty( $context ) ) {
-			$this->context = $context;
-			// Add generic story element class for all direct children of a section.
-			if ( 'section' === $this->context ) {
-				$this->classes[] = 'section__slice';
-				$this->classes[] = $this->base;
-			} else {
-				$this->classes[] = $this->context . '__' . $this->base;
+		$this->context = ! empty( $context ) ? $context : '';
+		// Add generic story element class for all direct children of a section.
+		if ( 'section' === $this->context ) {
+			$this->classes['section__default-element'] = 'section__slice';
+		}
+		// Add
+		if ( ! array_key_exists('base__element', $this->classes )
+			|| empty( $this->classes['base__element'] ) ) {
+			if ( ! empty( $this->context ) ) {
+				$this->classes['base__element'] = $this->context . '__' . $this->element;
 			}
 		} else {
 			// Fallback to setting generic class element.
-			$this->classes[] = $this->base;
+			$this->classes['element'] = $this->element;
 		}
 	}
 
@@ -150,7 +152,7 @@ abstract class BasePattern {
 	protected function set_initial_output( $input ) {
 		if ( ! empty( $input ) ) {
 			$this->output_tag_open();
-			$this->output .= '<h1 style="color: red">No output defined for' . $this->base . '</h1>';
+			$this->output .= '<h1 style="color: red">No output defined for' . $this->element . '</h1>';
 			$this->output_tag_close();
 		}
 	}
@@ -281,7 +283,7 @@ abstract class BasePattern {
 			if ( ! empty( $this->parent ) ) {
 				$class .= $this->parent . '__';
 			}
-			$class .= $this->base.'--'.$val;
+			$class .= $this->element.'--'.$val;
 			$this->classes[] = $class;
 		}
 	}
@@ -325,7 +327,7 @@ abstract class BasePattern {
 	 * @return string HTML closing comment.
 	 **/
 	protected function end_pattern_tag_comment() {
-		return '<!-- end ' . strtolower( $this->base ) . ' -->' . PHP_EOL;
+		return '<!-- end ' . strtolower( $this->element ) . ' -->' . PHP_EOL;
 	}
 
 	/**

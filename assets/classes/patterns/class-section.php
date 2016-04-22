@@ -78,7 +78,7 @@ class Section extends BasePattern {
 	 **/
 	protected function build_section_header( $input ) {
 		if ( ! empty( $input['section_header'] ) ) {
-			$this->section_header = new SectionHeader( $input['section_header'], $this->base );
+			$this->section_header = new SectionHeader( $input['section_header'], $this->element );
 			$this->output .= $this->section_header->embed();
 		}
 	}
@@ -109,22 +109,22 @@ class Section extends BasePattern {
 							if ( 'portrait' === $e['image_orientation']  ) {
 								$image_mods['orientation'] = 'portrait';
 							}
-							$image = new Image( $e['image'], $this->base, $image_mods );
+							$image = new Image( $e['image'], $this->element, $image_mods );
 							$this->output .= $image->embed();
 							break;
 
 						case 'two_images':
-							$duo = new ImageDuo( $e['two_images'], $this->base );
+							$duo = new ImageDuo( $e['two_images'], $this->element );
 							$this->output .= $duo->embed();
 							break;
 
 						case 'paragraph':
-							$paragraph = new Paragraph( $e['text'], $this->base );
+							$paragraph = new Paragraph( $e['text'], $this->element );
 							$this->output .= $paragraph->embed();
 							break;
 
 						case 'block_quote':
-							$blockquote = new BlockQuote( $e, $this->base );
+							$blockquote = new BlockQuote( $e, $this->element );
 							$this->output .= $blockquote->embed();
 							break;
 
@@ -133,25 +133,25 @@ class Section extends BasePattern {
 							if ( ! empty( $e['pquote_colour'] ) ) {
 								$pquote_mods['colour'] = $e['pquote_colour'];
 							}
-							$pullquote = new PullQuote( $e, $this->base, $pquote_mods );
+							$pullquote = new PullQuote( $e, $this->element, $pquote_mods );
 							$this->output .= $pullquote->embed();
 							break;
 
 						case 'embed_video':
-							$video = new Video( $e['embed_video'], $this->base );
+							$video = new Video( $e['embed_video'], $this->element );
 							$this->output .= $video->embed();
 							break;
 
 						case 'interview_conversation':
-							$interview = new InterviewConversation( $e['interview'], $this->base );
+							$interview = new InterviewConversation( $e['interview'], $this->element );
 							$this->output .= $interview->embed();
 							break;
 						case 'interview_q_and_a':
-							$interview = new InterviewQA( $e['interview'], $this->base );
+							$interview = new InterviewQA( $e['interview'], $this->element );
 							$this->output .= $interview->embed();
 							break;
 						case 'subheader':
-							$subheader = new SubHeader( $e['text'], $this->base );
+							$subheader = new SubHeader( $e['text'], $this->element );
 							$this->output .= $subheader->embed();
 							break;
 
@@ -161,7 +161,7 @@ class Section extends BasePattern {
 							if ( isset( $type ) && in_array( $type, array( 'cta','post-it', true ) ) ) {
 								$block_mods['type'] = $type;
 								$block_mods['colour'] = $e[ $type . '_colour'];
-								$emphasis_block = new EmphasisBlock( $e[ $type . '_block_elements'], $this->base, $block_mods );
+								$emphasis_block = new EmphasisBlock( $e[ $type . '_block_elements'], $this->element, $block_mods );
 								$this->output .= $emphasis_block->embed();
 							}
 							break;

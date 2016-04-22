@@ -165,9 +165,9 @@ class Exchange {
 		$this->controller->set_container( $this );
 	}
 
-	public function publish_featured_image() {
+	public function publish_featured_image( $context = '' ) {
 		if ( $this->has_featured_image ) {
-			$this->featured_image->publish();
+			$this->featured_image->publish( $context );
 		}
 	}
 

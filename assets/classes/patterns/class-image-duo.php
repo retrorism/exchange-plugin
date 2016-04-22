@@ -78,7 +78,7 @@ class ImageDuo extends BasePattern {
 				$pos = 'right';
 			}
 			$mods['position'] = $pos;
-			$gallery_item = new Image( $this->gallery[ $i ], $this->base, $mods );
+			$gallery_item = new Image( $this->gallery[ $i ], $this->element, $mods );
 			$this->output .= $gallery_item->embed();
 			$i++;
 		}

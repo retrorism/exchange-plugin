@@ -122,7 +122,7 @@ abstract class BaseGrid extends BasePattern {
 	protected function create_grid_item( $item ) {
 		$exchange = BaseController::exchange_factory( $item, 'grid' );
 		$item_mods = self::add_grid_modifiers( $exchange );
-		$grid_item = new GridItem( $exchange, $this->base, $item_mods );
+		$grid_item = new GridItem( $exchange, $this->element, $item_mods );
 		return $grid_item;
 	}
 	/**

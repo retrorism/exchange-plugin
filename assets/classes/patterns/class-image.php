@@ -135,15 +135,9 @@ class Image extends BasePattern {
 			}
 		}
 		// Default base size is story-portrait or story-landscape, switch to different sizes depending on context.
-		$image_size = 'story-' . $this->orientation;
-
-		if ( key_exists( 'context', $modifiers ) ) {
-			if ( 'header' === $context ) {
-				$image_size = 'header-image';
-			} elseif ( 'grid' === $context ) {
-				$image_size = 'post_thumbnail';
-			}
-		}
+		$image_size = isset( $special_image_sizes[ $context ] ) ?
+			$special_sizes[ $context ] :
+			'story-' . $this->orientation;
 
 		//Set src_set from attachment_id.
 		if ( ! empty( $input['ID'] ) ) {
@@ -217,7 +211,7 @@ class Image extends BasePattern {
 			$mods['position'] = $modifiers['caption_position'];
 		}
 
-		$this->caption = new Caption( $input['caption'], $this->base, $mods );
+		$this->caption = new Caption( $input['caption'], $this->element, $mods );
 	}
 
 	/**

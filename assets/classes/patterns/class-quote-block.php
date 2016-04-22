@@ -95,7 +95,7 @@ class BlockQuote extends BasePattern {
 		}
 
 		if ( count( $this->source ) > 0 ) {
-			$caption = new Caption( $this->source, $this->base );
+			$caption = new Caption( $this->source, $this->element );
 		}
 	}
 

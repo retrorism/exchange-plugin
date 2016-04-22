@@ -67,17 +67,17 @@ class EmphasisBlock extends BasePattern {
 
 				case '_block_graphic':
 					$image_mods = array();
-					$image = new ImageSVG( $e[ $type . '_block_graphic_select' ],$this->base, $image_mods );
+					$image = new ImageSVG( $e[ $type . '_block_graphic_select' ],$this->element, $image_mods );
 					$this->output .= $image->embed();
 					break;
 
 				case '_block_paragraph':
-					$paragraph = new Paragraph( $e[ $type . '_block_paragraph_text'], $this->base );
+					$paragraph = new Paragraph( $e[ $type . '_block_paragraph_text'], $this->element );
 					$this->output .= $paragraph->embed();
 					break;
 
 				case '_block_header':
-					$subheader = new SubHeader( $e[ $type . '_block_header_text'], $this->base );
+					$subheader = new SubHeader( $e[ $type . '_block_header_text'], $this->element );
 					$this->output .= $subheader->embed();
 					break;
 
@@ -98,7 +98,7 @@ class EmphasisBlock extends BasePattern {
 					if ( ! empty( $e['button_size'] ) ) {
 						$button_mods['size'] = $e['button_size'];
 					}
-					$button = new Button( $e, $this->base, $button_mods );
+					$button = new Button( $e, $this->element, $button_mods );
 					$this->output .= $button->embed();
 					break;
 
