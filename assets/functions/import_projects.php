@@ -67,7 +67,7 @@ function tandem_image_importer() {
 	$collab_args = array(
 		'post_type' => 'collaboration',
 		'posts_per_page' => -1,
-		'post_status' => 'draft',
+		'post_status' => 'publish',
 	);
 	$query = new WP_Query($collab_args);
 	$collabs = $query->posts;
@@ -76,50 +76,58 @@ function tandem_image_importer() {
 		$fail = 0;
 		$success = 0;
 		foreach($collabs as $collab) {
+			//print_r( $collab );
 			// lookup collab ID
-			$name = $collab->post_title;
+			$name = $collab->post_name;
 			// set as metavalue
-			$name_lower = strtolower( $name );
-			$path = ABSPATH . 'collab-data/' . $name_lower . '.jpg';
-			$file_clean = str_replace( '-','_', sanitize_title( $name_lower ) . '.jpg' );
-			$path_clean = ABSPATH . 'collab-data/' . $file_clean ;
-			$upload_path_clean = $upload_path['path'] . '/' . $file_clean ;
+			$name_lower = sanitize_title( strtolower( $name ) );
+			$name_clean = str_replace( '-','_', $name_lower );
+			$path = ABSPATH . 'collaborations/' . $name_clean . '.jpg';
+			$file_clean = $name_clean . '.jpg';
+			$path_clean = ABSPATH . 'collaborations/' . $file_clean ;
 			$post_id = $collab->ID;
+			$post_tag = exchange_get_post_tag_from_parent_id( $post_id );
+			$post_tag_folder = $post_tag->slug;
+			$upload_path_clean = $upload_path['path'] . '/' . $post_tag_folder . '/' . $file_clean ;
+
 			echo 'post_id: ' . $post_id . '<br />';
 			echo 'path: ' . $path . '<br />';
 			echo 'file_clean: ' . $file_clean . '<br />';
 			echo 'path_clean: ' . $path_clean . '<br />';
 			echo 'upload_path_clean: ' . $upload_path_clean . '<br />';
-			if ( file_exists( $path ) ) {
-				rename( $path, $upload_path_clean );
+			if ( file_exists( $path_clean ) ) {
 
-				// Check the type of file. We'll use this as the 'post_mime_type'.
-				$filetype = wp_check_filetype( basename( $upload_path_clean ), null );
-
-				// Prepare an array of post data for the attachment.
-				$attachment = array(
-					'guid'           => $upload_path['url'] . '/' . basename( $file_clean ),
-					'post_mime_type' => $filetype['type'],
-					'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $file_clean ) ),
-					'post_content'   => '',
-					'post_status'    => 'inherit'
-				);
-
-				print_r( $attachment );
-				//
-				// // Insert the attachment.
-				$attach_id = wp_insert_attachment( $attachment, $file_clean, $post_id );
-				//
-				// // Make sure that this file is included, as wp_generate_attachment_metadata() depends on it.
-				require_once( ABSPATH . 'wp-admin/includes/image.php' );
-				//
-				// // Generate the metadata for the attachment, and update the database record.
-				$attach_data = wp_generate_attachment_metadata( $attach_id, $file_clean );
-				wp_update_attachment_metadata( $attach_id, $attach_data );
-				//
-				set_post_thumbnail( $post_id, $attach_id );
 				if ( has_post_thumbnail( $post_id ) ) {
 					echo "yes<br />";
+				} else {
+					rename( $path_clean, $upload_path_clean );
+
+					// Check the type of file. We'll use this as the 'post_mime_type'.
+					$filetype = wp_check_filetype( $upload_path_clean, null );
+
+					// Prepare an array of post data for the attachment.
+					$attachment = array(
+						'guid'           => $upload_path_clean,
+						'post_mime_type' => $filetype['type'],
+						'post_title'     => preg_replace( '/\.[^.]+$/', '', $collab->post_title ),
+						'post_content'   => '',
+						'post_status'    => 'inherit',
+					);
+
+					print_r( $attachment );
+					//
+					// // Insert the attachment.
+					$attach_id = wp_insert_attachment( $attachment, $upload_path_clean, $post_id );
+					//
+					// // Make sure that this file is included, as wp_generate_attachment_metadata() depends on it.
+					require_once( ABSPATH . 'wp-admin/includes/image.php' );
+					//
+					// // Generate the metadata for the attachment, and update the database record.
+					$attach_data = wp_generate_attachment_metadata( $attach_id, $upload_path_clean );
+					wp_update_attachment_metadata( $attach_id, $attach_data );
+					//
+					set_post_thumbnail( $post_id, $attach_id );
+					exchange_check_for_post_tag( $attach_id );
 				}
 			} else {
 				echo "no<br />";
@@ -130,16 +138,106 @@ function tandem_image_importer() {
 	}
 }
 
-function add_taxo( $taxonomy, $term ) {
-	$term_id = term_exists( htmlspecialchars( $term ), $taxonomy );
-	if ( $term_id > 0 ) {
-		//echo "existing term found";
-		return $term_id;
+function tandem_image_tag_swap() {
+	$attachment_args = array(
+		'post_type' => 'attachment',
+		'posts_per_page' => -1,
+		'post_status' => 'any',
+	);
+	$query = new WP_Query($attachment_args);
+	$attachments = $query->posts;
+	//print_r( $query );
+	if(!empty($attachments)) {
+		foreach($attachments as $attachment) {
+			echo "getting an attachment:";
+			$terms = wp_get_post_terms( $attachment->ID, 'post_tag' );
+			$tag = get_term_by('name', $terms[0]->name, 'media_category');
+			//print_r( $tag );
+			$result = wp_set_object_terms( $attachment->ID, $tag->slug, 'media_category', true );
+			print_r( $result );
+			echo "<hr />";
+		}
 	} else {
-		//echo "adding " . $term . " to " . $taxonomy ;
-		$result = wp_insert_term( htmlspecialchars( $term ), $taxonomy );
+		echo "attachment not found";
 	}
 }
+
+function tandem_collab_tagger() {
+	$result = array();
+	$collab_args = array(
+		'post_type' => 'collaboration',
+		'posts_per_page' => -1,
+		'post_status' => 'publish',
+	);
+	$query = new WP_Query($collab_args);
+	$collabs = $query->posts;
+	$upload_path = wp_get_upload_dir();
+	if(!empty($collabs)) {
+		foreach($collabs as $collab) {
+			$parent_id = wp_get_post_parent_id( $collab->ID );
+			echo "parent_id: " . $parent_id . "<br />";
+			if ( !empty( $parent_id ) ) {
+				$parent_name = get_the_title( $parent_id );
+				echo "parent_name: " . $parent_name . "<br />";
+				echo "trying to attach<hr />";
+				$term = get_term_by('name', $parent_name, 'post_tag' );
+				if ( is_object( $term ) && get_class( $term ) === 'WP_Term' ) {
+					$term = wp_set_object_terms( $collab->ID, $term->term_id, 'post_tag', true );
+					echo $term->name;
+				} else {
+					echo "no term object< br />";
+				}
+			} else {
+				echo "no parent<br />";
+			}
+		}
+	}
+}
+
+function tandem_image_tagger() {
+	$result = array();
+	$collab_args = array(
+		'post_type' => 'collaboration',
+		'posts_per_page' => -1,
+		'post_status' => 'publish',
+	);
+	$query = new WP_Query($collab_args);
+	$collabs = $query->posts;
+	$upload_path = wp_get_upload_dir();
+	if(!empty($collabs)) {
+		foreach($collabs as $collab) {
+			if ( has_post_thumbnail( $collab ) ) {
+				$parent_id = wp_get_post_parent_id( $collab->ID );
+				echo "parent_id: " . $parent_id . "<br />";
+				if ( !empty( $parent_id ) ) {
+					$parent_name = get_the_title( $parent_id );
+					echo "parent_name: " . $parent_name . "<br />";
+					$thumb_id = get_post_thumbnail_id( $collab );
+					echo "thumb_id : " . $thumb_id . "<br />";
+					if ( $thumb_id > 0 ) {
+						echo "trying to attach<hr />";
+						$term = get_term_by('name', $parent_name, 'media_category' );
+						if ( is_object( $term ) && get_class( $term ) === 'WP_Term' ) {
+							$term = wp_set_object_terms( $thumb_id, $term->term_id, 'media_category', true );
+						} else {
+							echo "no term object< br />";
+						}
+						echo $term->name;
+					}
+				} else {
+					echo "no parent<br />";
+					$fail++;
+				}
+			} else {
+				echo "no thumbnail<br />";
+				continue;
+			}
+
+		}
+		echo "<hr>" . $success . " successes and " . $fail . " failures.";
+	}
+}
+
 
 function add_term_to_cid( $cid, $arr ) {
 	$collab_args = array(

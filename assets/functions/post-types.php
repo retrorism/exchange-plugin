@@ -51,7 +51,7 @@ function tandem_create_story() {
 		'exclude_from_search' => false,
 		'capability_type'     => 'post',
 		'supports'            => array( 'title', 'editor', 'thumbnail', 'revisions' ),
-		'taxonomies'          => array( 'category' ),
+		'taxonomies'          => array( 'post_tag', 'category', 'topic' ),
 		'rewrite'             => array( 'slug' => 'stories' ),
 		// Removed 'taxonomies' => array( 'category','post_tag').
 	) );
@@ -92,7 +92,7 @@ function tandem_create_collaboration() {
 		'exclude_from_search' => false,
 		'capability_type' => 'post',
 		'rewrite' => array( 'slug' => 'collaborations' ),
-		'taxonomies' => array( 'location','topic','discipline','methodology','output'),
+		'taxonomies' => array( 'post_tag','location','topic','discipline','methodology','output'),
 		)
 	);
 
@@ -165,6 +165,7 @@ function tandem_create_programme_round() {
 		'exclude_from_search' => false,
 		'capability_type'     => 'page',
 		'rewrite'             => array( 'slug' => 'programme-rounds' ),
+		'taxonomies'          => array( 'post_tag' ),
 		)
 	);
 }

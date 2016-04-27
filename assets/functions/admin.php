@@ -60,12 +60,19 @@ function set_admin_menu_separator() {
 }
 
 function tandem_add_and_remove_menu_options() {
-	if ( ! current_user_can( 'edit_file') ) {
+	if ( ! current_user_can( 'edit_files') ) {
 		remove_menu_page( 'edit.php' ); // Remove Posts editor from menu for editors.
 		remove_menu_page( 'edit-comments.php' ); // Comments from menu for editors.
+		remove_submenu_page( 'upload.php', 'edit-tags.php?taxonomy=post_tag&amp;post_type=attachment' );
 	}
 
 	remove_meta_box( 'categorydiv', 'story', 'side');
+	//remove_meta_box( 'tagsdiv-post_tag', 'collaboration', 'side');
+	remove_meta_box( 'tagsdiv-post_tag', 'story', 'side');
+	remove_meta_box( 'tagsdiv-post_tag', 'attachment', 'side');
+	remove_submenu_page( 'edit.php?post_type=collaboration', 'edit-tags.php?taxonomy=post_tag&amp;post_type=collaboration' );
+	remove_submenu_page( 'edit.php?post_type=story', 'edit-tags.php?taxonomy=post_tag&amp;post_type=story' );
+
 
  // end set_admin_menu_separator
 	// add_submenu_page(
@@ -180,7 +187,7 @@ function tandem_programme_rounds_parent_meta_box( $post ) {
 		'post_type'   => 'programme_round',
 		'orderby'     => 'title',
 		'order'       => 'ASC',
-		'numberposts' => -1,
+		'posts_per_page' => -1,
 	);
 
 	$parent_query = new WP_Query( $args );
@@ -189,7 +196,6 @@ function tandem_programme_rounds_parent_meta_box( $post ) {
 	if ( ! empty( $parents ) ) {
 
 		$output = '<select name="parent_id" class="widefat">'; // !Important! Don't change the 'parent_id' name attribute.
-
 		foreach ( $parents as $parent ) {
 			$output .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $parent->ID ), selected( $parent->ID, $post->post_parent, false ), esc_html( $parent->post_title ) );
 		}

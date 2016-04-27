@@ -46,6 +46,7 @@ function tandem_require_functions() {
 		'post-types.php',
 		'public.php',
 		'taxonomies.php',
+		'import_projects.php'
 	);
 	foreach ( $files as $file ) {
 		require_once( EXCHANGE_PLUGIN_PATH . 'assets/functions/' . $file );
