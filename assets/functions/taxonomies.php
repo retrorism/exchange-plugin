@@ -193,24 +193,24 @@ function exchange_fix_tag_labels()
     //  http://codex.wordpress.org/Function_Reference/register_taxonomy
     //  http://core.trac.wordpress.org/browser/branches/3.0/wp-includes/taxonomy.php#L350
     $wp_taxonomies['post_tag']->labels = (object)array(
-        'name' => 'Programme Rounds',
-        'menu_name' => 'Programme Rounds',
-        'singular_name' => 'Programme Round',
-        'search_items' => 'Search Programme Rounds',
-        'popular_items' => 'Popular Programme Rounds',
-        'all_items' => 'All Programme Rounds',
+        'name' => 'Programme Round (Tags)',
+        'menu_name' => 'Programme Round (Tags)',
+        'singular_name' => 'Programme Round (Tag)',
+        'search_items' => 'Search Programme Round (Tags)',
+        'popular_items' => 'Popular Programme Round (Tags)',
+        'all_items' => 'All Programme Round (Tags)',
         'parent_item' => null, // Tags aren't hierarchical
         'parent_item_colon' => null,
-        'edit_item' => 'Edit Programme Round',
-        'update_item' => 'Update Programme Round',
-        'add_new_item' => 'Add new Programme Round',
-        'new_item_name' => 'New Programme Round Name',
-        'separate_items_with_commas' => 'Separate Programme Rounds with commas',
-        'add_or_remove_items' => 'Add or remove Programme Rounds',
-        'choose_from_most_used' => 'Choose from the most used Programme Rounds',
+        'edit_item' => 'Edit Programme Round (Tag)',
+        'update_item' => 'Update Programme Round (Tag)',
+        'add_new_item' => 'Add new Programme Round (Tag)',
+        'new_item_name' => 'New Programme Round (Tag) Name',
+        'separate_items_with_commas' => 'Separate Programme Round (Tags) with commas',
+        'add_or_remove_items' => 'Add or remove Programme Round (Tags)',
+        'choose_from_most_used' => 'Choose from the most used Programme Round (Tags)',
     );
 
-    $wp_taxonomies['post_tag']->label = 'Programme Rounds';
+    $wp_taxonomies['post_tag']->label = 'Programme Round (Tag)s';
 }
 
 // Add taxonomies by checking against a sluggified $term name.
@@ -222,7 +222,7 @@ function add_taxo( $taxonomy, $term, $is_programme_round_media_tag = false ) {
 		return $term_id;
 	} else {
 		if ( $is_programme_round_media_tag ) {
-			$parent = get_term_by('name', 'Programme Round', 'media_category');
+			$parent = get_term_by('name', 'Programme Round (Tag)', 'media_category');
 			if ( isset( $parent ) && is_object( $parent ) ) {
 				$args['parent'] = $parent->term_id;
 			}
@@ -231,7 +231,7 @@ function add_taxo( $taxonomy, $term, $is_programme_round_media_tag = false ) {
 	}
 }
 
-// Create a new term when a new programme round is saved.
+// Create a new term when a new Programme Round (Tag) is saved.
 function exchange_create_tax_for_programme_round( $post_id, $post, $update ) {
 	$name = $post->post_title;
 	add_taxo( 'post_tag', $name );
@@ -259,7 +259,7 @@ function exchange_check_for_post_tag( $post_id ) {
 	}
 }
 
-// Check and / or set the programme round tag to match the collaborations parent.
+// Check and / or set the Programme Round (Tag) tag to match the collaborations parent.
 function exchange_set_post_tag_from_parent_id( $post_id, $post, $update ) {
 	$term = exchange_get_post_tag_from_parent_id( $post_id );
 	if ( exchange_is_term( $term ) ) {
