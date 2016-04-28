@@ -32,44 +32,55 @@ if ( ! defined( 'EXCHANGE_PLUGIN_PATH' ) ) {
 	define( 'EXCHANGE_PLUGIN_PATH', plugin_dir_path( EXCHANGE_PLUGIN_FILE ) );
 }
 
-add_action( 'plugins_loaded','tandem_require_functions' );
+add_action( 'plugins_loaded','exchange_require_functions' );
 
 /**
  * Require our function files.
  */
-function tandem_require_functions() {
+function exchange_require_functions() {
 	$files = array(
 		'globals.php',
 		'admin.php',
 		'admin-acf.php',
 		'admin-options.php',
+		'admin-roles.php',
 		'post-types.php',
 		'public.php',
 		'taxonomies.php',
-		'import_projects.php'
+		'import_projects.php',
 	);
 	foreach ( $files as $file ) {
 		require_once( EXCHANGE_PLUGIN_PATH . 'assets/functions/' . $file );
 	}
 }
 
+
 /* Runs on plugin is activated */
-register_activation_hook( EXCHANGE_PLUGIN_FILE, 'tandem_activate' );
+register_activation_hook( EXCHANGE_PLUGIN_FILE, 'exchange_plugin_activate' );
 
 /* Runs on plugin deactivation */
-register_deactivation_hook( EXCHANGE_PLUGIN_FILE, 'tandem_deactivate' );
+register_deactivation_hook( EXCHANGE_PLUGIN_FILE, 'exchange_plugin_deactivate' );
+
+
 
 /**
  * Runs on activation of the plugin.
  **/
-function tandem_activate() {
+function exchange_plugin_activate() {
+	require_once( EXCHANGE_PLUGIN_PATH . 'assets/functions/admin-roles.php' );
+	if ( function_exists( 'exchange_add_user_management_for_editors') ) {
+		exchange_add_user_management_for_editors();
+	} else {
+		die( $debug );
+	}
 	return;
 }
 
 /**
  * Runs on plugin deactivation.
  **/
-function tandem_deactivate() {
+function exchange_plugin_deactivate() {
+	exchange_remove_user_management_for_editors();
 	return;
 }
 
