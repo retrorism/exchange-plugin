@@ -53,13 +53,31 @@ abstract class BasePattern {
 	protected $link_attributes = array();
 
 	/**
+	 * Output string
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var string $output pattern content.
+	 **/
+	protected $output;
+
+	/**
 	 * List of classes for pattern container element.
 	 *
 	 * @since 0.1.0
 	 * @access public
-	 * @var string $output HTML containing pattern content.
+	 * @var array $output Context for Twig template.
 	 **/
-	public $output = '';
+	protected $twig_output = array();
+
+	/**
+	 * List of classes for pattern container element.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var string $view Twig template name.
+	 **/
+	protected $view;
 
 	/**
 	 * Context in/through which this pattern object has been instantiated.
@@ -154,6 +172,8 @@ abstract class BasePattern {
 			$this->output_tag_open();
 			$this->output .= '<h1 style="color: red">No output defined for' . $this->element . '</h1>';
 			$this->output_tag_close();
+
+			$this->twig_output_set_tag();
 		}
 	}
 
@@ -278,7 +298,7 @@ abstract class BasePattern {
 		if ( is_string( $val ) ) {
 			$class = '';
 			if ( 'colour' === $key ) {
-				$val = tandem_hex_to_slug( $val );
+				$val = exchange_hex_to_slug( $val );
 			}
 			if ( ! empty( $this->parent ) ) {
 				$class .= $this->parent . '__';
@@ -358,6 +378,28 @@ abstract class BasePattern {
 	}
 
 	/**
+	 * Overriding output, part 1: opening tag. Adds EOL suffix for block elements.
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 *
+	 * @param string $tag HTML element tag to be opened. Defaults to div.
+	 **/
+	protected function twig_output_set_tag( $tag = 'div' ) {
+		$this->twig_output['tag'] = $tag;
+		if ( count( $this->classes ) > 0 ) {
+			$this->twig_output['classes'] .= $this->classes;
+		}
+		if ( count( $this->link_attributes ) > 0 ) {
+			$this->twig_output['link_attributes'] = $this->link_attributes;
+		}
+		if ( count( $this->data ) > 0 ) {
+			$this->twig_output['data'] = $this->data;
+		}
+		$this->twig_output['close_comment'] = $this->end_pattern_tag_comment();
+	}
+
+	/**
 	 * Overriding output, part 2: closing tag
 	 *
 	 * @since 0.1.0
@@ -398,5 +440,16 @@ abstract class BasePattern {
 	 **/
 	public function embed() {
 		return $this->output;
+	}
+
+	/**
+	 * Returns escaped pattern output for use in parent object.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @return array $output HTML output consisting of tags and content.
+	 **/
+	public function get_twig_context() {
+		return $this->twig_output;
 	}
 }

@@ -38,7 +38,8 @@ class GridItem extends BasePattern {
 	 public function __construct( $input, $context = '', $modifiers = array() ) {
  		Parent::__construct( $input, $context, $modifiers );
  		$this->output_tag_open();
- 		$this->output .= $this->build_grid_item( $input, $modifiers );
+ 		//$this->output .= $this->build_grid_item( $input, $modifiers );
+		$this->output .= Timber::render('grid-item.twig');
  		$this->output_tag_close();
  		// End construct.
  	}
