@@ -37,32 +37,26 @@ class BlockQuote extends BasePattern {
 	 * List of details about the source. Default value is an empty array.
 	 *
 	 * @since 0.1.0
-	 * @access private
+	 * @access public
 	 * @var array $source Extra information about the quote source.
 	 **/
 	public $source = array();
 
 	/**
-	 * Constructor for Paragraphs.
-	 *
-	 * At instantiation this method checks if input is a string and is not empty.
+	 * Overwrite initial output value for Blockquotes
 	 *
 	 * @since 0.1.0
-	 *
-	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $context Optional. String referring to pattern.
-	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
+	 * @access protected
 	 **/
-	public function __construct( $input, $context = '', $modifiers = array() ) {
-		Parent::__construct( $input, $context, $modifiers );
-		if ( ! empty( $input['bquote_text'] ) ) {
+	 protected function create_output() {
+		if ( ! empty( $this->input['bquote_text'] ) ) {
 
-			$source_ind = $input['bquote_source_individual'];
-			$source_info = $input['bquote_source_info'];
+			$source_ind = $this->input['bquote_source_individual'];
+			$source_info = $this->input['bquote_source_info'];
 
 			// Open element.
 			$this->output_tag_open();
-			$this->output .= '<blockquote>' . $input['bquote_text'] . '</blockquote>';
+			$this->output .= '<blockquote>' . $this->input['bquote_text'] . '</blockquote>';
 
 			// Prepare caption.
 			if ( ! empty( $source_ind ) || ! empty( $source_info ) ) {

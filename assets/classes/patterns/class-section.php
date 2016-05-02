@@ -43,28 +43,15 @@ class Section extends BasePattern {
 	 **/
 	protected $story_elements;
 
-	/**
-	 * Constructor for Section Pattern class objects.
-	 *
-	 * At instantiation this method adds background colour modifier,
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $context Optional. String referring to pattern.
-	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
-	 **/
-	public function __construct( $input, $context = '', $modifiers = array() ) {
-		Parent::__construct( $input, $context, $modifiers );
-
+	public function create_output() {
 		// Check for background colour modifier and add to classes.
-		if ( isset( $input['background_colour'] ) ) {
-			$this->set_modifier_class( 'colour', $input['background_colour'] );
+		if ( isset( $this->input['background_colour'] ) ) {
+			$this->set_modifier_class( 'colour', $this->input['background_colour'] );
 		}
 
 		$this->output_tag_open( 'section' );
-		$this->build_section_header( $input );
-		$this->build_story_elements( $input );
+		$this->build_section_header();
+		$this->build_story_elements();
 		$this->output_tag_close( 'section' );
 	}
 
@@ -73,12 +60,10 @@ class Section extends BasePattern {
 	 *
 	 * @since 0.1.0
 	 * @global $base Object base name is passed to embeddable child.
-	 *
-	 * @param string $input ACF text input value.
 	 **/
-	protected function build_section_header( $input ) {
-		if ( ! empty( $input['section_header'] ) ) {
-			$this->section_header = new SectionHeader( $input['section_header'], $this->element );
+	protected function build_section_header() {
+		if ( ! empty( $this->input['section_header'] ) ) {
+			$this->section_header = new SectionHeader( $this->input['section_header'], $this->element );
 			$this->output .= $this->section_header->embed();
 		}
 	}
@@ -88,16 +73,14 @@ class Section extends BasePattern {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param array $input List of ACF content elements for which different patterns have been selected.
-	 *
 	 * @throws Exception Errors when input does not contain story elements.
 	 *
 	 * @TODO proper Error notifications.
 	 **/
-	protected function build_story_elements( $input ) {
+	protected function build_story_elements() {
 		// Check for story elements.
-		if ( isset( $input['story_elements'] ) ) {
-			$this->story_elements = $input['story_elements'];
+		if ( isset( $this->input['story_elements'] ) ) {
+			$this->story_elements = $this->input['story_elements'];
 			if ( count( $this->story_elements ) > 0 ) {
 				foreach ( $this->story_elements as $e ) {
 
@@ -160,8 +143,8 @@ class Section extends BasePattern {
 							$type = $e['block_type'];
 							if ( isset( $type ) && in_array( $type, array( 'cta','post-it', true ) ) ) {
 								$block_mods['type'] = $type;
-								$block_mods['colour'] = $e[ $type . '_colour'];
-								$emphasis_block = new EmphasisBlock( $e[ $type . '_block_elements'], $this->element, $block_mods );
+								$block_mods['colour'] = $e[ $type . '_colour' ];
+								$emphasis_block = new EmphasisBlock( $e [ $type . '_block_elements' ], $this->element, $block_mods );
 								$this->output .= $emphasis_block->embed();
 							}
 							break;

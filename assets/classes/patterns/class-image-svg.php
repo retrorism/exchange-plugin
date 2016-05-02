@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 };
 
 /**
- * Image Duo pattern class.
+ * Image SVG pattern class.
  *
  * This class serves to build SVG Graphics for the grid, emphasis blocks and sections.
  *

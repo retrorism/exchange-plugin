@@ -25,28 +25,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Caption extends BasePattern {
 
 	/**
-	 * Constructor for Caption Pattern class objects.
-	 *
-	 * At instantiation this method adds background colour modifier,
+	 * Overwrite initial output value for Captions.
 	 *
 	 * @since 0.1.0
-	 *
-	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $context String referring to pattern.
-	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
-	 *
-	 * @throws Exception Throws error when there's no parent set for this caption.
+	 * @access protected
 	 **/
-	public function __construct( $input, $context = '', $modifiers = array() ) {
-		Parent::__construct( $input, $context, $modifiers );
+	 protected function create_output() {
 
 		if ( ! empty( $this->context ) ) {
 			if ( 'image' === $this->context ) {
 				$this->output_tag_open( 'figcaption' );
-				$this->output .= $input;
+				$this->output .= $this->input;
 				$this->output_tag_close( 'figcaption' );
 			} elseif ( in_array( $this->context, array( 'blockquote', 'pullquote' ), true ) ) {
-				$this->build_quote_caption( $input );
+				$this->build_quote_caption();
 			} else {
 				throw new Exception( 'No valid parent for this caption.' );
 			}
@@ -58,22 +50,20 @@ class Caption extends BasePattern {
 	 * Create quote caption if source name and/or source info is set.
 	 *
 	 * @since 0.1.0
-	 *
-	 * @param array $input List of ACF fields.
 	 **/
-	protected function build_quote_caption( $input ) {
-		if ( ! empty( $input['source_name'] ) || ! empty( $input['source_info'] ) ) {
+	protected function build_quote_caption() {
+		if ( ! empty( $this->input['source_name'] ) || ! empty( $this->input['source_info'] ) ) {
 			$this->output_tag_open( 'footer' );
 			$this->output .= '<cite>';
 
 			// Add name if available.
-			if ( ! empty( $input['source_name'] ) ) {
-				$this->output .= '<div class="' . $this->context . '__source-name">' . $input['source_name'] . '</div>' . PHP_EOL;
+			if ( ! empty( $this->input['source_name'] ) ) {
+				$this->output .= '<div class="' . $this->context . '__source-name">' . $this->input['source_name'] . '</div>' . PHP_EOL;
 			}
 
 			// Add info if available.
-			if ( ! empty( $input['source_info'] ) ) {
-				$info_cleaned = strip_tags( apply_filters( 'the_content',$input['source_info'] ),'<a>' );
+			if ( ! empty( $this->input['source_info'] ) ) {
+				$info_cleaned = strip_tags( apply_filters( 'the_content',$this->input['source_info'] ),'<a>' );
 				$this->output .= '<p class="' . $this->context . '__source-info">' . $info_cleaned . '</p>' . PHP_EOL;
 			}
 

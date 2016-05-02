@@ -30,21 +30,15 @@ class BaseList extends BasePattern {
 	protected $list_items = array();
 
 	/**
-	 * Constructor for Base class objects.
+	 * Overwrite initial output value for List patterns.
 	 *
 	 * @since 0.1.0
-	 * @access public
-	 *
-	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $context String referring to pattern.
-	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
+	 * @access protected
 	 **/
-	public function __construct( $input, $context = '', $modifiers = array() ) {
-		Parent::__construct( $input, $context, $modifiers );
-
+	 protected function create_output() {
 		$this->output_tag_open();
 		$this->output .='<ul>';
-		$this->output .= $this->build_list( $input['list_items'] ) . PHP_EOL;
+		$this->output .= $this->build_list() . PHP_EOL;
 		$this->output .='<ul>';
 		$this->output_tag_close();
 	}
@@ -56,9 +50,9 @@ class BaseList extends BasePattern {
 	 *
 	 * @param array $list_items Array of list items.
 	 */
-	protected function build_list( $list_items ) {
-		if ( is_array( $list_items ) && count( $list_items ) ) {
-			foreach ( $list_item as $li ) {
+	protected function build_list() {
+		if ( is_array( $this->input['list_items'] ) && count( $this->input['list_items'] > 0 ) ) {
+			foreach ( $this->input['list_items'] as $li ) {
 				if ( ! empty( $li ) ) {
 					$this->list_items[] = '<li>' . $li  . '</li>';
 				}

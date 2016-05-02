@@ -25,24 +25,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 class SubHeader extends BasePattern {
 
 	/**
-	 * Constructor for Caption Pattern class objects.
-	 *
-	 * At instantiation this method adds background colour modifier,
+	 * Overwrite initial output value for Subheaders.
 	 *
 	 * @since 0.1.0
-	 *
-	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $context Optional. String referring to pattern.
-	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
-	 *
-	 * @throws Exception Throws error when there's no parent set for this caption.
+	 * @access protected
 	 **/
-	public function __construct( $input, $context = '', $modifiers = array() ) {
-		Parent::__construct( $input, $context, $modifiers );
-
+	 protected function create_output() {
 		$this->output_tag_open();
-		$this->output .= '<h3>' . $input . '</h3>' . PHP_EOL;
+		$this->output .= '<h3>' . $this->input . '</h3>' . PHP_EOL;
 		$this->output_tag_close();
-
 	}
 }

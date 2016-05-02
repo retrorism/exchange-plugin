@@ -62,6 +62,15 @@ abstract class BasePattern {
 	public $output = '';
 
 	/**
+	 * Input content, stored for use when rendering
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var mixed $input
+	 **/
+	protected $input;
+
+	/**
 	 * Context in/through which this pattern object has been instantiated.
 	 *
 	 * @since 0.1.0
@@ -69,6 +78,16 @@ abstract class BasePattern {
 	 * @var mixed $context Parent object or slug name.
 	 **/
 	public $context;
+
+	/**
+	 * Modifiers provided at instantiation, stored for later use
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var array $modifiers Associatiative array containing modifier-types (keys) and values.
+	 **/
+	protected $modifiers;
+
 
 	/**
 	 * Base class name slug as element.
@@ -90,16 +109,29 @@ abstract class BasePattern {
 	 * @param mixed  $input Pattern content.
 	 * @param string $context String referring to pattern.
 	 * @param array  $modifiers Additional modifiers that influence look and functionality.
+	 *
+	 * @throws exception when input is empty.
 	 **/
-	protected function __construct( $input, $context = '', $modifiers = array() ) {
+	public function __construct( $input, $context = '', $modifiers = array() ) {
 
-		$this->set_basename();
-		$this->set_context_and_base_class( $context );
+		/* Check if the context (for example the patterns parent)
+		 * provided at instantiation is not empty, then assign it.
+		 */
+		$this->context = ! empty( $context ) ? $context : '';
 
-		if ( ! empty( $modifiers ) ) {
-			$this->process_modifiers( $modifiers );
+		// Check if the modifiers provided at instantiation are not empty.
+		if ( !empty( $modifiers ) ) {
+			$this->modifiers = $modifiers;
 		}
-		$this->set_initial_output( $input );
+
+		// Check if the input isn't empty, else throw error.
+		if ( empty( $input ) ) {
+			unset( $this );
+			//throw new Exception('No input provided for this pattern');
+		} else {
+			$this->input = $input;
+		}
+
 	}
 
 	/**
@@ -121,7 +153,10 @@ abstract class BasePattern {
 	 * @param string $context Context (usually the parent element's element / basename).
 	 **/
 	protected function set_context_and_base_class( $context ) {
-		$this->context = ! empty( $context ) ? $context : '';
+		// Override base context from 'publish / embed' calls.
+		if ( ! empty( $context ) ) {
+			$this->context = $context;
+		}
 		// Add generic story element class for all direct children of a section.
 		if ( 'section' === $this->context ) {
 			$this->classes['section__default-element'] = 'section__slice';
@@ -135,25 +170,6 @@ abstract class BasePattern {
 		} else {
 			// Fallback to setting generic class element.
 			$this->classes['element'] = $this->element;
-		}
-	}
-
-	/**
-	 * Set initial output value. Will be overwritten by individual Patterns.
-	 *
-	 * @since 0.1.0
-	 * @access protected
-	 *
-	 * @param string $input Uescaped input.
-	 *
-	 * @TODO move HTML output to template parts instead?
-	 * @TODO escape input here?
-	 **/
-	protected function set_initial_output( $input ) {
-		if ( ! empty( $input ) ) {
-			$this->output_tag_open();
-			$this->output .= '<h1 style="color: red">No output defined for' . $this->element . '</h1>';
-			$this->output_tag_close();
 		}
 	}
 
@@ -222,11 +238,11 @@ abstract class BasePattern {
 	 *
 	 * @param array $modifiers Modifiers array passed in Constructor.
 	 **/
-	protected function process_modifiers( $modifiers ) {
-		foreach ( $modifiers as $key => $val ) {
+	protected function process_modifiers() {
+		foreach ( $this->modifiers as $key => $val ) {
 			switch ( $key ) {
 				case 'data' :
-					$data_atts = $modifiers[ $key ];
+					$data_atts = $this->modifiers[ $key ];
 					if ( ! empty( $data_atts ) && is_array( $data_atts ) ) {
 						foreach ( $data_atts as $k => $v ) {
 							if ( is_string( $k ) ) {
@@ -236,7 +252,7 @@ abstract class BasePattern {
 					}
 					break;
 				case 'link_attributes' :
-					$link_atts = $modifiers[ $key ];
+					$link_atts = $this->modifiers[ $key ];
 					if ( ! empty( $link_atts ) && is_array( $link_atts ) ) {
 						foreach ( $link_atts as $k => $v ) {
 							if ( is_string( $k ) ) {
@@ -246,7 +262,7 @@ abstract class BasePattern {
 					}
 					break;
 				case 'classes' :
-					$classes = $modifiers[ $key ];
+					$classes = $this->modifiers[ $key ];
 					if ( ! empty( $classes ) && is_array( $classes ) ) {
 						foreach ( $classes as $class ) {
 							$this->classes[] = $class ;
@@ -369,25 +385,60 @@ abstract class BasePattern {
 	}
 
 	/**
+	 * Set initial output value. Will be overwritten by individual Patterns.
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 *
+	 * @TODO move HTML output to template parts instead?
+	 * @TODO escape input here?
+	 **/
+	protected function create_output() {
+		if ( ! empty( $this->input ) ) {
+			$this->output_tag_open();
+			$this->output .= $this->input;
+			$this->output_tag_close();
+		} else {
+			die( $debug );
+		}
+	}
+
+	/**
+	 * Prepare pattern for rendering or embedding
+	 *
+	 * @param $context
+	 * @return void
+	 */
+	protected function prepare( $context ) {
+		$this->set_basename();
+		$this->set_context_and_base_class( $context );
+		if ( ! empty( $this->modifiers ) ) {
+			$this->process_modifiers();
+		}
+		return $this;
+	}
+
+	/**
 	 * Prints escaped pattern output. Make sure to escape anywhere else.
 	 *
 	 * @since 0.1.0
 	 * @access public
 	 **/
-	public function publish() {
+	public function publish( $context = '' ) {
+		$this->prepare( $context )->create_output();
 		echo $this->output . PHP_EOL;
 	}
 
 	/**
-	 * Prints untagged.
+	 * Prints untagged contents.
 	 *
 	 * @since 0.1.0
 	 * @access public
 	 **/
-	public function publish_stripped() {
+	public function publish_stripped( $context = '' ) {
+		$this->prepare( $context )->create_output();
 		echo strip_tags( $this->output, '<div><p><em>' ) . PHP_EOL;
 	}
-
 
 	/**
 	 * Returns escaped pattern output for use in parent object.
@@ -396,7 +447,8 @@ abstract class BasePattern {
 	 * @access public
 	 * @return string $output HTML output consisting of tags and content.
 	 **/
-	public function embed() {
+	public function embed( $context = '' ) {
+		$this->prepare( $context )->create_output();
 		return $this->output;
 	}
 }

@@ -25,34 +25,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 class GridItem extends BasePattern {
 
 	/**
-	 * Constructor for Item Pattern class objects.
+	 * Overwrite initial output value for Grid items.
 	 *
 	 * @since 0.1.0
-	 *
-	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $context String referring to pattern.
-	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
-	 *
-	 * @throws Exception Throws error when there's no parent set for this Item.
+	 * @access protected
 	 **/
-	 public function __construct( $input, $context = '', $modifiers = array() ) {
- 		Parent::__construct( $input, $context, $modifiers );
- 		$this->output_tag_open();
- 		$this->output .= $this->build_grid_item( $input, $modifiers );
- 		$this->output_tag_close();
- 		// End construct.
+	 protected function create_output() {
+		if ( is_object( $this->input ) ) {
+			$this->output_tag_open();
+	 		$this->output .= $this->build_grid_item();
+	 		$this->output_tag_close();
+		} else {
+			throw new Exception('Calling griditem on non-post');
+		}
  	}
 
 	/**
 	 * Build Item output
 	 *
 	 * @since 0.1.0
-	 *
-	 * @param array $input List of ACF fields.
 	 **/
-	protected function build_grid_item( $exchange, $modifiers ) {
-		if ( locate_template( 'parts/grid-' . $exchange->type . '.php' ) !== '') {
-			$template = $exchange->type;
+	protected function build_grid_item() {
+		if ( locate_template( 'parts/grid-' . $this->input->type . '.php' ) !== '') {
+			$template = $this->input->type;
 		} elseif ( locate_template( 'parts/grid-default.php' ) !== '') {
 			$template = 'default';
 		} else {

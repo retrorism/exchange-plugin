@@ -247,7 +247,7 @@ class Exchange {
 
 	public function publish_related_content() {
 		if ( $this->has_related_content ) {
-			$this->related_content->publish();
+			$this->related_content->publish('related');
 		}
 	}
 

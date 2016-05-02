@@ -23,19 +23,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class BaseInterview extends BasePattern {
 
 	/**
-	 * Constructor for Interview Conversation class objects.
+	 * Overwrite initial output value for Interviews.
 	 *
 	 * @since 0.1.0
-	 * @access public
-	 *
-	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $context String referring to pattern.
-	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
+	 * @access protected
 	 **/
-	public function __construct( $input, $context = '', $modifiers = array() ) {
-		Parent::__construct( $input, $context, $modifiers );
+	 protected function create_output() {
 		$this->output_tag_open();
-		$this->output .= $this->build_interview( $input ) . PHP_EOL;
+		$this->output .= $this->build_interview() . PHP_EOL;
 		$this->output_tag_close();
 	}
 

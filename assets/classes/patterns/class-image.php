@@ -88,24 +88,20 @@ class Image extends BasePattern {
 	private $src_set;
 
 	/**
-	 * Constructor for Section Pattern class objects.
+	 * Overwrite initial output value for Subheaders.
 	 *
 	 * @since 0.1.0
-	 *
-	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $context Optional. String referring to pattern.
-	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
+	 * @access protected
 	 **/
-	public function __construct( $input, $context = '', $modifiers = array() ) {
-		Parent::__construct( $input, $context, $modifiers );
+	 protected function create_output() {
 
-		$this->set_image_properties( $input, $context, $modifiers );
+		$this->set_image_properties();
 
 		$this->output_tag_open( 'figure' );
 		$this->output .= $this->build_image_element();
 		// Add caption if available.
-		if ( ! empty( $input['caption'] ) ) {
-			$this->set_image_caption( $input, $modifiers );
+		if ( ! empty( $this->input['caption'] ) ) {
+			$this->set_image_caption();
 
 			if ( is_object( $this->caption ) ) {
 				$this->output .= $this->build_image_caption();
@@ -120,43 +116,40 @@ class Image extends BasePattern {
 	 * Set image properties by using input and modifiers.
 	 *
 	 * @since 0.1.0
-	 *
-	 * @param array $input ACF input, consisting of image araray.
-	 * @param array $modifiers List of modifiers received from sibling classes.
 	 **/
-	protected function set_image_properties( $input, $context, $modifiers ) {
-		if ( isset( $input['height'] ) ) {
-			$h = $input['height'];
-			$w = $input['width'];
+	protected function set_image_properties() {
+		if ( isset( $this->input['height'] ) ) {
+			$h = $this->input['height'];
+			$w = $this->input['width'];
 			// Get orientation and validate with actual height and width.
 			if ( is_int( $h ) && is_int( $w ) ) {
-				$this->set_image_orientation( $h, $w, $modifiers );
+				$this->set_image_orientation( $h, $w );
 				$this->set_image_quality( $h, $w );
 			}
 		}
 		// Default base size is story-portrait or story-landscape, switch to different sizes depending on context.
-		$image_size = isset( $special_image_sizes[ $context ] ) ?
-			$special_sizes[ $context ] :
+		$image_size = isset( $special_image_sizes[ $this->context ] ) ?
+			$special_sizes[ $this->context ] :
 			'story-' . $this->orientation;
 
 		//Set src_set from attachment_id.
-		if ( ! empty( $input['ID'] ) ) {
-			$this->src_set = wp_get_attachment_image_srcset( $input['ID'], $image_size );
+		if ( ! empty( $this->input['ID'] ) ) {
+			$this->src_set = wp_get_attachment_image_srcset( $this->input['ID'], $image_size );
 		}
 
 		// Set src just in case.
-		if ( ! empty( $input['sizes'][ $image_size ] ) ) {
-			$this->src = $input['sizes'][ $image_size ];
+		if ( ! empty( $this->input['sizes'][ $image_size ] ) ) {
+			$this->src = $this->input['sizes'][ $image_size ];
 		}
 
 		// Set description to be used as alt and alternative for title.
-		if ( ! empty( $input['description'] ) ) {
-			$this->description = $input['description'];
+		if ( ! empty( $this->input['description'] ) ) {
+			$this->description = $this->input['description'];
 		}
 
 		// Add description to be used as title.
-		if ( ! empty( $input['title'] ) ) {
-			$this->title = $input['title'];
+		if ( ! empty( $this->input['title'] ) ) {
+			$this->title = $this->input['title'];
 		}
 	}
 
@@ -199,19 +192,16 @@ class Image extends BasePattern {
 	 * Set image caption object from input and modifiers.
 	 *
 	 * @since 0.1.0
-	 *
-	 * @param array $input ACF input.
-	 * @param array $modifiers List of modifiers received from sibling classes.
 	 **/
-	protected function set_image_caption( $input, $modifiers ) {
+	protected function set_image_caption() {
 
 		// Get caption position from modifiers paramater.
 		$mods = array();
-		if ( ! empty( $modifiers['caption_position'] ) ) {
-			$mods['position'] = $modifiers['caption_position'];
+		if ( ! empty( $this->modifiers['caption_position'] ) ) {
+			$mods['position'] = $this->modifiers['caption_position'];
 		}
 
-		$this->caption = new Caption( $input['caption'], $this->element, $mods );
+		$this->caption = new Caption( $this->input['caption'], $this->element, $mods );
 	}
 
 	/**
@@ -235,18 +225,17 @@ class Image extends BasePattern {
 	 *
 	 * @param integer $h Image height.
 	 * @param integer $w Image width.
-	 * @param array   $modifiers List of modifiers may contain info on orientation.
 	 *
 	 * @TODO resolve difference between user input and actual size.
 	 **/
-	protected function set_image_orientation( $h, $w, $modifiers ) {
+	protected function set_image_orientation( $h, $w ) {
 		// Check for orientation modifier.
-		if ( empty( $modifiers['orientation'] ) ) {
+		if ( empty( $this->modifiers['orientation'] ) ) {
 			$this->orientation = $h > $w ?
 				'portrait' :
 				'landscape';
 		} else {
-			$this->orientation = 'portrait' === $modifiers['orientation'] ?
+			$this->orientation = 'portrait' === $this->modifiers['orientation'] ?
 				'portrait' :
 				'landscape';
 		}

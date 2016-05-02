@@ -36,25 +36,19 @@ class ImageDuo extends BasePattern {
 	public $gallery = array();
 
 	/**
-	 * Constructor for Image Duo's.
+	 * Overwrite initial output value for Duo Images.
 	 *
 	 * @since 0.1.0
-	 *
-	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $context Optional. String referring to pattern.
-	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
+	 * @access protected
 	 **/
-	function __construct( $input, $context = '', $modifiers = array() ) {
-		Parent::__construct( $input, $context, $modifiers );
+	 protected function create_output() {
 
 		// Check if there are two images and add them to gallery.
-		if ( 2 === count( $input ) ) {
+		if ( 2 === count( $this->input ) ) {
 
 			// Open element.
 			$this->output_tag_open();
-
-			$this->set_gallery( $input );
-
+			$this->set_gallery(  );
 			// Close element.
 			$this->output_tag_close();
 		}
@@ -64,12 +58,10 @@ class ImageDuo extends BasePattern {
 	 * Set gallery with two image objects.
 	 *
 	 * @since 0.1.0
-	 *
-	 * @param array $input ACF field input.
 	 **/
-	protected function set_gallery( $input ) {
+	protected function set_gallery() {
 		$i = 0;
-		foreach ( $input as $image ) {
+		foreach ( $this->input as $image ) {
 			if ( ! empty( $image['filename'] ) ) {
 				$this->gallery[ $i ] = $image;
 			}

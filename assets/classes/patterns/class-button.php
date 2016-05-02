@@ -25,45 +25,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Button extends BasePattern {
 
 	/**
-	 * Data
-	 *
-	 * @access protected
-	 * @var array $data Data attributes can be passed through modifiers array.
-	 **/
-	protected $data;
-
-	/**
-	 * Constructor for Button Pattern class objects.
-	 *
-	 * At instantiation this method adds button colour.
+	 * Overwrite initial output value for buttons.
 	 *
 	 * @since 0.1.0
-	 *
-	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $context String referring to pattern.
-	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
-	 *
-	 * @throws Exception Throws error when there's no parent set for this button.
+	 * @access protected
 	 **/
-	 public function __construct( $input, $context = '', $modifiers = array() ) {
- 		Parent::__construct( $input, $context, $modifiers );
+	 protected function create_output() {
 		$el = 'button';
-		if ( ! empty( $modifiers['link_attributes'] ) ) {
+		if ( ! empty( $this->modifiers['link_attributes'] ) ) {
 			$el = 'a';
 		}
  		$this->output_tag_open( $el );
- 		$this->output .= $input['button_text'];
+ 		$this->output .= $this->input['button_text'];
  		$this->output_tag_close( $el );
- 		// End construct.
  	}
 
-	/**
-	 * Create button.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param array $input List of ACF fields.
-	 **/
-	protected function build_button( $input ) {
-	}
 }

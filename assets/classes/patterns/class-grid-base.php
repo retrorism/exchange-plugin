@@ -38,19 +38,18 @@ abstract class BaseGrid extends BasePattern {
 	protected $has_grid_items = false;
 
 	/**
-	 * Constructor for Base Grid Class.
+	 * Overwrite initial output value for Grid blocks
 	 *
 	 * @since 0.1.0
-	 * @access public
-	 * @param array  $input Collection of Grid Item objects
-	 * @param string $context Optional. String referring to pattern.
-	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
+	 * @access protected
+	 *
+	 * @throws Exception when there's no valid input array.
 	 **/
-	public function __construct( $input, $context = '', $modifiers = array() ) {
-		Parent::__construct( $input, $context, $modifiers );
+	 protected function create_output() {
 
-		if ( is_array( $input ) &&  count( $input ) > 0 ) {
-			$this->set_grid_items( $input );
+		if ( is_array( $this->input ) &&  count( $this->input ) > 0 ) {
+			// Retrieve all items for this block.
+			$this->set_grid_items();
 		} else {
 			throw new Exception( __( 'This is not valid grid content', EXCHANGE_PLUGIN ) );
 		}
@@ -60,14 +59,12 @@ abstract class BaseGrid extends BasePattern {
 	/**
 	 * Set grid items.
 	 *
-	 * If not empty, sets input array to grid_items property.
-	 *
-	 * @param array $input List of items passed from ACF or controller.
+	 * Sets input array to grid_items property.
 	 */
-	protected function set_grid_items( $input ) {
+	protected function set_grid_items() {
 		// Reset grid items array.
 		$this->grid_items = array();
-		foreach ( $input as $item ) {
+		foreach ( $this->input as $item ) {
 			$this->add_grid_item( $this->create_grid_item( $item ) );
 		}
 		if ( count( $this->grid_items ) > 0 ) {

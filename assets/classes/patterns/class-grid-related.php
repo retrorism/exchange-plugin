@@ -23,23 +23,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 class RelatedGrid extends BaseGrid {
 
 	/**
-	 * Constructor for Related Grid Class.
+	 * Overwrite initial output value for Subheaders.
 	 *
 	 * @since 0.1.0
-	 * @access public
-	 * @param array  $input Collection of one or more related content items
-	 * @param string $context Optional. String referring to pattern.
-	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
+	 * @access protected
 	 **/
-	public function __construct( $input, $context = '', $modifiers = array() ) {
-		Parent::__construct( $input, $context, $modifiers );
-
+	 protected function create_output() {
 		if ( $this->has_grid_items ) {
-			$this->output_tag_open( 'aside' );
+			$this->output_tag_open();
 			foreach ( $this->grid_items as $item ) {
 				$this->output .= $item->embed();
 			}
-			$this->output_tag_close( 'aside' );
+			$this->output_tag_close();
 		}
 	}
 }

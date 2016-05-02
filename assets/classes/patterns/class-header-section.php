@@ -25,22 +25,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 class SectionHeader extends BasePattern {
 
 	/**
-	 * Constructor for Caption Pattern class objects.
-	 *
-	 * At instantiation this method adds background colour modifier,
+	 * Overwrite initial output value for Section Headers.
 	 *
 	 * @since 0.1.0
-	 *
-	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $context String referring to pattern.
-	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
+	 * @access private
 	 **/
-	public function __construct( $input, $context = '', $modifiers = array() ) {
-		Parent::__construct( $input, $context, $modifiers );
-
+	 protected function create_output() {
 		$this->output_tag_open();
-		$this->output .= '<h2>' . $input . '</h2>' . PHP_EOL;
+		$this->output .= '<h2>' . $this->input . '</h2>' . PHP_EOL;
 		$this->output_tag_close();
-
 	}
 }

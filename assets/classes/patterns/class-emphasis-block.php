@@ -23,27 +23,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 class EmphasisBlock extends BasePattern {
 
 	/**
-	 * List of block elements - these are the elements (content styled in patterns).
+	 * Overwrite initial output value for Emphasis blocks
 	 *
 	 * @since 0.1.0
 	 * @access protected
-	 * @var array $block_elements Elements-list.
 	 **/
-	protected $block_elements;
-
-	/**
-	 * Constructor for Emphasis Blocks.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 **/
-	public function __construct( $input, $context = '', $modifiers = array() ) {
-		Parent::__construct( $input, $context, $modifiers );
-		if ( is_array( $input ) && count( $input ) > 0 ) {
-			$this->block_elements = $input;
+	 protected function create_output() {
+		if ( is_array( $this->input ) && count( $this->input ) > 0 ) {
 			$this->output_tag_open();
-			$type = isset( $modifiers['type'] ) ? $modifiers['type'] : 'post-it';
-			$this->output .= $this->build_block_elements( $this->block_elements, $type );
+			$type = isset( $this->modifiers['type'] ) ? $this->modifiers['type'] : 'post-it';
+			$this->output .= $this->build_block_elements( $type );
 			$this->output_tag_close();
 		}
 	}
@@ -53,14 +42,14 @@ class EmphasisBlock extends BasePattern {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param array $input List of ACF content elements for which different patterns have been selected.
+	 * @param string $type String describing the kind of block we're building.
 	 *
 	 * @TODO proper Error notifications.
 	 **/
-	protected function build_block_elements( $block_elements, $type ) {
+	protected function build_block_elements( $type ) {
 
 		// Check for CTA elements.
-		foreach ( $block_elements as $e ) {
+		foreach ( $this->input as $e ) {
 			// Loop through elements.
 			$layout = str_replace($type, '', $e['acf_fc_layout'] );
 			switch ( $layout ) {

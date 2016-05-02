@@ -25,15 +25,12 @@ class InterviewQA extends BaseInterview {
 	/**
 	 * Build interview, QA-style.
 	 *
-	 * Undocumented function long description
-	 *
-	 * @param array $input Array containing questions and answers
 	 * @return HTML string with questions and answers
 	 **/
-	public function build_interview( $input ) {
-		if ( is_array( $input ) && count( $input ) > 0 ) {
+	public function build_interview() {
+		if ( is_array( $this->input ) && count( $this->input ) > 0 ) {
 			$output = '';
-			foreach ( $input as $qa ) {
+			foreach ( $this->input as $qa ) {
 				if ( ! empty( $qa['question'] ) && ! empty( $qa['answer'] ) ) {
 					$modifiers_q = array( 'style' => 'question' );
 					$modifiers_a = array( 'style' => 'answer' );

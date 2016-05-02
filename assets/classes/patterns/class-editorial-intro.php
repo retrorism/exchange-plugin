@@ -25,22 +25,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class EditorialIntro extends BasePattern {
 
 	/**
-	 * Constructor for Editorial Intros.
-	 *
-	 * At instantiation this method checks if input is a string and is not empty.
+	 * Overwrite initial output value for editorial intros
 	 *
 	 * @since 0.1.0
-	 * @access public
-	 *
-	 * @param mixed  $input Pattern content as defined in ACF input values.
-	 * @param string $context Optional. String referring to pattern.
-	 * @param array  $modifiers Optional. Additional modifiers that influence look and functionality.
+	 * @access protected
 	 **/
-	function __construct( $input, $context = '', $modifiers = array() ) {
-		Parent::__construct( $input, $context, $modifiers );
-		if ( is_string( $input ) && ! empty( $input ) ) {
+	 protected function create_output() {
+		if ( is_string( $this->input ) && ! empty( $this->input ) ) {
 			$this->output_tag_open();
-			$content = new Paragraph( $input, $this->element );
+			$content = new Paragraph( $this->input, $this->element );
 			$this->output .= $content->embed();
 			$this->output_tag_close();
 		}

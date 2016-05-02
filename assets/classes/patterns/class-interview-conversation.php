@@ -25,13 +25,10 @@ class InterviewConversation extends BaseInterview {
 	/**
 	 * Build interview, Conversation-style.
 	 *
-	 * Undocumented function long description
-	 *
-	 * @param array $input Array containing names and statements.
 	 * @return HTML string with names and statements.
 	 **/
-	public function build_interview( $input ) {
-		return print_r( $input, true );
+	public function build_interview() {
+		return print_r( $this->input, true );
 	}
 
 }
