@@ -98,9 +98,20 @@ class Image extends BasePattern {
 		$this->set_image_properties();
 
 		$this->output_tag_open( 'figure' );
+
+		// Add wrapper for centering if this is a header image.
+		if ( 'story__header' === $this->context ) {
+			$this->output .= '<div class="story__header__image-wrapper">';
+		}
 		$this->output .= $this->build_image_element();
+
+		// Close wrapper.
+		if ( 'story__header' === $this->context ) {
+			$this->output .= '</div>';
+		}
+		
 		// Add caption if available.
-		if ( ! empty( $this->input['caption'] ) ) {
+		if ( ! empty( $this->input['caption'] ) || ! empty( $this->title ) )  {
 			$this->set_image_caption();
 
 			if ( is_object( $this->caption ) ) {
@@ -151,6 +162,7 @@ class Image extends BasePattern {
 		if ( ! empty( $this->input['title'] ) ) {
 			$this->title = $this->input['title'];
 		}
+
 	}
 
 	/**
@@ -200,8 +212,11 @@ class Image extends BasePattern {
 		if ( ! empty( $this->modifiers['caption_position'] ) ) {
 			$mods['position'] = $this->modifiers['caption_position'];
 		}
+		$caption = ! empty( $this->input['caption'] ) ?
+			$this->input['caption'] :
+			$this->title;
 
-		$this->caption = new Caption( $this->input['caption'], $this->element, $mods );
+		$this->caption = new Caption( $caption, $this->element, $mods );
 	}
 
 	/**

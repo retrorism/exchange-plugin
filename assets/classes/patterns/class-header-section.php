@@ -32,7 +32,7 @@ class SectionHeader extends BasePattern {
 	 **/
 	 protected function create_output() {
 		$this->output_tag_open();
-		$this->output .= '<h2>' . $this->input . '</h2>' . PHP_EOL;
+		$this->output .= '<h4>' . $this->input . '</h4>' . PHP_EOL;
 		$this->output_tag_close();
 	}
 }

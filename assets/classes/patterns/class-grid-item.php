@@ -54,6 +54,7 @@ class GridItem extends BasePattern {
 			$template = false;
 		}
 		if ( $template ) {
+			$exchange = $this->input;
 			ob_start();
 			include( locate_template( 'parts/grid-' . $template .'.php' ) );
 			$grid_item = ob_get_contents();

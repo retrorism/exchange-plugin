@@ -47,13 +47,20 @@ abstract class BaseGrid extends BasePattern {
 	 **/
 	 protected function create_output() {
 
-		if ( is_array( $this->input ) &&  count( $this->input ) > 0 ) {
-			// Retrieve all items for this block.
-			$this->set_grid_items();
-		} else {
-			throw new Exception( __( 'This is not valid grid content', EXCHANGE_PLUGIN ) );
+		// If a grid is created inside a story, make this into an aside class.
+		if ( is_single() ) {
+			$el = 'aside';
 		}
+		$this->set_grid_items();
 
+		 // Create grid with posts embedded.
+		if ( $this->has_grid_items ) {
+			$this->output_tag_open( $el );
+			foreach ( $this->grid_items as $item ) {
+				$this->output .= $item->embed();
+			}
+			$this->output_tag_close( $el );
+		}
 	}
 
 	/**
@@ -62,13 +69,19 @@ abstract class BaseGrid extends BasePattern {
 	 * Sets input array to grid_items property.
 	 */
 	protected function set_grid_items() {
-		// Reset grid items array.
-		$this->grid_items = array();
-		foreach ( $this->input as $item ) {
-			$this->add_grid_item( $this->create_grid_item( $item ) );
-		}
-		if ( count( $this->grid_items ) > 0 ) {
-			$this->has_grid_items = true;
+		// Test input for array with posts.
+		if ( is_array( $this->input ) &&  count( $this->input ) > 0 ) {
+		   // Retrieve all items for this block.
+			// Reset grid items array.
+			$this->grid_items = array();
+			foreach ( $this->input as $item ) {
+				$this->add_grid_item( $this->create_grid_item( $item ) );
+			}
+			if ( count( $this->grid_items ) > 0 ) {
+				$this->has_grid_items = true;
+			}
+		} else {
+			throw new Exception( __( 'This is not valid grid content', EXCHANGE_PLUGIN ) );
 		}
 	}
 

@@ -30,13 +30,24 @@ function tandem_hex_to_slug( $hex ) {
 	return 'default';
 }
 
-function tandem_create_link( $obj ) {
-	if ( BaseController::is_correct_content_type( $obj ) ) {
+/**
+ * Create link (or simply an opening tag)
+ *
+ * @param object Exchange object to link to.
+ * @param bool @with_text Optional. Add object title as link text, or simply open tag.
+
+ * @return string Anchor tag with appropriate attributes and / or title.
+ */
+function exchange_create_link( $obj, $with_text = true ) {
+	if ( $obj instanceof Exchange ) {
 		$url = $obj->link;
 		$title = $obj->title;
 	}
 	if ( ! empty( $url ) && ! empty( $title ) ) {
-		$output = '<a href="' . $url . '" title="' .sprintf( esc_html__( 'Navigate to %s', EXCHANGE_PLUGIN ), esc_attr( $title ) ).'">' . $title . '</a>';
+		$output = '<a href="' . $url . '" title="' .sprintf( esc_html__( 'Navigate to %s', EXCHANGE_PLUGIN ), esc_attr( $title ) ).'">';
+		if ( $with_text ) {
+			$output .= $title . '</a>';
+		}
 		return $output;
 	} else {
 		return false;

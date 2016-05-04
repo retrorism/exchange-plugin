@@ -26,15 +26,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Story extends Exchange {
 
 	/**
-	 * Ordered array for use in grid / single display.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 * @var array Ordered tag-list.
-	 **/
-	public $ordered_tag_list = array();
-
-	/**
 	 * Language.
 	 *
 	 * @since 0.1.0
@@ -117,9 +108,9 @@ class Story extends Exchange {
 	 *
 	 * @return void
 	 */
-	public function publish_byline() {
+	public function publish_byline( $context= '' ) {
 		if ( isset( $this->byline ) ) {
-			$this->byline->publish();
+			$this->byline->publish( $context );
 		}
 	}
 }

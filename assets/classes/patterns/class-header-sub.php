@@ -32,7 +32,7 @@ class SubHeader extends BasePattern {
 	 **/
 	 protected function create_output() {
 		$this->output_tag_open();
-		$this->output .= '<h3>' . $this->input . '</h3>' . PHP_EOL;
+		$this->output .= '<h5>' . $this->input . '</h5>' . PHP_EOL;
 		$this->output_tag_close();
 	}
 }

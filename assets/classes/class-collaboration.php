@@ -56,7 +56,7 @@ class Collaboration extends Exchange {
 		Parent::__construct( $post, $context, $controller );
 		$this->controller->map_collaboration_basics( $post );
 		if ( 'grid' === $context ) {
-			$this->controller->set_featured_image();
+			$this->controller->set_featured_image( $context );
 			$this->controller->set_ordered_tag_list();
 		} else {
 			$this->controller->map_full_collaboration();

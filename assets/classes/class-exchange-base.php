@@ -90,6 +90,15 @@ class Exchange {
 	public $has_header_image = false;
 
 	/**
+	 * Ordered array for use in grid / single display.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var array $ordered_tag_list Ordered tag-list.
+	 **/
+	public $ordered_tag_list = array();
+
+	/**
 	 * Array to be filled with tags.
 	 *
 	 * @since 0.1.0
@@ -188,47 +197,6 @@ class Exchange {
 	// 	);
 	// }
 
-	/**
-	 * Returns all tags for this story.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 *
-	 * @return array $taglist List of tags.
-	 **/
-	public function get_tag_list() {
-		return $this->tag_list;
-	}
-
-	/**
-	 * Returns short list of tags (no more than 2) for this story.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 *
-	 * @return array $shortlist List of tags.
-	 *
-	 * @TODO Expand selection options.
-	 **/
-	public function get_tag_short_list() {
-		$i = 0;
-		$shortlist = array();
-		$tax_order = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['display_priority'];
-		foreach ( $tax_order as $taxonomy ) {
-			if ( array_key_exists( $taxonomy, $this->ordered_tag_list ) ) {
-				foreach ( $this->ordered_tag_list[$taxonomy] as $term ) {
-					if ( $i < $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['grid_tax_max'] ) {
-						$shortlist[] = $term;
-						$i++;
-					} else {
-						continue 2;
-					}
-				}
-			}
-		}
-		return $shortlist;
-	}
-
 	public function publish_header_image() {
 		if ( null !== $this->header_image ) {
 			$this->header_image->publish();
@@ -245,17 +213,21 @@ class Exchange {
 		}
 	}
 
-	public function publish_related_content() {
+	public function publish_related_content( $context = '' ) {
 		if ( $this->has_related_content ) {
-			$this->related_content->publish('related');
+			$this->related_content->publish( $context );
 		}
 	}
 
 	public function publish_tags( $context = '' ) {
 		if ( $this->has_tags ) {
 			$output = "<ol>" . PHP_EOL;
-			$shortlist = $this->get_tag_short_list();
-			foreach ( $shortlist as $term ) {
+			if ( 'griditem' === $context ) {
+			 	$list = $this->controller->get_tag_short_list();
+			} else {
+				$list = $this->ordered_tag_list;
+			}
+			foreach ( $list as $term ) {
 				$tag_mods = $this->controller->prepare_tag_modifiers( $term );
 				$tag = new Tag( $term, $context, $tag_mods );
 				$output .= "<li>" . $tag->embed() . "</li>" . PHP_EOL;

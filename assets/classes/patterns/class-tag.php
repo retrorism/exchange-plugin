@@ -31,13 +31,14 @@ class Tag extends BasePattern {
 	 * @access protected
 	 **/
 	 protected function create_output() {
-		if ( 'grid' === $this->context ) {
+		if ( 'griditem' === $this->context ) {
 			$el = 'span';
 		} else {
 			$el = 'a';
 		}
  		$this->output_tag_open( $el );
- 		$this->output .= $input->name;
+ 		$this->output .= $this->input->name;
  		$this->output_tag_close( $el );
 	}
+
 }

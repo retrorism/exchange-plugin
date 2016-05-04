@@ -48,7 +48,7 @@ class ImageDuo extends BasePattern {
 
 			// Open element.
 			$this->output_tag_open();
-			$this->set_gallery(  );
+			$this->set_gallery();
 			// Close element.
 			$this->output_tag_close();
 		}
@@ -61,6 +61,7 @@ class ImageDuo extends BasePattern {
 	 **/
 	protected function set_gallery() {
 		$i = 0;
+		$this->output .= '<div class="imageduo__wrapper">';
 		foreach ( $this->input as $image ) {
 			if ( ! empty( $image['filename'] ) ) {
 				$this->gallery[ $i ] = $image;
@@ -74,5 +75,6 @@ class ImageDuo extends BasePattern {
 			$this->output .= $gallery_item->embed();
 			$i++;
 		}
+		$this->output .= '</div>';
 	}
 }

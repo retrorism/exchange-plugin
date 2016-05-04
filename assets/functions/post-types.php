@@ -50,10 +50,9 @@ function tandem_create_story() {
 		'public'              => true,
 		'exclude_from_search' => false,
 		'capability_type'     => 'post',
-		'supports'            => array( 'title', 'editor', 'thumbnail', 'revisions' ),
-		'taxonomies'          => array( 'post_tag', 'category', 'topic' ),
+		'supports'            => array( 'title','editor','thumbnail','revisions' ),
 		'rewrite'             => array( 'slug' => 'stories' ),
-		// Removed 'taxonomies' => array( 'category','post_tag').
+		'taxonomies'          => array( 'post_tag','category','location','topic'),
 	) );
 }
 
@@ -80,19 +79,18 @@ function tandem_create_collaboration() {
 	);
 	// Register post type.
 	register_post_type( 'collaboration', array(
-		'labels' => $labels,
-		'has_archive' => true,
-		'menu_icon' => 'dashicons-editor-paste-text',
-		'menu_position' => 12,
-		'public' => true,
-		'hierarchical' => true,
+		'labels'              => $labels,
+		'has_archive'         => true,
+		'menu_icon'           => 'dashicons-editor-paste-text',
+		'menu_position'       => 12,
+		'public'              => true,
+		'hierarchical'        => true,
 		// Other items that are available for this array: 'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'.
-		'supports' => array( 'title', 'thumbnail', 'editor', 'revisions' ),
-		// Removed: 'taxonomies' => array( 'output', 'theme', 'discipline' ).
+		'supports'            => array( 'title', 'thumbnail', 'editor', 'revisions' ),
 		'exclude_from_search' => false,
-		'capability_type' => 'post',
-		'rewrite' => array( 'slug' => 'collaborations' ),
-		'taxonomies' => array( 'post_tag','location','topic','discipline','methodology','output'),
+		'capability_type'     => 'post',
+		'rewrite'             => array( 'slug' => 'collaborations' ),
+		'taxonomies'          => array( 'post_tag','location','topic','discipline','methodology','output'),
 		)
 	);
 

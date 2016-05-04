@@ -20,7 +20,7 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 		'COLOURS' => array(
 			'yellow-tandem' => 'f4c522', /* Tandem styleguide */
 			'black-tandem'  => '4c4d53', /* Tandem styleguide */
-			'white'         => 'ffffff',
+			'white'         => 'fefefe',
 			'salmon-1-web'  => 'fde1c7', /* Section / Box bg webguide */
 			'yellow-1-web'  => 'fffbdb', /* Section / Box bg webguide */
 			'blue-1-web'	=> 'dceff0', /* Section bg webguide */
@@ -48,6 +48,7 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 		'TAXONOMIES' => array(
 			// Priority in taxonomy types, listed by ACF Field label.
 			'display_priority' => array(
+				0 => 'post_tag',
 				1 => 'topics',
 				2 => 'disciplines',
 				3 => 'methodologies',

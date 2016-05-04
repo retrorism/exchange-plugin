@@ -229,25 +229,32 @@ class BaseController {
 	 **/
 	protected function get_ordered_tag_list() {
 		$tax_list = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['display_priority'];
-
+		$results = array();
 		switch ( $this->container->type ) {
 			case 'story':
 				foreach( $tax_list as $taxonomy ) {
-					if ( $taxonomy === 'topics' || 'locations' ) {
+					if ( $taxonomy === 'topics'
+						|| $taxonomy === 'locations'
+						|| $taxonomy === 'post_tag' ) {
 						$tax_results = get_field( $taxonomy, $this->container->post_id );
 						if ( $tax_results ) {
-							$results[$taxonomy] = $tax_results;
+							if ( is_object( $tax_results ) ) {
+								$tax_results = array( $tax_results );
+							}
+							$results = array_merge( $results, $tax_results );
 						}
 					}
 				}
-				$results[] = $this->container->language;
+				if ( isset( $this->container->language ) ) {
+					$results[] = $this->container->language;
+				}
 				break;
 			case 'collaboration':
 				$results[] = get_term_by( 'name', $this->container->programme_round->title, 'topic' );
 				foreach( $tax_list as $taxonomy ) {
 					$tax_results = get_field( $taxonomy, $this->container->post_id );
 					if ( $tax_results ) {
-						$results[$taxonomy] = $tax_results;
+						$results = array_merge( $results, $tax_results );
 					}
 				}
 				break;
@@ -270,10 +277,39 @@ class BaseController {
 	 **/
 	public function set_ordered_tag_list() {
 		$ordered_tag_list = $this->get_ordered_tag_list();
-		if ( $ordered_tag_list ) {
+		if ( is_array( $ordered_tag_list ) && count( $ordered_tag_list ) > 0 ) {
 			$this->container->ordered_tag_list = $ordered_tag_list;
 			$this->container->has_tags = true;
 		}
+	}
+
+	/**
+	 * Returns short list of tags (no more than 2) for this story.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 *
+	 * @return array $shortlist List of tags.
+	 *
+	 * @TODO Expand selection options.
+	 **/
+	public function get_tag_short_list() {
+		$i = 0;
+		$shortlist = array();
+		$tax_order = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['display_priority'];
+		foreach ( $tax_order as $taxonomy ) {
+			if ( array_key_exists( $taxonomy, $this->container->ordered_tag_list ) ) {
+				foreach ( $this->container->ordered_tag_list[$taxonomy] as $term ) {
+					if ( $i < $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['grid_tax_max'] ) {
+						$shortlist[] = $term;
+						$i++;
+					} else {
+						continue 2;
+					}
+				}
+			}
+		}
+		return $shortlist;
 	}
 
 	/**
@@ -335,6 +371,9 @@ class BaseController {
 			'link_attributes' => array(
 				'title'       => $desc,
 				'href'        => '#',
+			),
+			'classes' => array(
+				'taxonomy' => $term->taxonomy,
 			)
 		);
 		return $term_mods;

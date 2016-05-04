@@ -55,7 +55,7 @@ class StoryController extends BaseController {
 		// Set language.
 		if ( is_object( $acf_language ) ) {
 			if ( 'WP_Term' === get_class( $acf_language ) ) {
-				$this->container->language = $acf_language->name;
+				$this->container->language = $acf_language;
 			}
 		}
 
@@ -111,6 +111,8 @@ class StoryController extends BaseController {
 		$this->set_header_image( $post_id, 'story__header' );
 
 		$this->set_byline();
+
+		$this->set_ordered_tag_list();
 	}
 
 
@@ -302,8 +304,8 @@ class StoryController extends BaseController {
 				$byline_template = $templates['past'];
 			}
 			$byline_template = str_replace( '[[storyteller]]', $this->container->storyteller->name, $byline_template );
-			$byline_template = str_replace( '[[programme_round]]', tandem_create_link( $this->container->storyteller->collaboration->programme_round ), $byline_template );
-			$byline = str_replace( '[[collaboration]]', tandem_create_link( $this->container->storyteller->collaboration ), $byline_template );
+			$byline_template = str_replace( '[[programme_round]]', exchange_create_link( $this->container->storyteller->collaboration->programme_round ), $byline_template );
+			$byline = str_replace( '[[collaboration]]', exchange_create_link( $this->container->storyteller->collaboration ), $byline_template );
 
 			$this->container->byline = new Byline( $byline, 'footer' );
 		}
