@@ -70,7 +70,7 @@ function exchange_create_tax_language() {
 function exchange_create_tax_topic() {
 	register_taxonomy(
 		'topic',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
-		array( 'collaboration', 'story' ), // Post type name.
+		array( 'collaboration','story' ), // Post type name.
 		array(
 			'hierarchical' => false,
 			'sort'         => true,
@@ -84,6 +84,30 @@ function exchange_create_tax_topic() {
 			'query_var'    => true,
 			'rewrite'      => array(
 				'slug'       => 'topics', // This controls the base slug that will display before each term.
+				'with_front' => false, // Don't display the category base before.
+			),
+		)
+	);
+}
+
+
+// Register location as taxonomy.
+function exchange_create_tax_location() {
+	register_taxonomy(
+		'location',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
+		array( 'story', 'collaboration' ), // Post type name.
+		array(
+			'hierarchical' => false,
+			'sort'         => true,
+			'label'        => __( 'Locations', EXCHANGE_PLUGIN ),  // Display name.
+			'show_ui'      => true,
+			'show_in_menu' => true,
+			'show_in_quick_edit' => true,
+			'meta_box_cb'  => false,
+			'public'       => true,
+			'query_var'    => true,
+			'rewrite'      => array(
+				'slug'       => 'locations', // This controls the base slug that will display before each term.
 				'with_front' => false, // Don't display the category base before.
 			),
 		)
@@ -162,28 +186,6 @@ function exchange_create_tax_output() {
 	);
 }
 
-// Register location as taxonomy.
-function exchange_create_tax_location() {
-	register_taxonomy(
-		'location',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
-		array( 'collaboration', 'story' ), // Post type name.
-		array(
-			'hierarchical' => false,
-			'sort'         => true,
-			'label'        => __( 'Locations', EXCHANGE_PLUGIN ),  // Display name.
-			'show_ui'      => true,
-			'show_in_menu' => true,
-			'show_in_quick_edit' => false,
-			'meta_box_cb'  => false,
-			'public'       => true,
-			'query_var'    => true,
-			'rewrite'      => array(
-				'slug'       => 'locations', // This controls the base slug that will display before each term.
-				'with_front' => false, // Don't display the category base before.
-			),
-		)
-	);
-}
 
 function exchange_fix_tag_labels()
 {
@@ -192,7 +194,7 @@ function exchange_fix_tag_labels()
     // The list of labels we can modify comes from
     //  http://codex.wordpress.org/Function_Reference/register_taxonomy
     //  http://core.trac.wordpress.org/browser/branches/3.0/wp-includes/taxonomy.php#L350
-    $wp_taxonomies['post_tag']->labels = (object)array(
+    $wp_taxonomies['post_tag']->labels = (object) array(
         'name' => 'Programme Round (Tags)',
         'menu_name' => 'Programme Round (Tags)',
         'singular_name' => 'Programme Round (Tag)',

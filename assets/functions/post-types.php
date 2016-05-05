@@ -49,6 +49,7 @@ function tandem_create_story() {
 		'menu_position'       => 11, // Dashboard is 2, Separator 4, Posts = 5, Media = 10,
 		'public'              => true,
 		'exclude_from_search' => false,
+		'hierarchical'        => true,
 		'capability_type'     => 'post',
 		'supports'            => array( 'title','editor','thumbnail','revisions' ),
 		'rewrite'             => array( 'slug' => 'stories' ),
