@@ -148,6 +148,36 @@ class Section extends BasePattern {
 								$this->output .= $emphasis_block->embed();
 							}
 							break;
+						case 'map':
+							$map_mods = array();
+							$style = $e['map_style'];
+							$center = $e['map_center'];
+							$zoom_level = $e['map_zoom_level'];
+							$markers = $e['map_markers'];
+							// Set map style.
+							if ( isset( $style ) && in_array( $style, array( 'dots','network', 'route' true ) ) ) {
+								$map_mods['style'] = $style;
+							}
+							// Set map center.
+							if ( is_array( $map_center ) && array_key_exists( 'lat', $map_center ) && array_key_exists( 'long', $map_center ) ) {
+								$map_mods['center'] = $center;
+							} else {
+								// Default to Berlin. TODO: find center function for markers
+								$map_mods['center'] = array(
+									'lat'  => 52.516667
+									'long' => 13.383333
+								);
+							}
+							// Set zoom level.
+							if ( isset( $zoom_level ) && is_int( $zoom_level ) ) {
+								$map_mods['zoom_level'] = $zoom_level;
+							} else {
+								$map_mods['zoom_level'] = 14;
+							}
+							if ( isset( $map_mods['zoom_level'] ) && isset( $map_mods['center'] ) ) {
+								$map = new SimpleMap( $e, $this->element, $map_mods );
+								$this->output .= $map->embed();
+							break;
 
 						default:
 							$this->output .= '<div data-alert class="alert-box alert">';

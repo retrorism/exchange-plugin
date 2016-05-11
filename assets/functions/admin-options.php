@@ -15,15 +15,40 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 };
 
+function exchange_helper_plugins() {
+	return array(
+		'exchange-leaflet-map' => 'Exchange_Leaflet_Map',
+		'exchange-flickr-images' => 'Exchange_Flickr_Images',
+		'exchange-svg-support' => 'Exchange_SVG_Support',
+	);
+}
 
-function tandem_add_options_page() {
-	add_theme_page(
+function exchange_add_options_page() {
+	add_menu_page(
 		__( 'Exchange settings', EXCHANGE_PLUGIN ),
 		__( 'Exchange ', EXCHANGE_PLUGIN ),
 		'manage_options',
 		EXCHANGE_PLUGIN,
-		'tandem_display_options_page'
+		'exchange_display_options_page'
 	);
+	$helper_plugins = exchange_helper_plugins();
+	foreach( $helper_plugins as $helper_plugin => $helper_plugin_class ) {
+		if ( ! class_exists( $helper_plugin_class ) ) {
+			continue;
+		}
+		if ( method_exists( $helper_plugin, 'get_instance' ) ) {
+			$plugin_object = $helpder_plugin::get_instance();
+		} else {
+			$plugin_object = new $helper_plugin_class;
+		}
+		if ( method_exists( $plugin_object, 'admin_init' ) ) {
+			$plugin_object->admin_init();
+		}
+		if ( method_exists( $plugin_object, 'admin_menu' ) ) {
+			$plugin_object->admin_menu();
+		}
+
+	}
 }
 
 /**
@@ -31,7 +56,7 @@ function tandem_add_options_page() {
  *
  * @since  0.1.0
  */
-function tandem_display_options_page() {
+function exchange_display_options_page() {
 	include_once EXCHANGE_PLUGIN_PATH . 'parts/admin-display.php';
 }
 
@@ -41,20 +66,20 @@ function tandem_display_options_page() {
  * @since     0.1.0
  * @return    boolean    The version number of the plugin.
  */
-function tandem_register_settings() {
+function exchange_register_settings() {
 
 	// Add a General section
 	add_settings_section(
 		EXCHANGE_PLUGIN . '_general',
 		__( 'Tandem Exchange theme Settings', EXCHANGE_PLUGIN ),
-		'tandem_settings_general_cb' ,
+		'exchange_settings_general_cb' ,
 		EXCHANGE_PLUGIN
 	);
 
 	add_settings_field(
 		EXCHANGE_PLUGIN . '_byline_template_past',
 		__( 'Byline template (past)', EXCHANGE_PLUGIN ),
-		'tandem_settings_byline_template_past_cb',
+		'exchange_settings_byline_template_past_cb',
 		EXCHANGE_PLUGIN,
 		EXCHANGE_PLUGIN . '_general',
 		array( 'label_for' => EXCHANGE_PLUGIN . '_byline_template_past' )
@@ -63,14 +88,14 @@ function tandem_register_settings() {
 	add_settings_field(
 		EXCHANGE_PLUGIN . '_byline_template_present',
 		__( 'Byline template (present)', EXCHANGE_PLUGIN ),
-		'tandem_settings_byline_template_present_cb',
+		'exchange_settings_byline_template_present_cb',
 		EXCHANGE_PLUGIN,
 		EXCHANGE_PLUGIN . '_general',
 		array( 'label_for' => EXCHANGE_PLUGIN . '_byline_template_present' )
 	);
 
-	register_setting( EXCHANGE_PLUGIN, EXCHANGE_PLUGIN . '_byline_template_present', 'tandem_settings_sanitize_byline_template' );
-	register_setting( EXCHANGE_PLUGIN, EXCHANGE_PLUGIN . '_byline_template_past', 'tandem_settings_sanitize_byline_template' );
+	register_setting( EXCHANGE_PLUGIN, EXCHANGE_PLUGIN . '_byline_template_present', 'exchange_settings_sanitize_byline_template' );
+	register_setting( EXCHANGE_PLUGIN, EXCHANGE_PLUGIN . '_byline_template_past', 'exchange_settings_sanitize_byline_template' );
 
 }
 
@@ -79,7 +104,7 @@ function tandem_register_settings() {
  *
  * @since  0.1.0
  */
-function tandem_settings_general_cb() {
+function exchange_settings_general_cb() {
 	echo '<p>' . __( 'Display options for the Tandem website', EXCHANGE_PLUGIN ) . '</p>';
 }
 
@@ -88,7 +113,7 @@ function tandem_settings_general_cb() {
  *
  * @since  0.1.0
  */
-function tandem_settings_byline_template_present_cb() {
+function exchange_settings_byline_template_present_cb() {
 	$present = get_option( EXCHANGE_PLUGIN . '_byline_template_present' );
 	?>
 	<fieldset>
@@ -113,7 +138,7 @@ function tandem_settings_byline_template_present_cb() {
  *
  * @since  0.1.0
  */
-function tandem_settings_byline_template_past_cb() {
+function exchange_settings_byline_template_past_cb() {
 	$past = get_option( EXCHANGE_PLUGIN . '_byline_template_past' );
 	?>
 	<fieldset>
@@ -139,6 +164,6 @@ function tandem_settings_byline_template_past_cb() {
  * @since  0.1.0
  * @return string Sanitized value
  */
-function tandem_settings_sanitize_byline_template( $byline_template ) {
+function exchange_settings_sanitize_byline_template( $byline_template ) {
 	return $byline_template;
 }

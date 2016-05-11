@@ -19,21 +19,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 //add_action( 'admin_enqueue_scripts', 'tandem_admin_enqueue_scripts' );
 
 /* Register admin menu pages upon loading admin menu */
-add_action( 'admin_menu', 'tandem_add_and_remove_menu_options' );
-add_action( 'admin_menu', 'tandem_register_settings');
-add_action( 'admin_menu', 'tandem_add_options_page');
-add_action( 'admin_init', 'set_admin_menu_separator' );
+add_action( 'admin_menu', 'exchange_add_and_remove_menu_options' );
+add_action( 'admin_menu', 'exchange_register_settings');
+add_action( 'admin_menu', 'exchange_add_options_page');
+add_action( 'admin_init', 'exchange_set_admin_menu_separator' );
 
 /* Hook meta boxes to the 'story' and 'collaboration' post types. */
 // add_action( 'add_meta_boxes_story', 'tandem_add_meta_boxes_for_story' );
-add_action( 'add_meta_boxes_collaboration', 'tandem_add_meta_boxes_for_collaboration' );
+add_action( 'add_meta_boxes_collaboration', 'exchange_add_meta_boxes_for_collaboration' );
 
 function tandem_admin_enqueue_scripts() {
 	wp_enqueue_script( 'tandem-admin-js', plugin_dir_url( EXCHANGE_PLUGIN_FILE )  . '/assets/js/tandem_admin.js', array(), '0.1.0', true );
 }
 
 /* https://github.com/tommcfarlin/WordPress-Custom-Menu-Separator */
-function set_admin_menu_separator() {
+function exchange_set_admin_menu_separator() {
 	global $menu;
 	// Replace Media Upload item nothing and surround the Pages item with separators.
 	$separators = array( 19 );
@@ -59,7 +59,7 @@ function set_admin_menu_separator() {
 	ksort( $menu );
 }
 
-function tandem_add_and_remove_menu_options() {
+function exchange_add_and_remove_menu_options() {
 	if ( ! current_user_can( 'edit_files') ) {
 		remove_menu_page( 'edit.php' ); // Remove Posts editor from menu for editors.
 		remove_menu_page( 'edit-comments.php' ); // Comments from menu for editors.
@@ -74,7 +74,7 @@ function tandem_add_and_remove_menu_options() {
 	remove_submenu_page( 'edit.php?post_type=story', 'edit-tags.php?taxonomy=post_tag&amp;post_type=story' );
 
 
- // end set_admin_menu_separator
+ // end exchange_set_admin_menu_separator
 	// add_submenu_page(
 	// 	'edit.php?post_type=story',
 	// 	'Languages',
@@ -138,7 +138,7 @@ function tandem_add_and_remove_menu_options() {
 // }
 
 /* Creates the meta box for project. */
-function tandem_add_meta_boxes_for_collaboration( $post ) {
+function exchange_add_meta_boxes_for_collaboration( $post ) {
 	add_meta_box(
 		'tandem-programme_round-parent',
 		__( 'Programme round', 'exchange-plugin' ),

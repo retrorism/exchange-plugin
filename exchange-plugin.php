@@ -32,119 +32,139 @@ if ( ! defined( 'EXCHANGE_PLUGIN_PATH' ) ) {
 	define( 'EXCHANGE_PLUGIN_PATH', plugin_dir_path( EXCHANGE_PLUGIN_FILE ) );
 }
 
-add_action( 'plugins_loaded','exchange_require_functions' );
+if ( ! class_exists( 'Exchange_Plugin' ) ) {
 
-/**
- * Require our function files.
- */
-function exchange_require_functions() {
-	$files = array(
-		'globals.php',
-		'admin.php',
-		'admin-acf.php',
-		'admin-options.php',
-		'admin-roles.php',
-		'post-types.php',
-		'public.php',
-		'taxonomies.php',
-		'import_projects.php',
-	);
-	foreach ( $files as $file ) {
-		require_once( EXCHANGE_PLUGIN_PATH . 'assets/functions/' . $file );
+	class Exchange_Plugin {
+
+		/**
+		 * Constructor for Exchange Plugin.
+		 *
+		 * @since 0.1.0
+		 * @access public
+		 *
+		 * TODO make the require_functions action more OOP
+		 **/
+		 public function __construct() {
+
+			add_action( 'plugins_loaded', array( $this, 'exchange_require_functions' ) );
+
+			/* Runs on plugin is activated */
+	 		register_activation_hook( EXCHANGE_PLUGIN_FILE, array( $this, 'exchange_plugin_activate' ) );
+
+	 		/* Runs on plugin deactivation */
+	 		register_deactivation_hook( EXCHANGE_PLUGIN_FILE, array( $this, 'exchange_plugin_deactivate' ) );
+
+			/* Register classes with autoloader */
+			spl_autoload_register( array( $this, 'exchange_auto_load' ) );
+
+		}
+
+		/**
+		 * Require our function files.
+		 */
+		function exchange_require_functions() {
+			$files = array(
+				'globals.php',
+				'admin.php',
+				'admin-acf.php',
+				'admin-options.php',
+				'admin-roles.php',
+				'post-types.php',
+				'public.php',
+				'taxonomies.php',
+				'import_projects.php',
+			);
+			foreach ( $files as $file ) {
+				require_once( EXCHANGE_PLUGIN_PATH . 'assets/functions/' . $file );
+			}
+		}
+
+		/**
+		 * Runs on activation of the plugin.
+		 **/
+		public function exchange_plugin_activate() {
+			require_once( EXCHANGE_PLUGIN_PATH . 'assets/functions/admin-roles.php' );
+			if ( function_exists( 'exchange_add_user_management_for_editors') ) {
+				exchange_add_user_management_for_editors();
+			} else {
+				die( $debug );
+			}
+			return;
+		}
+
+		/**
+		 * Runs on plugin deactivation.
+		 **/
+		public function exchange_plugin_deactivate() {
+			exchange_remove_user_management_for_editors();
+			return;
+		}
+
+		/**
+		 * Auto-load our class files.
+		 *
+		 * @param  string $class Class name.
+		 * @return void
+		 */
+		public function exchange_auto_load( $class ) {
+			static $classes = null;
+
+			if ( null === $classes ) {
+				$classes = array(
+					'exchange'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-exchange-base.php',
+					'story'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-story.php',
+					'collaboration'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-collaboration.php',
+					'programme_round'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-programme-round.php',
+					'participant'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-participant.php',
+
+					'basecontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-base.php',
+					'storycontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-story.php',
+					'participantcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-participant.php',
+					'collaborationcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-collaboration.php',
+					'programme_roundcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-programme-round.php',
+
+					'basepattern' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-pattern-base.php',
+					'basegrid' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-grid-base.php',
+					'relatedgrid' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-grid-related.php',
+					'griditem' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-grid-item.php',
+
+					'baseinterview' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-interview-base.php',
+					'byline' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-byline.php',
+					'editorialintro' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-editorial-intro.php',
+					'paragraph' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-paragraph.php',
+					'pullquote' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-quote-pull.php',
+					'blockquote' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-quote-block.php',
+					'video' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-video.php',
+					'interviewconversation' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-interview-conversation.php',
+					'interviewqa' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-interview-qa.php',
+					'section' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-section.php',
+					'sectionheader' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-header-section.php',
+					'subheader' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-header-sub.php',
+					'image' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-image.php',
+					'headerimage' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-image-header.php',
+					'imageduo' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-image-duo.php',
+					'caption' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-caption.php',
+					'emphasisblock' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-emphasis-block.php',
+					'button' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-button.php',
+					'blocklist' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-block-list.php',
+					'imagesvg' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-image-svg.php',
+					'tag' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-tag.php',
+
+				);
+				// Plugin-dependent patterns - check if the plugin exists, add extra pattern clas when available
+				if ( class_exists( 'Exchange_Leaflet_Map', false ) ) {
+					$classes['basemap'] = EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-map-base';
+					$classes['simplemap'] = EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-map-simple';
+				}
+			}
+
+			$cn = strtolower( $class );
+
+			if ( isset( $classes[ $cn ] ) ) {
+				require_once( $classes[ $cn ] );
+			}
+		}
 	}
-}
 
-
-/* Runs on plugin is activated */
-register_activation_hook( EXCHANGE_PLUGIN_FILE, 'exchange_plugin_activate' );
-
-/* Runs on plugin deactivation */
-register_deactivation_hook( EXCHANGE_PLUGIN_FILE, 'exchange_plugin_deactivate' );
-
-
-
-/**
- * Runs on activation of the plugin.
- **/
-function exchange_plugin_activate() {
-	require_once( EXCHANGE_PLUGIN_PATH . 'assets/functions/admin-roles.php' );
-	if ( function_exists( 'exchange_add_user_management_for_editors') ) {
-		exchange_add_user_management_for_editors();
-	} else {
-		die( $debug );
-	}
-	return;
-}
-
-/**
- * Runs on plugin deactivation.
- **/
-function exchange_plugin_deactivate() {
-	exchange_remove_user_management_for_editors();
-	return;
-}
-
-/**
- * Auto-load our class files.
- *
- * @param  string $class Class name.
- * @return void
- */
-function tandem_auto_load( $class ) {
-	static $classes = null;
-
-	if ( null === $classes ) {
-		$classes = array(
-			'exchange'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-exchange-base.php',
-			'story'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-story.php',
-			'collaboration'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-collaboration.php',
-			'programme_round'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-programme-round.php',
-			'participant'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/class-participant.php',
-
-			'basepattern' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-pattern-base.php',
-			'basegrid' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-grid-base.php',
-			'relatedgrid' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-grid-related.php',
-			'griditem' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-grid-item.php',
-
-			'baseinterview' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-interview-base.php',
-			'byline' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-byline.php',
-			'editorialintro' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-editorial-intro.php',
-			'paragraph' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-paragraph.php',
-			'pullquote' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-quote-pull.php',
-			'blockquote' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-quote-block.php',
-			'video' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-video.php',
-			'interviewconversation' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-interview-conversation.php',
-			'interviewqa' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-interview-qa.php',
-			'section' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-section.php',
-			'sectionheader' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-header-section.php',
-			'subheader' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-header-sub.php',
-			'image' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-image.php',
-			'headerimage' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-image-header.php',
-			'imageduo' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-image-duo.php',
-			'caption' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-caption.php',
-			'emphasisblock' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-emphasis-block.php',
-			'button' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-button.php',
-			'blocklist' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-block-list.php',
-			'imagesvg' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-image-svg.php',
-			'tag' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-tag.php',
-
-
-			'basecontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-base.php',
-			'storycontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-story.php',
-			'participantcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-participant.php',
-			'collaborationcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-collaboration.php',
-			'programme_roundcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-programme-round.php',
-
-		);
-	}
-
-	$cn = strtolower( $class );
-
-	if ( isset( $classes[ $cn ] ) ) {
-		require_once( $classes[ $cn ] );
-	}
-}
-
-if ( function_exists( 'tandem_auto_load' ) ) {
-	spl_autoload_register( 'tandem_auto_load' );
+	new Exchange_Plugin();
 }
