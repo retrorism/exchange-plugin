@@ -88,6 +88,15 @@ class Image extends BasePattern {
 	private $src_set;
 
 	/**
+	 * Image RWD sizes attribute.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var string $rwd_sizes HTML image src_set attribute.
+	 **/
+	private $rwd_sizes;
+
+	/**
 	 * Overwrite initial output value for Subheaders.
 	 *
 	 * @since 0.1.0
@@ -97,19 +106,16 @@ class Image extends BasePattern {
 
 		$this->set_image_properties();
 
-		$this->output_tag_open( 'figure' );
-
 		// Add wrapper for centering if this is a header image.
 		if ( 'story__header' === $this->context ) {
-			$this->output .= '<div class="story__header__image-wrapper">';
+			$res = $this->is_hq ? '' : 'lowres-';
+			$this->output .= '<div class="story__header__' . $res . 'image-wrapper">';
 		}
+
+		$this->output_tag_open( 'figure' );
+
 		$this->output .= $this->build_image_element();
 
-		// Close wrapper.
-		if ( 'story__header' === $this->context ) {
-			$this->output .= '</div>';
-		}
-		
 		// Add caption if available.
 		if ( ! empty( $this->input['caption'] ) || ! empty( $this->title ) )  {
 			$this->set_image_caption();
@@ -121,7 +127,121 @@ class Image extends BasePattern {
 		// Close element.
 		$this->output_tag_close( 'figure' );
 
+		// Close wrapper.
+		if ( 'story__header' === $this->context ) {
+			$this->output .= '</div>';
+		}
 	}
+
+	private function image_size_in_context() {
+		global $_wp_additional_image_sizes;
+		$_wp_additional_image_sizes;
+		$sizes = array(
+			'story__header' => 'header-image',
+			'griditem' => 'story-landscape',
+		);
+		if ( ! array_key_exists( $this->context, $sizes ) ) {
+			return false;
+		} else {
+			return $sizes[ $this->context ];
+		}
+	}
+
+	private function check_for_src_set() {
+		$src_sets = array();
+		$input_sizes = $this->input['sizes'];
+		global $_wp_additional_image_sizes;
+		foreach( $_wp_additional_image_sizes as $size => $vals ) {
+			if ( ! $vals['height'] === $input_sizes[ $size . '-height' ] ) {
+				$src_sets[ $size ] = false;
+				continue;
+			}
+			if ( ! $vals['width'] === $input_sizes[ $size . '-width' ] ) {
+				$src_sets[ $size ] = false;
+				continue;
+			}
+			$src_sets[ $size ] = array(
+				$input_sizes[ $size ],
+				$input_sizes[ $size . '-width'] . 'w',
+			);
+		}
+		return $src_sets;
+	}
+
+	protected function get_appropriate_image_size() {
+		if ( empty( $this->context ) ) {
+			return;
+		}
+		$size = $this->image_size_in_context();
+		$src_sets = $this->check_for_src_set();
+		if ( $size && is_array( $src_sets[ $size ] ) ) {
+			return $size;
+		}
+	}
+
+	/**
+	 * Get source-set part for this size
+	 *	 *
+	 * @param string $size Image size.
+	 * @return void | string
+	 */
+	private function get_src_set_part( $size ) {
+		$src_sets = $this->check_for_src_set();
+		if ( ! is_array( $src_sets[ $size ] ) ) {
+			return;
+		}
+		return implode( ' ', $src_sets[ $size ] );
+	}
+
+	/**
+	 * Set source set
+	 *
+	 * @return void
+	 */
+	 private function set_src_set_and_sizes() {
+		if ( 'portrait' !== $this->orientation ) {
+			$wide = $this->get_src_set_part( 'header-image' );
+			$medium = $this->get_src_set_part( 'story-landscape' );
+			$small = $this->get_src_set_part( 'story-landscape-small' );
+		} else {
+			$medium = $this->get_src_set_part( 'story-portrait' );
+			$small = $this->get_src_set_part( 'story-portrait-small' );
+		}
+		switch ( $this->context ) {
+			case 'story__header':
+				$order = array( $wide, $medium, $small );
+				if ( $this->is_hq ) {
+					$sizes = "100vw";
+				} else {
+					$sizes = "(max-width: 60em) 100vw, (min-width: 90em) 50vw, 75vw";
+				}
+				break;
+			case 'griditem' :
+				$order = array( $medium, $small );
+				$sizes = "(max-width: 30em) 100vw, (min-width: 60em) 33vw, 50vw";
+				break;
+			default :
+				$order = array( $medium, $small );
+				if ( 'portrait' !== $this->orientation ) {
+					$sizes = "(max-width: 30em) 100vw, (min-width: 90em) 50vw, 75vw";
+				} else {
+					$sizes = "(max-width: 30em) 75vw, (max-width: 60em) 50vw, 33vw";
+				}
+				break;
+		}
+		$new_order = array();
+		foreach( $order as $url_and_width ) {
+			if ( ! empty( $url_and_width ) ) {
+				$new_order[] = $url_and_width;
+			}
+		}
+		if ( count( $new_order ) > 0 ) {
+			$this->src_set = implode( ', ', $new_order );
+		}
+		if ( isset( $sizes ) ) {
+			$this->rwd_sizes = $sizes;
+		}
+	 }
 
 	/**
 	 * Set image properties by using input and modifiers.
@@ -138,19 +258,18 @@ class Image extends BasePattern {
 				$this->set_image_quality( $h, $w );
 			}
 		}
-		// Default base size is story-portrait or story-landscape, switch to different sizes depending on context.
-		$image_size = isset( $special_image_sizes[ $this->context ] ) ?
-			$special_sizes[ $this->context ] :
-			'story-' . $this->orientation;
 
-		//Set src_set from attachment_id.
-		if ( ! empty( $this->input['ID'] ) ) {
-			$this->src_set = wp_get_attachment_image_srcset( $this->input['ID'], $image_size );
-		}
+		// Set src_set and RWD sizes based on context.
+		$this->set_src_set_and_sizes();
+
+		// Default base size is story-portrait or story-landscape, switch to different sizes depending on context.
+		$image_size = $this->get_appropriate_image_size();
 
 		// Set src just in case.
 		if ( ! empty( $this->input['sizes'][ $image_size ] ) ) {
 			$this->src = $this->input['sizes'][ $image_size ];
+		} else {
+			$this->src = $this->input['sizes'][ 'medium' ];
 		}
 
 		// Set description to be used as alt and alternative for title.
@@ -180,6 +299,11 @@ class Image extends BasePattern {
 		// Add srcset to image element.
 		if ( $this->src_set ) {
 			$img .= ' srcset="' . esc_attr( $this->src_set ) . '"';
+		}
+
+		// Add RWD_sizes to image element.
+		if ( $this->rwd_sizes ) {
+			$img .= ' sizes="' . esc_attr( $this->rwd_sizes ) . '"';
 		}
 
 		// Add title to image element.
@@ -270,6 +394,9 @@ class Image extends BasePattern {
 		$sum = $h * $w;
 		if ( is_int( $sum ) && $sum >= $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['IMAGES']['hq-norm'] ) {
 			$this->is_hq = true;
+			$this->classes[] = 'highres';
+		} else {
+			$this->classes[] = 'lowres';
 		}
 	}
 }
