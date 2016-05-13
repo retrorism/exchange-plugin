@@ -20,4 +20,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 0.1.0
  **/
-class SimpleMap extends BaseMap {}
+class SimpleMap extends BaseMap {
+
+}

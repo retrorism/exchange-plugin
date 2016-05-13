@@ -50,6 +50,14 @@ class CollaborationController extends BaseController {
 		if ( $post->post_parent >= 1 ) {
 			$this->set_programme_round( $post->post_parent );
 		}
+
+		// Add participants.
+		$this->set_participants();
+
+		// Add participants' locations
+		if ( $this->container->has_participants ) {
+			$this->set_collaboration_locations();
+		}
 	}
 
 	public function map_full_collaboration() {
@@ -61,6 +69,48 @@ class CollaborationController extends BaseController {
 		// if ( is_array( $acf_related_content ) && count( $acf_related_content ) > 0 ) {
 		// 	$this->set_related_content_grid( $collaboration, $acf_related_content );
 		// }
+	}
+
+	protected function set_collaboration_locations() {
+		$locations = array();
+		foreach( $this->container->participants as $p_id ) {
+			$org_name = get_field( 'organisation_name', $p_id );
+			$org_coords = get_field( 'organisation_location', $p_id );
+			$org_city = get_field( 'organisation_city', $p_id );
+			if ( !empty( $org_name ) ) {
+				$locations[$p_id]['org_name'] = $org_name;
+			}
+			if ( ! empty( $org_coords ) ) {
+				$locations[$p_id]['org_lat'] = $org_coords['lat'];
+				$locations[$p_id]['org_lat'] = $org_coords['lng'];
+			}
+			if ( ! empty( $org_city ) ) {
+				$locations[$p_id]['org_city'] = $org_city;
+			}
+		}
+		if ( count( $locations ) > 1 ) {
+			$this->container->locations = $locations;
+			$this->container->has_locations = true;
+		}
+	}
+
+	/**
+	 * Set participant IDs
+	 *
+	 * @return void.
+	 */
+	protected function set_participants() {
+		$participants = get_field( 'participants', $this->container->post_id );
+		if ( is_array( $participants ) && count( $participants ) > 0 ) {
+			foreach( $participants as $participant ) {
+				if ( exchange_post_exists( $participant ) ) {
+					$this->container->participants[] = $participant;
+				}
+			}
+			if ( count( $this->container->participants ) > 0 ) {
+				$this->container->has_participants = true;
+			}
+		}
 	}
 
 	public function set_programme_round( $parent_id ) {

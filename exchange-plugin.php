@@ -153,8 +153,8 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 				);
 				// Plugin-dependent patterns - check if the plugin exists, add extra pattern clas when available
 				if ( class_exists( 'Exchange_Leaflet_Map', false ) ) {
-					$classes['basemap'] = EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-map-base';
-					$classes['simplemap'] = EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-map-simple';
+					$classes['basemap'] = EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-map-base.php';
+					$classes['simplemap'] = EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-map-simple.php';
 				}
 			}
 

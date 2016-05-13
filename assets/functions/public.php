@@ -44,7 +44,7 @@ function exchange_create_link( $obj, $with_text = true ) {
 		$title = $obj->title;
 	}
 	if ( ! empty( $url ) && ! empty( $title ) ) {
-		$output = '<a href="' . $url . '" title="' .sprintf( esc_html__( 'Navigate to %s', EXCHANGE_PLUGIN ), esc_attr( $title ) ).'">';
+		$output  = '<a href="' . $url . '" title="' .sprintf( esc_html__( 'Navigate to %s', EXCHANGE_PLUGIN ), esc_attr( $title ) ).'">';
 		if ( $with_text ) {
 			$output .= $title . '</a>';
 		}
@@ -52,4 +52,21 @@ function exchange_create_link( $obj, $with_text = true ) {
 	} else {
 		return false;
 	}
+}
+
+/**
+ * Determines if a post, identified by the specified ID, exist
+ * within the WordPress database.
+ *
+ * Note that this function uses the 'acme_' prefix to serve as an
+ * example for how to use the function within a theme. If this were
+ * to be within a class, then the prefix would not be necessary.
+ * Via: https://tommcfarlin.com/wordpress-post-exists-by-id/
+ *
+ * @param    int    $id    The ID of the post to check
+ * @return   bool          True if the post exists; otherwise, false.
+ * @since    1.0.0
+ */
+function exchange_post_exists( $id ) {
+  return is_string( get_post_status( $id ) );
 }

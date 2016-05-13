@@ -150,35 +150,36 @@ class Section extends BasePattern {
 							break;
 						case 'map':
 							$map_mods = array();
+							$data = array();
 							$style = $e['map_style'];
+							$size = $e['map_size'];
 							$center = $e['map_center'];
 							$zoom_level = $e['map_zoom_level'];
 							$markers = $e['map_markers'];
+
 							// Set map style.
-							if ( isset( $style ) && in_array( $style, array( 'dots','network', 'route' true ) ) ) {
+							if ( isset( $style ) && in_array( $style, array( 'dots','network', 'route', true ) ) ) {
 								$map_mods['style'] = $style;
 							}
+
+							// Set map size.
+							if ( isset( $size ) && in_array( $size, array( 'wide','square', 'small', true ) ) ) {
+								$map_mods['size'] = $size;
+							}
 							// Set map center.
-							if ( is_array( $map_center ) && array_key_exists( 'lat', $map_center ) && array_key_exists( 'long', $map_center ) ) {
-								$map_mods['center'] = $center;
-							} else {
-								// Default to Berlin. TODO: find center function for markers
-								$map_mods['center'] = array(
-									'lat'  => 52.516667
-									'long' => 13.383333
-								);
+							if ( is_array( $center ) && array_key_exists( 'lat', $center ) && array_key_exists( 'lng', $center ) ) {
+								$map_mods['data']['center'] = $center['lat'] . ';' . $center['lng'];
 							}
 							// Set zoom level.
-							if ( isset( $zoom_level ) && is_int( $zoom_level ) ) {
-								$map_mods['zoom_level'] = $zoom_level;
-							} else {
-								$map_mods['zoom_level'] = 14;
+							if ( isset( $zoom_level ) ) {
+								$map_mods['data']['zoom_level'] = $zoom_level;
 							}
-							if ( isset( $map_mods['zoom_level'] ) && isset( $map_mods['center'] ) ) {
+							if ( isset( $map_mods['data']['zoom_level'] ) && isset( $map_mods['data']['center'] ) ) {
 								$map = new SimpleMap( $e, $this->element, $map_mods );
+								//var_dump( $map );
 								$this->output .= $map->embed();
+							} else
 							break;
-
 						default:
 							$this->output .= '<div data-alert class="alert-box alert">';
 							$this->output .= '<strong>' . __( 'Error: This layout has not yet been defined', EXCHANGE_PLUGIN ) . '</strong>';

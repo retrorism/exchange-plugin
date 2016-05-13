@@ -360,7 +360,7 @@ abstract class BasePattern {
 		} else {
 			$eol = PHP_EOL;
 		}
-		$this->output = '<' . $tag;
+		$this->output .= '<' . $tag;
 		if ( count( $this->classes ) > 0 ) {
 			$this->output .= ' ' . $this->stringify_classes();
 		}
@@ -437,7 +437,7 @@ abstract class BasePattern {
 	 **/
 	public function publish_stripped( $context = '' ) {
 		$this->prepare( $context )->create_output();
-		echo strip_tags( $this->output, '<div><p><em>' ) . PHP_EOL;
+		echo strip_tags( strip_shortcodes( $this->output ), '<div><p><em>' ) . PHP_EOL;
 	}
 
 	/**

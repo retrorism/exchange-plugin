@@ -33,7 +33,7 @@ class Caption extends BasePattern {
 	 protected function create_output() {
 
 		if ( ! empty( $this->context ) ) {
-			if ( 'image' === $this->context ) {
+			if ( 'image' === $this->context || 'simplemap' === $this->context ) {
 				$this->output_tag_open( 'figcaption' );
 				$this->output .= $this->input;
 				$this->output_tag_close( 'figcaption' );

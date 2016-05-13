@@ -47,7 +47,6 @@ function exchange_add_options_page() {
 		if ( method_exists( $plugin_object, 'admin_menu' ) ) {
 			$plugin_object->admin_menu();
 		}
-
 	}
 }
 
