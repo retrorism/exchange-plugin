@@ -19,6 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_action( 'init', 'exchange_connect_default_taxonomies' );
 add_action( 'init', 'exchange_fix_tag_labels' );
 add_action( 'init', 'exchange_create_tax_language' );
+add_action( 'init', 'exchange_create_tax_tandem' );
 add_action( 'init', 'exchange_create_tax_location' );
 add_action( 'init', 'exchange_create_tax_topic' );
 add_action( 'init', 'exchange_create_tax_discipline' );
@@ -38,6 +39,33 @@ function exchange_connect_default_taxonomies() {
 	register_taxonomy_for_object_type( 'post_tag', 'story' );
 	register_taxonomy_for_object_type( 'post_tag', 'collaboration' );
 	register_taxonomy_for_object_type( 'post_tag', 'programme_round' );
+}
+
+
+// Register language as taxonomy.
+function exchange_create_tax_tandem() {
+	register_taxonomy(
+		'tandem',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
+		'story',	// Post type name.
+		array(
+			'hierarchical' => false,
+			'sort'         => true,
+			'label'        => 'Tandem Tag',  // Display name.
+			'show_ui'      => true,
+			'show_in_menu' => true,
+			'show_in_quick_edit' => false,
+			'meta_box_cb'  => false,
+			'public'       => true,
+			'query_var'    => true,
+			'rewrite'      => array(
+				'slug'       => 'tandem', // This controls the base slug that will display before each term.
+				'with_front' => false, // Don't display the category base before.
+			),
+			'labels'       => array(
+				'add_new_item' => 'Add new Tandem tag',
+			),
+		)
+	);
 }
 
 // Register language as taxonomy.

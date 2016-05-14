@@ -49,11 +49,12 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 			// Priority in taxonomy types, listed by ACF Field label.
 			'display_priority' => array(
 				0 => 'post_tag',
-				1 => 'topics',
-				2 => 'disciplines',
-				3 => 'methodologies',
-				4 => 'outputs',
-				5 => 'locations',
+				1 => 'tandem',
+				2 => 'topics',
+				3 => 'disciplines',
+				4 => 'methodologies',
+				5 => 'outputs',
+				6 => 'locations',
 			),
 			// Maximum number of tags on grid items
 			'grid_tax_max' => 3,
