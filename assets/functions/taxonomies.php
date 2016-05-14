@@ -50,7 +50,7 @@ function exchange_create_tax_tandem() {
 		array(
 			'hierarchical' => false,
 			'sort'         => true,
-			'label'        => 'Tandem Tag',  // Display name.
+			'label'        => 'Tandem Tags',  // Display name.
 			'show_ui'      => true,
 			'show_in_menu' => true,
 			'show_in_quick_edit' => false,
@@ -62,7 +62,7 @@ function exchange_create_tax_tandem() {
 				'with_front' => false, // Don't display the category base before.
 			),
 			'labels'       => array(
-				'add_new_item' => 'Add new Tandem tag',
+				'add_new_item' => 'Add new Tandem Tag',
 			),
 		)
 	);
