@@ -126,10 +126,11 @@ class StoryController extends BaseController {
 				$thumb = get_field( 'upload_header_image', $post_id );
 				break;
 			case 'use_featured_image':
-			default:
 				$thumb_id = get_post_thumbnail_id( $post_id );
 				// Use ACF function to create array for Image object constructor.
 				$thumb = acf_get_attachment( $thumb_id );
+				break;
+			case 'none':
 				break;
 		}
 		if ( is_array( $thumb ) ) {

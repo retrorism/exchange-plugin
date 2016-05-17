@@ -198,7 +198,7 @@ class Exchange {
 	// }
 
 	public function publish_header_image() {
-		if ( null !== $this->header_image ) {
+		if ( $this->has_header_image ) {
 			$this->header_image->publish();
 		}
 	}
