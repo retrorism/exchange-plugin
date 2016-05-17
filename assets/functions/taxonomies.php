@@ -24,7 +24,7 @@ add_action( 'init', 'exchange_create_tax_location' );
 add_action( 'init', 'exchange_create_tax_topic' );
 add_action( 'init', 'exchange_create_tax_discipline' );
 add_action( 'init', 'exchange_create_tax_methodology' );
-add_action( 'init', 'exchange_create_tax_output' );
+add_action( 'init', 'exchange_create_tax_project_output' );
 
 add_action( 'save_post_programme_round', 'exchange_create_tax_for_programme_round', 10, 3 );
 add_action( 'save_post_collaboration', 'exchange_set_post_tag_from_parent_id', 10, 3 );
@@ -192,9 +192,9 @@ function exchange_create_tax_discipline() {
 }
 
 // Register output as taxonomy.
-function exchange_create_tax_output() {
+function exchange_create_tax_project_output() {
 	register_taxonomy(
-		'output', // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
+		'project_output', // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
 		'collaboration', // Post type name.
 		array(
 			'hierarchical' => false,
