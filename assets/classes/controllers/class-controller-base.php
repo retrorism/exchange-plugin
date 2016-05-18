@@ -59,10 +59,17 @@ class BaseController {
 	public static function is_correct_content_type( $post_object, $type = null ) {
 		if ( is_object( $post_object ) ) {
 			if ( 'WP_Post' === get_class( $post_object ) ) {
-				$allowed_types = array( 'story', 'collaboration', 'programme_round', 'page', 'grid_breaker' );
-				if ( in_array( $post_object->post_type, $allowed_types, true ) ) {
-					if ( $post_object->post_type === $type || null === $type ) {
-						return $post_object->post_type;
+				$allowed_types = array(
+					'story'           => 'story',
+					'page'            => 'story',
+					'programme_round' => 'programme_round',
+					'grid_breaker'    => 'grid_breaker',
+					'collaboration'   => 'collaboration',
+				);
+				if ( array_key_exists( $post_object->post_type, $allowed_types ) ) {
+					$exchange = $allowed_types[ $post_object->post_type ];
+					if ( $exchange === $type || null === $type ) {
+						return $exchange;
 					}
 				}
 			}
@@ -117,6 +124,8 @@ class BaseController {
 	public function map_basics( $exchange, $post ) {
 		$class_lower = strtolower( get_class( $exchange ) );
 		if ( empty( self::is_correct_content_type( $post, $class_lower ) ) ) {
+			var_dump( $exchange );
+			var_dump( $post );
 			unset( $exchange );
 			throw new Exception( 'This is not a valid post' );
 		}
