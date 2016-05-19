@@ -74,6 +74,9 @@ class CollaborationController extends BaseController {
 	protected function set_collaboration_locations() {
 		$locations = array();
 		foreach( $this->container->participants as $p_id ) {
+			if ( ! is_numeric( $p_id ) ) {
+				continue;
+			}
 			$org_name = get_field( 'organisation_name', $p_id );
 			$org_coords = get_field( 'organisation_location', $p_id );
 			$org_city = get_field( 'organisation_city', $p_id );
