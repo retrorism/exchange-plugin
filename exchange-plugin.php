@@ -130,6 +130,7 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 
 					'baseinterview' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-interview-base.php',
 					'byline' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-byline.php',
+					'contactblock' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-contact-block.php',
 					'editorialintro' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-editorial-intro.php',
 					'paragraph' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-paragraph.php',
 					'pullquote' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-quote-pull.php',

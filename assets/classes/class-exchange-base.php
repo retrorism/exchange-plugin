@@ -204,10 +204,14 @@ class Exchange {
 	}
 
 	public function publish_sections() {
+		$section_mods = array();
 		if ( count( $this->sections ) > 0 ) {
 			// Loop through sections.
 			foreach( $this->sections as $s ) {
-				$section = new Section( $s, strtolower( get_class( $this ) ) );
+				if ( ! empty( $s['section_contents'] ) ) {
+					$section_mods['type'] = $s['section_contents'];
+				}
+				$section = new Section( $s, strtolower( get_class( $this ) ), $section_mods );
 				$section->publish();
 			}
 		}

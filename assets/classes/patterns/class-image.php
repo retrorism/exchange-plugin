@@ -117,7 +117,9 @@ class Image extends BasePattern {
 		$this->output .= $this->build_image_element();
 
 		// Add caption if available.
-		if ( ! empty( $this->input['caption'] ) || ! empty( $this->title ) )  {
+		if ( ! empty( $this->input['caption'] )
+			|| ! empty( $this->title ) ) {
+
 			$this->set_image_caption();
 
 			if ( is_object( $this->caption ) ) {
@@ -133,12 +135,50 @@ class Image extends BasePattern {
 		}
 	}
 
-	private function image_size_in_context() {
+	/**
+	 * Get image sizes
+	 *
+	 * @link https://core.trac.wordpress.org/timeline?from=2014-06-05T06%3A26%3A26Z&precision=second
+	 *
+	 * @param string $size Image size
+	 * @return array
+	 */
+
+	private function get_image_size_data( $size = 'thumbnail' ) {
+		$default_image_sizes = array( 'thumbnail', 'medium', 'large' ); // Standard sizes
+		if ( in_array( $size, $default_image_sizes ) ) {
+			$result['width'] = intval( get_option( "{$size}_size_w" ) );
+			$result['height'] = intval( get_option( "{$size}_size_h" ) );
+			// If not set: crop false per default.
+			$result[ $size ]['crop']   = false;
+			if ( get_option( "{$size}_crop" ) ) {
+				$result[ $size ]['crop'] = get_option( "{$size}_crop" );
+			}
+		} else {
+			global $_wp_additional_image_sizes;
+			if ( in_array( $size, array_keys( $_wp_additional_image_sizes ) ) ) {
+				$result = $_wp_additional_image_sizes[ $size ];
+			}
+		}
+		return $result;
+	}
+
+	private function get_all_image_sizes() {
 		global $_wp_additional_image_sizes;
-		$_wp_additional_image_sizes;
+		$default_sizes = array( 'thumbnail','medium','large' );
+		$image_sizes = array();
+		foreach( $default_sizes as $size ) {
+			$size_data = $this->get_image_size_data( $size );
+			$image_sizes[$size] = $size_data;
+		}
+		return array_merge( $image_sizes, $_wp_additional_image_sizes );
+	}
+
+	private function image_size_in_context() {
 		$sizes = array(
 			'story__header' => 'header-image',
-			'griditem' => 'story-landscape',
+			'griditem'      => 'story-landscape',
+			'contactblock'  => 'thumbnail',
 		);
 		if ( ! array_key_exists( $this->context, $sizes ) ) {
 			return false;
@@ -150,8 +190,8 @@ class Image extends BasePattern {
 	private function check_for_src_set() {
 		$src_sets = array();
 		$input_sizes = $this->input['sizes'];
-		global $_wp_additional_image_sizes;
-		foreach( $_wp_additional_image_sizes as $size => $vals ) {
+		$combined_sizes = $this->get_all_image_sizes();
+		foreach( $combined_sizes as $size => $vals ) {
 			if ( ! $vals['height'] === $input_sizes[ $size . '-height' ] ) {
 				$src_sets[ $size ] = false;
 				continue;
@@ -199,13 +239,17 @@ class Image extends BasePattern {
 	 * @return void
 	 */
 	 private function set_src_set_and_sizes() {
-		if ( 'portrait' !== $this->orientation ) {
-			$wide = $this->get_src_set_part( 'header-image' );
-			$medium = $this->get_src_set_part( 'story-landscape' );
-			$small = $this->get_src_set_part( 'story-landscape-small' );
+		if ( 'contactblock' === $this->context ) {
+			$thumb = $this->get_src_set_part( 'thumbnail' );
 		} else {
-			$medium = $this->get_src_set_part( 'story-portrait' );
-			$small = $this->get_src_set_part( 'story-portrait-small' );
+			if ( 'portrait' !== $this->orientation ) {
+				$wide = $this->get_src_set_part( 'header-image' );
+				$medium = $this->get_src_set_part( 'story-landscape' );
+				$small = $this->get_src_set_part( 'story-landscape-small' );
+			} else {
+				$medium = $this->get_src_set_part( 'story-portrait' );
+				$small = $this->get_src_set_part( 'story-portrait-small' );
+			}
 		}
 		switch ( $this->context ) {
 			case 'story__header':
@@ -219,6 +263,10 @@ class Image extends BasePattern {
 			case 'griditem' :
 				$order = array( $medium, $small );
 				$sizes = "(max-width: 30em) 100vw, (min-width: 60em) 33vw, 50vw";
+				break;
+			case 'contactblock' :
+				$order = array( $thumb );
+				$sizes = "(max-width: 30em) 25vw, (min-width: 30em) 20vw";
 				break;
 			default :
 				$order = array( $medium, $small );
@@ -333,6 +381,9 @@ class Image extends BasePattern {
 
 		// Get caption position from modifiers paramater.
 		$mods = array();
+		if ( $this->modifiers['style'] === 'rounded' ) {
+			return;
+		}
 		if ( ! empty( $this->modifiers['caption_position'] ) ) {
 			$mods['position'] = $this->modifiers['caption_position'];
 		}
