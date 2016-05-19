@@ -118,16 +118,16 @@ function exchange_change_acf_color_picker() {
 			var acfpalette = " . $client_colors_bg_jquery . ";
 			console.log('palette found: " . $client_colors_bg_jquery . "');
 			if ( $(this).find('.wp-color-picker').parents('*[data-name=\"pquote_colour\"]').length > 0 ) {
-			  var acfpalette = ". $client_colors_accents_jquery . ";
-			  console.log('switched to palette: " . $client_colors_accents_jquery . "');
+			  var acfpalette = ". $client_colors_bg_jquery . ";
+			  console.log('switched to palette: " . $client_colors_bg_jquery . "');
 			}
 			if ( $(this).find('.wp-color-picker').parents('*[data-name=\"cta_colour\"]').length > 0 ) {
 			  var acfpalette = ". $client_colors_accents_jquery .";
 			  console.log('switched to palette: " . $client_colors_accents_jquery ."');
 			}
 			if ( $(this).find('.wp-color-picker').parents('*[data-name=\"post-it_colour\"]').length > 0 ) {
-			  var acfpalette = " . $client_colors_boxes_jquery . ";
-			  console.log('switched to palette: " . $client_colors_boxes_jquery ."');
+			  var acfpalette = " . $client_colors_bg_jquery . ";
+			  console.log('switched to palette: " . $client_colors_bg_jquery ."');
 			}
 			if ( $(this).find('.wp-color-picker').parents('*[data-name=\"section_header_tape_colour\"]').length > 0 ) {
 			  var acfpalette = ". $client_colors_accents_jquery .";

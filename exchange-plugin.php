@@ -133,6 +133,7 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 					'contactblock' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-contact-block.php',
 					'editorialintro' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-editorial-intro.php',
 					'paragraph' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-paragraph.php',
+					'basequote' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-quote-base.php',
 					'pullquote' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-quote-pull.php',
 					'blockquote' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-quote-block.php',
 					'video' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-video.php',
