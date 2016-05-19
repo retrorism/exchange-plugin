@@ -41,7 +41,7 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 		),
 		'IMAGES' => array(
 			/* 'hq-norm' => 381024,  756 * 504 */
-			'hq-norm'       => 393216, /* 768 * 512 */
+			'hq-norm'       => 345600, /* 720 * 480 */ 
 			'size-in-story' => 'medium_large',
 			'fallback_image_att_id' => 970,
 		),

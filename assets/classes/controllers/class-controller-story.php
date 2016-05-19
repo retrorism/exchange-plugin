@@ -133,7 +133,7 @@ class StoryController extends BaseController {
 			case 'none':
 				break;
 		}
-		if ( is_array( $thumb ) ) {
+		if ( isset( $thumb ) && count( $thumb ) ) {
 			return new Image( $thumb, $context );
 		}
 	}
