@@ -41,7 +41,7 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 		),
 		'IMAGES' => array(
 			/* 'hq-norm' => 381024,  756 * 504 */
-			'hq-norm'       => 345600, /* 720 * 480 */ 
+			'hq-norm'       => 345600, /* 720 * 480 */
 			'size-in-story' => 'medium_large',
 			'fallback_image_att_id' => 970,
 		),
@@ -74,9 +74,6 @@ if ( empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['bg'] ) ) {
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['salmon-1-web'],
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-1-web'],
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['blue-1-web'],
-        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['blue-3'],
-        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-tandem'],
-        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['black-tandem'],
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['white'],
       );
   }
@@ -89,6 +86,7 @@ if ( empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['accents'] ) ) 
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-3'],
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['blue-4'],
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-tandem'],
+		$GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['black-tandem'],
       );
   }
 }
@@ -99,7 +97,9 @@ if ( empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['boxes'] ) ) {
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['salmon-1-web'],
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-1-web'],
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['rose-1-web'],
-        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['blue-2-web'],
+		$GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['white'],
+
+
       );
   }
 }
