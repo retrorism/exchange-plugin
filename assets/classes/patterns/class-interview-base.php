@@ -34,4 +34,6 @@ abstract class BaseInterview extends BasePattern {
 		$this->output_tag_close();
 	}
 
+
+
 }
