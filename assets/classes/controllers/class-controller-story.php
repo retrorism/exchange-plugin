@@ -43,7 +43,10 @@ class StoryController extends BaseController {
 		// Map ACF variables.
 		$acf_editorial_intro = get_field( 'editorial_intro', $post_id );
 		$acf_language = get_field( 'language', $post_id );
-		$acf_storyteller = get_field( 'storyteller', $post_id );
+		$acf_storyteller_is_participant = get_field( 'storyteller_is_participant', $post_id );
+		if ( $acf_storyteller_is_participant ) {
+			$acf_storyteller = get_field( 'storyteller', $post_id );
+		}
 		$acf_category = get_field( 'category', $post_id );
 
 		// Set editorial introduction.
@@ -66,8 +69,8 @@ class StoryController extends BaseController {
 			}
 		}
 
-		// Set participant.
-		if ( is_object( $acf_storyteller ) ) {
+		// Set participant
+		if ( $acf_storyteller_is_participant && is_object( $acf_storyteller ) ) {
 			if ( 'WP_Post' === get_class( $acf_storyteller ) && $acf_storyteller->post_type = 'participant' ) {
 				$this->container->storyteller = new Participant( $acf_storyteller );
 			}
@@ -96,6 +99,8 @@ class StoryController extends BaseController {
 
 		$acf_sections = get_field( 'sections', $post_id );
 		$acf_related_content = get_field( 'related_content', $post_id );
+		$acf_has_custom_byline = get_field( 'has_custom_byline', $post_id );
+
 
 		// Set related content.
 		if ( is_array( $acf_related_content ) && count( $acf_related_content ) > 0 ) {
@@ -110,7 +115,11 @@ class StoryController extends BaseController {
 		// Set header image.
 		$this->set_header_image( $post_id, 'story__header' );
 
-		$this->set_byline();
+		if ( is_object( $this->container->storyteller ) ) {
+			$this->set_byline();
+		} else {
+			$this->set_custom_byline();
+		}
 
 		$this->set_ordered_tag_list();
 	}
@@ -293,26 +302,42 @@ class StoryController extends BaseController {
 	 *
 	 * @since 0.1.0
 	 * @access protected
-	 * @return string $byline Byline object built from byline template.
 	 **/
 	protected function set_byline() {
-		if ( is_object( $this->container->storyteller ) && is_object( $this->container->storyteller->collaboration ) ) {
-			$templates = $this->get_byline_templates();
+		if ( ! is_object( $this->container->storyteller ) ) {
+			return;
+		}
+		if ( ! is_object( $this->container->storyteller->collaboration ) ) {
+			return;
+		}
+		$templates = $this->get_byline_templates();
 
-			if ( $this->container->storyteller->is_active ) {
-				$byline_template = $templates['present'];
-			} else {
-				$byline_template = $templates['past'];
-			}
-			$byline_template = str_replace( '[[storyteller]]', $this->container->storyteller->name, $byline_template );
-			$byline_template = str_replace( '[[programme_round]]', exchange_create_link( $this->container->storyteller->collaboration->programme_round ), $byline_template );
-			$byline = str_replace( '[[collaboration]]', exchange_create_link( $this->container->storyteller->collaboration ), $byline_template );
-
-			$this->container->byline = new Byline( $byline, 'footer' );
+		if ( $this->container->storyteller->is_active ) {
+			$byline_template = $templates['present'];
+		} else {
+			$byline_template = $templates['past'];
 		}
 
+		$byline_template = str_replace( '[[storyteller]]', $this->container->storyteller->name, $byline_template );
+		$byline_template = str_replace( '[[programme_round]]', exchange_create_link( $this->container->storyteller->collaboration->programme_round ), $byline_template );
+		$byline = str_replace( '[[collaboration]]', exchange_create_link( $this->container->storyteller->collaboration ), $byline_template );
+		$this->container->byline = new Byline( $byline, 'footer' );
+	}
+
+	/**
+	 * If storyteller is set, Replace placeholders in template with personal details connected to the storyteller.
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 **/
+	protected function set_custom_byline() {
+		$acf_custom_byline = get_field( 'custom_byline', $this->container->post_id );
+		if ( ! empty( $acf_custom_byline ) ) {
+			$this->container->has_custom_byline = true;
+			$this->container->byline = new Byline( $acf_custom_byline, 'footer' );
+		}
 		else {
-			$this->container->byline = null;
+			$this->set_byline();
 		}
 	}
 }

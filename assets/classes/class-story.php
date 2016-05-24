@@ -53,6 +53,15 @@ class Story extends Exchange {
 	public $storyteller;
 
 	/**
+	 * $has_custom_byline
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var boolean to see if a custom byline should replace the
+	 **/
+	public $has_custom_byline = false;
+
+	/**
 	 * Has editorial intro check
 	 *
 	 * @since 0.1.0

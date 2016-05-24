@@ -369,6 +369,7 @@ class BaseController {
 	}
 
 	public function prepare_tag_modifiers( $term ) {
+		var_dump( $term );
 		if ( 'WP_Term' !== get_class( $term ) ) {
 			throw new Exception( __('This is not a valid tag') );
 		}

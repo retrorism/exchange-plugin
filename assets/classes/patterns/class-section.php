@@ -126,8 +126,8 @@ class Section extends BasePattern {
 						$this->output .= $pullquote->embed();
 						break;
 
-					case 'embed_video':
-						$video = new Video( $e['embed_video'], $this->element );
+					case 'embedded_video':
+						$video = new Video( $e, $this->element );
 						$this->output .= $video->embed();
 						break;
 

@@ -30,20 +30,17 @@ class Caption extends BasePattern {
 	 * @since 0.1.0
 	 * @access protected
 	 **/
-	 protected function create_output() {
-
-		if ( ! empty( $this->context ) ) {
-			if ( 'image' === $this->context || 'simplemap' === $this->context ) {
-				$this->output_tag_open( 'figcaption' );
-				$this->output .= $this->input;
-				$this->output_tag_close( 'figcaption' );
-			} elseif ( in_array( $this->context, array( 'blockquote', 'pullquote' ), true ) ) {
-				$this->build_quote_caption();
-			} else {
-				throw new Exception( 'No valid parent for this caption.' );
-			}
+	protected function create_output() {
+		if ( ! empty( $this->context )
+			&& in_array( $this->context, array( 'image', 'simplemap', 'video' ), true ) ) {
+			$this->output_tag_open( 'figcaption' );
+			$this->output .= $this->input;
+			$this->output_tag_close( 'figcaption' );
+		} elseif ( in_array( $this->context, array( 'blockquote', 'pullquote' ), true ) ) {
+			$this->build_quote_caption();
+		} else {
+			throw new Exception( 'No valid parent for this caption.' );
 		}
-		// End construct.
 	}
 
 	/**
