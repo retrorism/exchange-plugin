@@ -124,8 +124,6 @@ class BaseController {
 	public function map_basics( $exchange, $post ) {
 		$class_lower = strtolower( get_class( $exchange ) );
 		if ( empty( self::is_correct_content_type( $post, $class_lower ) ) ) {
-			var_dump( $exchange );
-			var_dump( $post );
 			unset( $exchange );
 			throw new Exception( 'This is not a valid post' );
 		}
@@ -369,7 +367,6 @@ class BaseController {
 	}
 
 	public function prepare_tag_modifiers( $term ) {
-		var_dump( $term );
 		if ( 'WP_Term' !== get_class( $term ) ) {
 			throw new Exception( __('This is not a valid tag') );
 		}
