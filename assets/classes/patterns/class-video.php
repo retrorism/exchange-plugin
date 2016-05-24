@@ -79,9 +79,10 @@ class Video extends BasePattern {
 
  		$src = $matches[1];
 
-		if ( strstr( $src, 'vimeo' ) > 0 ) {
+		// Detect vimeo url.
+		if ( is_string( strstr( $src, 'vimeo' ) ) ) {
 
-	 		// Add extra params to iframe src
+	 		// Add extra params to iframe src.
 	 		$params = array(
 	 			'badge'    => 0,
 	 			'byline'   => 0,
