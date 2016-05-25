@@ -143,7 +143,17 @@ class StoryController extends BaseController {
 				break;
 		}
 		if ( isset( $thumb ) && count( $thumb ) ) {
-			return new Image( $thumb, $context );
+			$image_mods['data'] = array();
+			if ( class_exists('TstPostOptions') ) {
+				$focus_position = get_post_meta( $thumb['ID'], 'theiaSmartThumbnails_position', false );
+				$h = is_array( $focus_position[0] ) ? $focus_position[0][1] : null;
+				$w = is_array( $focus_position[0] ) ? $focus_position[0][0] : null;
+			}
+			if ( ! empty( $h ) && ! empty( $w ) ) {
+				$image_mods['data']['focus_h'] = $h;
+				$image_mods['data']['focus_w'] = $w;
+			}
+			return new Image( $thumb, $context, $image_mods );
 		}
 	}
 

@@ -381,7 +381,7 @@ class Image extends BasePattern {
 
 		// Get caption position from modifiers paramater.
 		$mods = array();
-		if ( $this->modifiers['style'] === 'rounded' ) {
+		if ( ! empty( $this->modifiers['style'] ) && $this->modifiers['style'] === 'rounded' ) {
 			return;
 		}
 		if ( ! empty( $this->modifiers['caption_position'] ) ) {
