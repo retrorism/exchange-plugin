@@ -129,6 +129,32 @@ class StoryController extends BaseController {
 		return get_field( 'header_image' );
 	}
 
+
+	/**
+	 * Get focus points for this image
+	 *
+	 * Add modifiers array with data properties if a focus point has been set.
+	 *
+	 * @param array $thumb ACF Image array
+	 * @return array $focus_points;
+	 */
+	protected function get_focus_points( $thumb ) {
+		if ( ! class_exists('TstPostOptions') ) {
+			return;
+		}
+		$focus_position = get_post_meta( $thumb['ID'], 'theiaSmartThumbnails_position', false );
+		if ( empty( $focus_position ) ) {
+			return;
+		}
+		$h = is_array( $focus_position[0] ) ? $focus_position[0][1] : null;
+		$w = is_array( $focus_position[0] ) ? $focus_position[0][0] : null;
+		if ( ! empty( $h ) && ! empty( $w ) ) {
+			$focus_points['focus_h'] = $h;
+			$focus_points['focus_w'] = $w;
+			return $focus_points;
+		}
+	}
+
 	protected function get_header_image( $post_id, $context ) {
 		switch ( $this->get_header_image_source( $post_id ) ) {
 			case 'upload_new_image':
@@ -143,19 +169,17 @@ class StoryController extends BaseController {
 				break;
 		}
 		if ( isset( $thumb ) && count( $thumb ) ) {
-			$image_mods['data'] = array();
-			if ( class_exists('TstPostOptions') ) {
-				$focus_position = get_post_meta( $thumb['ID'], 'theiaSmartThumbnails_position', false );
-				$h = is_array( $focus_position[0] ) ? $focus_position[0][1] : null;
-				$w = is_array( $focus_position[0] ) ? $focus_position[0][0] : null;
-			}
-			if ( ! empty( $h ) && ! empty( $w ) ) {
-				$image_mods['data']['focus_h'] = $h;
-				$image_mods['data']['focus_w'] = $w;
+			$focus_points = $this->get_focus_points( $thumb );
+			$image_mods = array();
+			if ( ! empty( $focus_points ) ) {
+				$image_mods['data'] = $focus_points;
+				$image_mods['classes'] = array('focus');
 			}
 			return new Image( $thumb, $context, $image_mods );
 		}
 	}
+
+
 
 	/**
 	 * Attaches header image to story
