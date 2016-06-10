@@ -1,4 +1,17 @@
 <?php
+
+
+/**
+* Adds user management for editor role.
+*
+* @return void
+*/
+function add_grav_forms(){
+    $role = get_role('editor');
+    $role->add_cap('gform_full_access');
+}
+add_action('admin_init','add_grav_forms');
+
 /**
  * JPB User Caps Functional class courtesy of John P Bloch (JPB)
  *
@@ -10,6 +23,20 @@
  **/
 
 add_action('exchange_plugin_deactivate','exchange_remove_user_management_for_editors');
+
+
+/**
+* Adds user management for editor role.
+*
+* @return void
+*/
+function exchange_add_user_management_for_editors() {
+	$role = get_role( 'editor' );
+	$caps = exchange_get_user_caps();
+	foreach ( $caps as $cap ) {
+		$role->add_cap( $cap );
+	}
+}
 
 /**
 * Returns array with user-editing capacities.
@@ -28,19 +55,6 @@ function exchange_get_user_caps() {
 }
 
 /**
-* Adds user management for editor role.
-*
-* @return void
-*/
-function exchange_add_user_management_for_editors() {
-	$role = get_role( 'editor' );
-	$caps = exchange_get_user_caps();
-	foreach ( $caps as $cap ) {
-		$role->add_cap( $cap );
-	}
-}
-
-/**
 * Removes user management for editor role.
 *
 * @return void
@@ -53,9 +67,7 @@ function exchange_remove_user_management_for_editors() {
 	}
 }
 
-
 class JPB_User_Caps {
-
 
 	// Add our filters
 	public function __construct(){
