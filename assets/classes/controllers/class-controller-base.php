@@ -237,12 +237,13 @@ class BaseController {
 			SELECT *
 			FROM {$wpdb->prefix}postmeta
 			WHERE post_id = %s
-				AND ( meta_key LIKE %s OR meta_key LIKE %s OR meta_key LIKE %s )
+				AND ( meta_key LIKE %s OR meta_key LIKE %s OR meta_key LIKE %s OR meta_key LIKE %s )
 			",
 			$this->container->post_id,
 			'sections_%_story_elements_%_two_images',
 			'sections_%_story_elements_%_image',
-			'upload_header_image'
+			'upload_header_image',
+			'_thumbnail_id'
 		));
 		if ( ! $rows ) {
 			return;
@@ -253,12 +254,13 @@ class BaseController {
 		// Iterate over rows
 		foreach( $rows as $row ) {
 			$image_id = $row->meta_value;
+			$key = preg_replace( '/_(\d)_image/i', '_0${1}_image', $row->meta_key );
 			if ( empty( $image_id ) ) {
 				continue;
 			}
 			// Single IDs
 			if ( is_numeric( $image_id ) ) {
-				$ids[] = intval( $image_id );
+				$ids[$key] = intval( $image_id );
 			} elseif ( is_string( $image_id ) ) {
 				$ids_array = unserialize( $image_id );
 				// Move to next row if this is not a serialized array;
@@ -267,7 +269,7 @@ class BaseController {
 				}
 				foreach( $ids_array as $id ) {
 					if ( is_numeric( $id ) ) {
-						$ids[] = $id;
+						$ids[$key] = intval( $id );
 					}
 				}
 			}
@@ -276,8 +278,9 @@ class BaseController {
 			return;
 		}
 
-		// Filter IDs
+		// Filter IDs and sort by key
 		$unique_ids = array_unique( $ids );
+		ksort( $unique_ids );
 		$gallery = array();
 		$index = 1;
 		foreach ( $unique_ids as $image_id ) {
