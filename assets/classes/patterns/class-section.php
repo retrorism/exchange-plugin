@@ -56,8 +56,15 @@ class Section extends BasePattern {
 		$this->output .= '<div class="section-inner">';
 		$this->build_section_header();
 
-		$this->set_story_elements();
-		$this->build_story_elements();
+		if ( count( $this->input['story_elements'] ) ) {
+			$this->story_elements = $this->input['story_elements'];
+			$this->build_story_elements();
+		}
+
+		if ( ! empty( $this->input['gravity_forms'] ) ) {
+			$this->build_form();
+		}
+
 		if ( ! empty( $this->input['contact_details'] ) ) {
 			$this->build_contact_block();
 		}
@@ -78,11 +85,6 @@ class Section extends BasePattern {
 		}
 	}
 
-	protected function set_story_elements() {
-		if ( count( $this->input['story_elements'] ) ) {
-			$this->story_elements = $this->input['story_elements'];
-		}
-	}
 	/**
 	 * For each story element in array, embed the right pattern class instantiation.
 	 *
@@ -225,5 +227,14 @@ class Section extends BasePattern {
 			$this->output .= $contact_block->embed();
 			break;
 		}
+	}
+
+	/**
+	 * Build contact block from Gravity Forms input.
+	 *
+	 */
+	function build_form() {
+		$form = $this->input['gravity_forms'];
+		$this->output .= do_shortcode('[gravityform id="' . $form['id'] . '" title="true" description="true" ajax="true"]');
 	}
 }
