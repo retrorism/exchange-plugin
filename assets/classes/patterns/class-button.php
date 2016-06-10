@@ -35,9 +35,15 @@ class Button extends BasePattern {
 		if ( ! empty( $this->modifiers['link_attributes'] ) ) {
 			$el = 'a';
 		}
+		if ( 'emphasisblock' === $this->context ) {
+			$this->output = '<div class="emphasisblock__button-wrapper">';
+		}
  		$this->output_tag_open( $el );
  		$this->output .= $this->input['button_text'];
- 		$this->output_tag_close( $el );
+		$this->output_tag_close( $el );
+		if ( 'emphasisblock' === $this->context ) {
+			$this->output .= '</div>';
+		}
  	}
 
 }

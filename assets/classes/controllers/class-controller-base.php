@@ -149,6 +149,23 @@ class BaseController {
 		$this->set_tag_list();
 	}
 
+	// Store sections in Exchange object
+	protected function set_sections( $acf_sections ) {
+		// Loop through sections.
+		foreach( $acf_sections as $s ) {
+			if ( ! empty( $s['section_contents'] ) ) {
+				$section_mods['type'] = $s['section_contents'];
+			}
+			$section = new Section( $s, strtolower( get_class( $this->container ) ), $section_mods );
+			if ( is_object( $section ) && is_a( $section, 'Section' ) ) {
+				$this->container->sections[] = $section;
+			}
+		}
+	}
+
+
+
+
 	/**
 	 * Retrieves featured image to story (for example for use in grid views).
 	 *
@@ -187,6 +204,115 @@ class BaseController {
 		if ( is_a( $image, 'Image' ) ) {
 			$this->container->has_featured_image = true;
 			$this->container->featured_image = $image;
+		}
+	}
+
+	protected function get_gallery_from_attachments() {
+		$attachments = get_attached_media( 'image', $this->container->post_id );
+		if ( ! count( $attachments ) ) {
+			return;
+		}
+		// Empty array to store Image objects;
+		$gallery = array();
+		foreach( $attachments as $attachment ) {
+			$img_array = acf_get_attachment( $attachment );
+			$image_mods = array();
+			$focus_points = exchange_get_focus_points( $img_array );
+			if ( ! empty( $focus_points ) ) {
+				$image_mods['data'] = $focus_points;
+				$image_mods['classes'] = array('focus');
+			}
+			$img_obj = new Image( $img_array, 'gallery', $image_mods );
+			if ( is_object( $img_obj ) && is_a( $img_obj, 'Image') ) {
+				$gallery[] = $img_obj;
+			}
+		}
+		return $gallery;
+	}
+
+	protected function get_gallery_from_query() {
+		global $wpdb;
+		$rows = $wpdb->get_results( $wpdb->prepare(
+			"
+			SELECT *
+			FROM {$wpdb->prefix}postmeta
+			WHERE post_id = %s
+				AND ( meta_key LIKE %s OR meta_key LIKE %s OR meta_key LIKE %s )
+			",
+			$this->container->post_id,
+			'sections_%_story_elements_%_two_images',
+			'sections_%_story_elements_%_image',
+			'upload_header_image'
+		));
+		if ( ! $rows ) {
+			return;
+		}
+		// Empty array for storing image ids.
+		$ids = array();
+
+		// Iterate over rows
+		foreach( $rows as $row ) {
+			$image_id = $row->meta_value;
+			if ( empty( $image_id ) ) {
+				continue;
+			}
+			// Single IDs
+			if ( is_numeric( $image_id ) ) {
+				$ids[] = intval( $image_id );
+			} elseif ( is_string( $image_id ) ) {
+				$ids_array = unserialize( $image_id );
+				// Move to next row if this is not a serialized array;
+				if ( !is_array( $ids_array ) || ! count( $ids_array) ) {
+					continue;
+				}
+				foreach( $ids_array as $id ) {
+					if ( is_numeric( $id ) ) {
+						$ids[] = $id;
+					}
+				}
+			}
+		}
+		if ( ! count( $ids ) ) {
+			return;
+		}
+
+		// Filter IDs
+		$unique_ids = array_unique( $ids );
+		$gallery = array();
+		$index = 1;
+		foreach ( $unique_ids as $image_id ) {
+			$img_arr = acf_get_attachment( $image_id );
+			if ( empty( $img_arr ) ) {
+				continue;
+			}
+			$image_mods = array();
+			// Add Image post ID and index to gallery item
+			$image_mods['data'] = array(
+				'img_id' => $image_id,
+			 	'index'  => $index,
+			);
+			$focus_points = exchange_get_focus_points( $img_arr );
+			if ( ! empty( $focus_points ) ) {
+				$image_mods['data'] = array_merge( $image_mods['data'], $focus_points );
+				$image_mods['classes'] = array('focus');
+			}
+			// Add lightbox context
+			$img_obj = new Image( $img_arr, 'lightbox', $image_mods );
+			if ( is_object( $img_obj ) && is_a( $img_obj, 'Image' ) ) {
+				$gallery[] = $img_obj;
+			}
+			$index++;
+		}
+		return $gallery;
+	}
+
+	public function set_gallery() {
+		$gallery = $this->get_gallery_from_query();
+		if ( ! count( $gallery ) ) {
+			return;
+		} else {
+			$this->container->gallery = $gallery;
+			$this->container->has_gallery = true;
 		}
 	}
 

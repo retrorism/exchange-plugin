@@ -71,12 +71,14 @@ class Video extends BasePattern {
 	 *
 	 * @TODO Vimeo API to add extra styling
 	 */
-	 function set_video_attributes() {
+	protected function set_video_attributes() {
 		 $iframe = $this->input['video_embed_code'];
 
  		// use preg_match to find iframe src
  		preg_match( '/src="(.+?)"/', $iframe, $matches );
-
+		if ( empty( $matches ) ) {
+			return;
+		}
  		$src = $matches[1];
 
 		// Detect vimeo url.

@@ -42,10 +42,18 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 		'IMAGES' => array(
 			/* 'hq-norm' => 381024,  756 * 504 */
 			'hq-norm'       => 345600, /* 720 * 480 */
-			'size-in-story' => 'medium_large',
+			'size-in-story' => 'medium-large',
 			'fallback_image_att_id' => 970,
 		),
 		'TAXONOMIES' => array(
+			// Parent programmes (not taxonomized for overall ease ).
+			'programmes' => array(
+				'C_P'     => 'Tandem Community & Participation',
+				'Europe'  => 'Tandem Europe',
+				'Shaml'   => 'Tandem Shaml',
+				'Turkey'  => 'Tandem Turkey',
+				'Ukraine' => 'Tandem Ukraine',
+			),
 			// Priority in taxonomy types, listed by ACF Field label.
 			'display_priority' => array(
 				0 => 'post_tag',

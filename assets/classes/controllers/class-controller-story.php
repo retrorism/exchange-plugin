@@ -109,7 +109,7 @@ class StoryController extends BaseController {
 
 		// Set sections.
 		if ( ! empty( $acf_sections ) ) {
-			$this->container->sections = $acf_sections;
+			$this->set_sections( $acf_sections );
 		}
 
 		// Set header image.
@@ -122,6 +122,8 @@ class StoryController extends BaseController {
 		}
 
 		$this->set_ordered_tag_list();
+
+		$this->set_gallery();
 	}
 
 
@@ -130,30 +132,7 @@ class StoryController extends BaseController {
 	}
 
 
-	/**
-	 * Get focus points for this image
-	 *
-	 * Add modifiers array with data properties if a focus point has been set.
-	 *
-	 * @param array $thumb ACF Image array
-	 * @return array $focus_points;
-	 */
-	protected function get_focus_points( $thumb ) {
-		if ( ! class_exists('TstPostOptions') ) {
-			return;
-		}
-		$focus_position = get_post_meta( $thumb['ID'], 'theiaSmartThumbnails_position', false );
-		if ( empty( $focus_position ) ) {
-			return;
-		}
-		$h = is_array( $focus_position[0] ) ? $focus_position[0][1] : null;
-		$w = is_array( $focus_position[0] ) ? $focus_position[0][0] : null;
-		if ( ! empty( $h ) && ! empty( $w ) ) {
-			$focus_points['focus_h'] = $h;
-			$focus_points['focus_w'] = $w;
-			return $focus_points;
-		}
-	}
+
 
 	protected function get_header_image( $post_id, $context ) {
 		switch ( $this->get_header_image_source( $post_id ) ) {
@@ -169,7 +148,7 @@ class StoryController extends BaseController {
 				break;
 		}
 		if ( isset( $thumb ) && count( $thumb ) ) {
-			$focus_points = $this->get_focus_points( $thumb );
+			$focus_points = exchange_get_focus_points( $thumb );
 			$image_mods = array();
 			if ( ! empty( $focus_points ) ) {
 				$image_mods['data'] = $focus_points;

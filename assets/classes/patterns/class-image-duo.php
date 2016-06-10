@@ -44,7 +44,7 @@ class ImageDuo extends BasePattern {
 	 protected function create_output() {
 
 		// Check if there are two images and add them to gallery.
-		if ( 2 === count( $this->input ) ) {
+		if ( 2 === count( $this->input['two_images'] ) ) {
 
 			// Open element.
 			$this->output_tag_open();
@@ -61,18 +61,35 @@ class ImageDuo extends BasePattern {
 	 **/
 	protected function set_gallery() {
 		$i = 0;
+		$orientations = $this->input['image_orientation'];
+		$pos = 'left';
+		if ( ! empty( $orientations ) ) {
+			$orientations_list = explode( '_', $orientations );
+
+		}
 		$this->output .= '<div class="imageduo__wrapper">';
-		foreach ( $this->input as $image ) {
+		foreach ( $this->input['two_images'] as $image ) {
+			$mods = array();
+			$focus_points = exchange_get_focus_points( $image );
+			$mods['data'] = array( 'img_id' => $image['id'] );
+			if ( ! empty( $focus_points ) ) {
+				$mods['data'] = array_merge( $mods['data'], $focus_points );
+				$mods['classes'] = array('focus');
+			}
 			if ( ! empty( $image['filename'] ) ) {
 				$this->gallery[ $i ] = $image;
 			}
-			$pos = 'left';
+			if ( ! empty( $orientations_list[$i] ) ) {
+				$mods['orientation'] = $orientations_list[$i];
+			}
 			if ( 1 === $i ) {
 				$pos = 'right';
 			}
 			$mods['position'] = $pos;
-			$gallery_item = new Image( $this->gallery[ $i ], $this->element, $mods );
-			$this->output .= $gallery_item->embed();
+			$gallery_item = new Image( $this->gallery[$i], $this->element, $mods );
+			if ( is_object( $gallery_item ) && is_a( $gallery_item, 'Image' ) ) {
+				$this->output .= $gallery_item->embed();
+			}
 			$i++;
 		}
 		$this->output .= '</div>';

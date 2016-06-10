@@ -31,8 +31,7 @@ class EmphasisBlock extends BasePattern {
 	 protected function create_output() {
 		if ( is_array( $this->input ) && count( $this->input ) > 0 ) {
 			$this->output_tag_open();
-			$type = isset( $this->modifiers['type'] ) ? $this->modifiers['type'] : 'post-it';
-			$this->output .= $this->build_block_elements( $type );
+			$this->output .= $this->build_block_elements();
 			$this->output_tag_close();
 		}
 	}
@@ -46,31 +45,37 @@ class EmphasisBlock extends BasePattern {
 	 *
 	 * @TODO proper Error notifications.
 	 **/
-	protected function build_block_elements( $type ) {
-
+	protected function build_block_elements() {
 		// Check for CTA elements.
 		foreach ( $this->input as $e ) {
-			// Loop through elements.
-			$layout = str_replace($type, '', $e['acf_fc_layout'] );
-			switch ( $layout ) {
+			switch ( $e['acf_fc_layout'] ) {
 
-				case '_block_graphic':
+				case 'block_graphic':
 					$image_mods = array();
-					$image = new ImageSVG( $e[ $type . '_block_graphic_select' ],$this->element, $image_mods );
+					$image = new ImageSVG( $e['block_graphic_select' ],$this->element, $image_mods );
 					$this->output .= $image->embed();
 					break;
 
-				case '_block_paragraph':
-					$paragraph = new Paragraph( $e[ $type . '_block_paragraph_text'], $this->element );
+				case 'block_logo':
+					$colour = isset( $this->modifiers['colour'] ) ? $this->modifiers['colour'] : 'default';
+					$image_mods = array(
+						'background-colour' => $colour,
+					);
+					$image = new ImageSVG( $e['block_programme' ],$this->element, $image_mods );
+					$this->output .= $image->embed();
+					break;
+
+				case 'block_paragraph':
+					$paragraph = new Paragraph( $e['block_paragraph_text'], $this->element );
 					$this->output .= $paragraph->embed();
 					break;
 
-				case '_block_header':
-					$subheader = new SubHeader( $e[ $type . '_block_header_text'], $this->element );
+				case 'block_header':
+					$subheader = new SubHeader( $e['block_header_text'], $this->element );
 					$this->output .= $subheader->embed();
 					break;
 
-				case '_block_button':
+				case 'block_button':
 					$button_mods = array(
 						'link_attributes' => array(),
 						'data_attributes' => array(),

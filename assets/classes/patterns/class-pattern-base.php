@@ -294,7 +294,7 @@ abstract class BasePattern {
 		if ( is_string( $val ) ) {
 			$class = '';
 			if ( 'colour' === $key ) {
-				$val = tandem_hex_to_slug( $val );
+				$val = exchange_hex_to_slug( $val );
 			}
 			if ( ! empty( $this->parent ) ) {
 				$class .= $this->parent . '__';

@@ -91,13 +91,22 @@ class Image extends BasePattern {
 	 * Image RWD sizes attribute.
 	 *
 	 * @since 0.1.0
-	 * @access public
+	 * @access private
 	 * @var string $rwd_sizes HTML image src_set attribute.
 	 **/
 	private $rwd_sizes;
 
 	/**
-	 * Overwrite initial output value for Subheaders.
+	 * Load image lazily?
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var bool $lazy Whether to load this image lazily. Default is true.
+	 **/
+	public $lazy = true;
+
+	/**
+	 * Overwrite initial output value for images.
 	 *
 	 * @since 0.1.0
 	 * @access protected
@@ -106,15 +115,19 @@ class Image extends BasePattern {
 
 		$this->set_image_properties();
 
-		// Add wrapper for centering if this is a header image.
-		if ( 'story__header' === $this->context ) {
-			$res = $this->is_hq ? '' : 'lowres-';
-			$this->output .= '<div class="story__header__' . $res . 'image-wrapper">';
-		}
+		// Open wrapper.
+		$this->wrapper( 'open' );
 
+		// Open element.
 		$this->output_tag_open( 'figure' );
 
-		$this->output .= $this->build_image_element();
+		// Add placeholder for images that need lazy-loading.
+		if ( in_array( $this->context, array( 'griditem','lightbox' ), true ) ) {
+			$this->lazy = false;
+			$this->output .= $this->build_image_element();
+		} else {
+			$this->output .= $this->build_image_placeholder();
+		}
 
 		// Add caption if available.
 		if ( ! empty( $this->input['caption'] )
@@ -130,30 +143,65 @@ class Image extends BasePattern {
 		$this->output_tag_close( 'figure' );
 
 		// Close wrapper.
-		if ( 'story__header' === $this->context ) {
-			$this->output .= '</div>';
+		$this->wrapper( 'close' );
+	}
+
+	/**
+	 * Add wrapper elements for specific contexts
+	 *
+	 * @param string $location ( open or close )
+	 * @return void
+	 * @TODO add filter instead of hardcoding the Orbit references
+	 */
+	protected function wrapper( $location ) {
+		// Empty array that contains two element values if context is met.
+		$el = array();
+		switch ( $this->context ) {
+			case 'story__header':
+				// Add wrapper for centering if this is a header image.
+				$res = $this->is_hq ? '' : 'lowres-';
+				$el['open'] = '<div class="story__header__' . $res . 'image-wrapper">';
+				$el['close'] = '</div>';
+				break;
+			case 'lightbox':
+				$orbit = '';
+				$orbit_is_active = '';
+				// Add wrapper for gallery list, optionally add orbit-slide class
+				if ( ! empty( $this->modifiers['data']['index'] ) && ( 1 == $this->modifiers['data']['index'] ) ) {
+					$orbit_is_active = ' is-active';
+				}
+				$orbit_class = defined( 'EXCHANGE_THEME' ) ? 'orbit-slide' . $orbit_is_active : '';
+				$el['open'] = '<li class="gallery__item '. $orbit_class . '" id="' . $this->modifiers['data']['img_id'] . '">';
+				$el['close'] = '</li>';
+				break;
+			case 'imageduo':
+			case 'section':
+				$el['open'] = '<a data-open="story__modal--gallery" data-img_id="' . $this->modifiers['data']['img_id'] . '">';
+				$el['close'] = '</a>';
+				break;
+			default:
+				break;
+		}
+		if ( count( $el ) ) {
+			$this->output .= $el[ $location ];
 		}
 	}
 
 	/**
-	 * Get image sizes
+	 * Get image size data for the given size.
 	 *
 	 * @link https://core.trac.wordpress.org/timeline?from=2014-06-05T06%3A26%3A26Z&precision=second
 	 *
 	 * @param string $size Image size
-	 * @return array
+	 * @return array $result Width, height, and crop settings
 	 */
-
 	private function get_image_size_data( $size = 'thumbnail' ) {
 		$default_image_sizes = array( 'thumbnail', 'medium', 'large' ); // Standard sizes
 		if ( in_array( $size, $default_image_sizes ) ) {
 			$result['width'] = intval( get_option( "{$size}_size_w" ) );
 			$result['height'] = intval( get_option( "{$size}_size_h" ) );
 			// If not set: crop false per default.
-			$result[ $size ]['crop']   = false;
-			if ( get_option( "{$size}_crop" ) ) {
-				$result[ $size ]['crop'] = get_option( "{$size}_crop" );
-			}
+			$result[$size]['crop'] = empty( get_option( "{$size}_crop" ) ) ? false : get_option( "{$size}_crop" );
 		} else {
 			global $_wp_additional_image_sizes;
 			if ( in_array( $size, array_keys( $_wp_additional_image_sizes ) ) ) {
@@ -163,6 +211,13 @@ class Image extends BasePattern {
 		return $result;
 	}
 
+	/**
+	 * Get all image size data.
+	 *
+	 * Merge array with default image size data with additional image sizes global for complete list.
+	 *
+	 * @return array $result Width, height, and crop settings for each available size.
+	 */
 	private function get_all_image_sizes() {
 		global $_wp_additional_image_sizes;
 		$default_sizes = array( 'thumbnail','medium','large' );
@@ -174,11 +229,26 @@ class Image extends BasePattern {
 		return array_merge( $image_sizes, $_wp_additional_image_sizes );
 	}
 
+	/**
+	 * Get all image size data.
+	 *
+	 * Merge array with default image size data with additional image sizes global for complete list.
+	 *
+	 * @return array $result Width, height, and crop settings for each available size.
+	 */
 	private function image_size_in_context() {
+		// Add portrait suffix for portrait images.
+		$orientation = '';
+		if ( 'portrait' === $this->orientation ) {
+			$orientation = '-portrait';
+		}
 		$sizes = array(
 			'story__header' => 'header-image',
-			'griditem'      => 'story-landscape',
+			'griditem'      => 'medium',
 			'contactblock'  => 'thumbnail',
+			'imageduo'      => 'medium' . $orientation,
+			'section'       => 'medium-large' . $orientation,
+			'lightbox'      => 'large' . $orientation,
 		);
 		if ( ! array_key_exists( $this->context, $sizes ) ) {
 			return false;
@@ -187,16 +257,27 @@ class Image extends BasePattern {
 		}
 	}
 
+	/**
+	 * Prepare sourceset sizes
+	 *
+	 * See which crops are available for each size, return available crops with widths.
+	 *
+	 * @return array $src_sets List of available sizes with widths.
+	 */
 	private function check_for_src_set() {
 		$src_sets = array();
 		$input_sizes = $this->input['sizes'];
 		$combined_sizes = $this->get_all_image_sizes();
 		foreach( $combined_sizes as $size => $vals ) {
-			if ( ! $vals['height'] === $input_sizes[ $size . '-height' ] ) {
+			// Check if the available crops are more or less the same height as the ideal height
+			$diff_h = $input_sizes[ $size . '-height' ] / $vals['height'];
+			if ( ( $diff_h * 100 ) > 105 || ( $diff_h * 100 ) < 95  ) {
 				$src_sets[ $size ] = false;
 				continue;
 			}
-			if ( ! $vals['width'] === $input_sizes[ $size . '-width' ] ) {
+			// Check if the available crops are more or less the same width as the ideal width.
+			$diff_w = $input_sizes[ $size . '-width' ] / $vals['width'];
+			if ( ( $diff_w  * 100 ) > 105 || ( $diff_w * 100 ) < 95  ) {
 				$src_sets[ $size ] = false;
 				continue;
 			}
@@ -208,14 +289,27 @@ class Image extends BasePattern {
 		return $src_sets;
 	}
 
+	/**
+	 * Prepare sourceset sizes
+	 *
+	 * See which crops are available for each size, return available crops with widths.
+	 *
+	 * @return a size only when the context is set *and* the crop is available
+	 */
 	protected function get_appropriate_image_size() {
 		if ( empty( $this->context ) ) {
 			return;
 		}
 		$size = $this->image_size_in_context();
 		$src_sets = $this->check_for_src_set();
+		// Test if appropriate size is available, fall back to smaller version when possible.
 		if ( $size && is_array( $src_sets[ $size ] ) ) {
 			return $size;
+		} elseif ( strpos( $size, 'medium-large' ) ) {
+			$size_medium = str_replace( 'medium-large', 'medium', $size );
+			if ( is_array( $src_sets[$size_medium] ) ) {
+				return $size_medium;
+			}
 		}
 	}
 
@@ -234,7 +328,7 @@ class Image extends BasePattern {
 	}
 
 	/**
-	 * Set source set
+	 * Set source set and sizes for the available crops
 	 *
 	 * @return void
 	 */
@@ -244,36 +338,46 @@ class Image extends BasePattern {
 		} else {
 			if ( 'portrait' !== $this->orientation ) {
 				$wide = $this->get_src_set_part( 'header-image' );
-				$medium = $this->get_src_set_part( 'story-landscape' );
-				$small = $this->get_src_set_part( 'story-landscape-small' );
+				$large = $this->get_src_set_part( 'large' );
+				$mlarge = $this->get_src_set_part( 'medium-large' );
+				$medium = $this->get_src_set_part( 'medium' );
 			} else {
-				$medium = $this->get_src_set_part( 'story-portrait' );
-				$small = $this->get_src_set_part( 'story-portrait-small' );
+				$large = $this->get_src_set_part( 'large-portrait' );
+				$mlarge = $this->get_src_set_part( 'medium-large-portrait' );
+				$medium = $this->get_src_set_part( 'medium-portrait' );
 			}
 		}
 		switch ( $this->context ) {
 			case 'story__header':
-				$order = array( $wide, $medium, $small );
+				$order = array( $wide, $large, $mlarge, $medium );
 				if ( $this->is_hq ) {
 					$sizes = "100vw";
 				} else {
-					$sizes = "(max-width: 60em) 100vw, (min-width: 90em) 50vw, 75vw";
+					$sizes = "(max-width: 60em) 100vw, (min-width: 90em) 60vw, 80vw";
 				}
 				break;
 			case 'griditem' :
-				$order = array( $medium, $small );
+				$order = array( $large, $mlarge, $medium );
 				$sizes = "(max-width: 30em) 100vw, (min-width: 60em) 33vw, 50vw";
 				break;
 			case 'contactblock' :
 				$order = array( $thumb );
 				$sizes = "(max-width: 30em) 25vw, (min-width: 30em) 20vw";
 				break;
-			default :
-				$order = array( $medium, $small );
+			case 'lightbox' :
+				$order = array( $large, $mlarge, $medium );
 				if ( 'portrait' !== $this->orientation ) {
-					$sizes = "(max-width: 30em) 100vw, (min-width: 90em) 50vw, 75vw";
+					$sizes = "(max-width: 30em) 100vw, (min-width: 90em) 60vw, 80vw";
 				} else {
-					$sizes = "(max-width: 30em) 75vw, (max-width: 60em) 50vw, 33vw";
+					$sizes = "(max-width: 30em) 60vw, (min-width: 90em) 50vw, 40vw";
+				}
+				break;
+			default :
+				$order = array( $large, $mlarge, $medium );
+				if ( 'portrait' !== $this->orientation ) {
+					$sizes = "(max-width: 30em) 100vw, (min-width: 90em) 60vw, 80vw";
+				} else {
+					$sizes = "(max-width: 30em) 75vw, (min-width: 90em) 50vw, 60vw";
 				}
 				break;
 		}
@@ -310,10 +414,9 @@ class Image extends BasePattern {
 		// Set src_set and RWD sizes based on context.
 		$this->set_src_set_and_sizes();
 
-		// Default base size is story-portrait or story-landscape, switch to different sizes depending on context.
+		// Default base size is large or large-portrait, switch to different sizes depending on context.
 		$image_size = $this->get_appropriate_image_size();
-
-		// Set src just in case.
+		// Set src just in case, defaulting to medium when not availabe
 		if ( ! empty( $this->input['sizes'][ $image_size ] ) ) {
 			$this->src = $this->input['sizes'][ $image_size ];
 		} else {
@@ -339,14 +442,40 @@ class Image extends BasePattern {
 	 *
 	 * @return string $img HTML image element.
 	 **/
+	protected function build_image_placeholder() {
+
+		$placeholder = '<div class="image__placeholder">';
+		$placeholder .= '<img class="image__placeholder__thumb" src=' . $this->input['sizes']['placeholder'] . ' />';
+		$placeholder .= $this->build_image_element();
+		$placeholder .= '<div class="image__aspect-ratio"></div>';
+		$placeholder .= '</div>';
+
+		return $placeholder;
+	}
+
+
+	/**
+	 * Set image properties by using input and modifiers.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return string $img HTML image element.
+	 **/
 	protected function build_image_element() {
 
 		// Add src to output.
-		$img = '<img src="' . $this->src . '"';
-
-		// Add srcset to image element.
-		if ( $this->src_set ) {
-			$img .= ' srcset="' . esc_attr( $this->src_set ) . '"';
+		if ( $this->lazy ) {
+			$img = '<img class="image--main lazy" data-original="' . $this->src . '"';
+			// Add srcset to image element.
+			if ( $this->src_set ) {
+				$img .= ' data-original-set="' . esc_attr( $this->src_set ) . '"';
+			}
+		} else {
+			$img = '<img class="image--main" src="' . $this->src . '"';
+			// Add srcset to image element.
+			if ( $this->src_set ) {
+				$img .= ' srcset="' . esc_attr( $this->src_set ) . '"';
+			}
 		}
 
 		// Add RWD_sizes to image element.
@@ -358,6 +487,7 @@ class Image extends BasePattern {
 		if ( $this->title ) {
 			$img .= ' title="' . esc_attr( $this->title ) . '"';
 		}
+
 
 		// Add alt to image element.
 		if ( $this->description ) {

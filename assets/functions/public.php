@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 };
 
 
-function tandem_hex_to_slug( $hex ) {
+function exchange_hex_to_slug( $hex ) {
 	$color_array = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS'];
 	$clean_hex = str_replace( '#','',strtolower( $hex ) );
 	if ( is_array( $color_array ) && in_array( $clean_hex,$color_array ) ){
@@ -51,6 +51,31 @@ function exchange_create_link( $obj, $with_text = true ) {
 		return $output;
 	} else {
 		return false;
+	}
+}
+
+/**
+ * Get focus points for this image
+ *
+ * Add modifiers array with data properties if a focus point has been set.
+ *
+ * @param array $thumb ACF Image array
+ * @return array $focus_points;
+ */
+function exchange_get_focus_points( $thumb ) {
+	if ( ! class_exists('TstPostOptions') ) {
+		return;
+	}
+	$focus_position = get_post_meta( $thumb['ID'], 'theiaSmartThumbnails_position', false );
+	if ( empty( $focus_position ) ) {
+		return;
+	}
+	$h = is_array( $focus_position[0] ) ? $focus_position[0][1] : null;
+	$w = is_array( $focus_position[0] ) ? $focus_position[0][0] : null;
+	if ( ! empty( $h ) && ! empty( $w ) ) {
+		$focus_points['focus_h'] = $h;
+		$focus_points['focus_w'] = $w;
+		return $focus_points;
 	}
 }
 
