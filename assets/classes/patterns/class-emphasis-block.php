@@ -31,7 +31,9 @@ class EmphasisBlock extends BasePattern {
 	 protected function create_output() {
 		if ( is_array( $this->input ) && count( $this->input ) > 0 ) {
 			$this->output_tag_open();
+			$this->output .= '<div class="emphasisblock-inner">';
 			$this->output .= $this->build_block_elements();
+			$this->output .= '</div>';
 			$this->output_tag_close();
 		}
 	}
@@ -48,11 +50,20 @@ class EmphasisBlock extends BasePattern {
 	protected function build_block_elements() {
 		// Check for CTA elements.
 		foreach ( $this->input as $e ) {
+
 			switch ( $e['acf_fc_layout'] ) {
 
 				case 'block_graphic':
+					$image_arr = $e['block_graphic_select'];
 					$image_mods = array();
-					$image = new ImageSVG( $e['block_graphic_select' ],$this->element, $image_mods );
+					if ( empty( $image_arr ) || empty( $image_arr['mime_type'] ) ) {
+						continue;
+					}
+					if ( 'image/svg+xml' === $image_arr['mime_type'] ) {
+						$image = new ImageSVG( $image_arr, $this->element, $image_mods );
+					} else {
+						$image = new Image( $image_arr, $this->element, $image_mods );
+					}
 					$this->output .= $image->embed();
 					break;
 
@@ -66,6 +77,7 @@ class EmphasisBlock extends BasePattern {
 					break;
 
 				case 'block_paragraph':
+
 					$paragraph = new Paragraph( $e['block_paragraph_text'], $this->element );
 					$this->output .= $paragraph->embed();
 					break;

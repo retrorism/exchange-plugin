@@ -121,6 +121,9 @@ class Image extends BasePattern {
 		// Open element.
 		$this->output_tag_open( 'figure' );
 
+		// Close anchor.
+		$this->anchor( 'open' );
+
 		// Add placeholder for images that need lazy-loading.
 		if ( in_array( $this->context, array( 'griditem','lightbox' ), true ) ) {
 			$this->lazy = false;
@@ -139,6 +142,10 @@ class Image extends BasePattern {
 				$this->output .= $this->build_image_caption();
 			}
 		}
+
+		// Close anchor.
+		$this->anchor( 'close' );
+
 		// Close element.
 		$this->output_tag_close( 'figure' );
 
@@ -174,6 +181,18 @@ class Image extends BasePattern {
 				$el['open'] = '<li class="gallery__item '. $orbit_class . '" id="' . $this->modifiers['data']['img_id'] . '">';
 				$el['close'] = '</li>';
 				break;
+			default:
+				break;
+		}
+		if ( count( $el ) ) {
+			$this->output .= $el[ $location ];
+		}
+	}
+
+	protected function anchor( $location ) {
+		// Empty array that contains two element values if context is met.
+		$el = array();
+		switch ( $this->context ) {
 			case 'imageduo':
 			case 'section':
 				$el['open'] = '<a data-open="story__modal--gallery" data-img_id="' . $this->modifiers['data']['img_id'] . '">';

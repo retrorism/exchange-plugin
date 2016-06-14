@@ -165,12 +165,25 @@ class Section extends BasePattern {
 				case 'emphasis_block':
 					$block_mods = array();
 					$type = $e['block_type'];
-					if ( isset( $type ) && in_array( $type, array( 'cta','post-it', true ) ) ) {
-						$block_mods['type'] = $type;
-						$block_mods['colour'] = exchange_hex_to_slug( $e[ $type . '_colour' ] );
-						$emphasis_block = new EmphasisBlock( $e [ $type . '_block_elements' ], $this->element, $block_mods );
-						$this->output .= $emphasis_block->embed();
+					$align = $e['block_alignment'];
+					$block_elements = $e[ $type . '_block_elements' ];
+					if (  empty( $type ) || ! count( $block_elements ) ) {
+						break;
 					}
+					switch ( $align ) {
+						case 'left':
+						case 'right':
+							$block_mods['classes'] = array( 'floated' );
+						case 'full':
+							$block_mods['align'] = $align;
+						default:
+							break;
+					}
+					$block_mods['type'] = $type;
+					$block_mods['colour'] = $e[ $type . '_colour' ];
+					$block_mods['data'] = array( 'element_count' => count( $block_elements ) );
+					$emphasis_block = new EmphasisBlock( $block_elements, $this->element, $block_mods );
+					$this->output .= $emphasis_block->embed();
 					break;
 				case 'map':
 					$map_mods = array();

@@ -35,7 +35,7 @@ class ImageSVG extends BasePattern {
 		$this->output_tag_open( 'figure' );
 		if ( $this->is_programme_logo() ) {
 			$this->output .= $this->build_logo();
-		} elseif ( is_array( $this->input ) && isset( $this->input['mime_type'] ) ){
+		} elseif ( count( $this->input ) ){
 			$this->output .= $this->build_svg( get_attached_file( $this->input['ID'] ) );
 		} else {
 			$this->output .= __( 'Oh no! We cannot create this graphic', EXCHANGE_PLUGIN );
