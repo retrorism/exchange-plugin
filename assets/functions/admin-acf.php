@@ -107,35 +107,30 @@ function exchange_change_acf_color_picker() {
 		$client_colors_boxes_array[] = '#'.$value;
 	}
 
-	$client_colors_bg_jquery = json_encode($client_colors_bg_array);
-	$client_colors_accents_jquery = json_encode( $client_colors_accents_array);
-	$client_colors_boxes_jquery = json_encode( $client_colors_boxes_array);
+	$client_colors_bg_jquery = json_encode( $client_colors_bg_array );
+	$client_colors_accents_jquery = json_encode( $client_colors_accents_array );
+	$client_colors_boxes_jquery = json_encode( $client_colors_boxes_array );
 
 	echo "<script>
 		(function($){
 		acf.add_action('ready append', function() {
 		  acf.get_fields({ type : 'color_picker'}).each(function() {
 			var acfpalette = " . $client_colors_bg_jquery . ";
-			console.log('palette found: " . $client_colors_bg_jquery . "');
 			if ( $(this).find('.wp-color-picker').parents('*[data-name=\"pquote_colour\"]').length > 0 ) {
 			  var acfpalette = ". $client_colors_bg_jquery . ";
-			  console.log('switched to palette: " . $client_colors_bg_jquery . "');
 			}
 			if ( $(this).find('.wp-color-picker').parents('*[data-name=\"cta_colour\"]').length > 0 ) {
 			  var acfpalette = ". $client_colors_accents_jquery .";
-			  console.log('switched to palette: " . $client_colors_accents_jquery ."');
 			}
 			if ( $(this).find('.wp-color-picker').parents('*[data-name=\"post-it_colour\"]').length > 0 ) {
 			  var acfpalette = " . $client_colors_bg_jquery . ";
-			  console.log('switched to palette: " . $client_colors_bg_jquery ."');
+			  console.log( $(this) );
 			}
-			if ( $(this).find('.wp-color-picker').parents('*[data-name=\"section_header_tape_colour\"]').length > 0 ) {
+			if ( $(this).find('.wp-color-picker').parents('*[data-name=\"tape_colour\"]').length > 0 ) {
 			  var acfpalette = ". $client_colors_accents_jquery .";
-			  console.log('switched to palette: " . $client_colors_accents_jquery . "');
 			}
 			if ( $(this).find('.wp-color-picker').parents('*[data-name=\"box_colour\"]').length > 0 ) {
 			  var acfpalette = ". $client_colors_accents_jquery . ";
-			  console.log('switched to palette: " . $client_colors_boxes_jquery . "');
 			}
 			$(this).iris({
 			  color: $(this).find('.wp-color-picker').val(),

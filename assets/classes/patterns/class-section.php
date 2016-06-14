@@ -162,6 +162,19 @@ class Section extends BasePattern {
 					$subheader = new SubHeader( $e['text'], $this->element );
 					$this->output .= $subheader->embed();
 					break;
+				case 'section_header':
+					$header_mods = array();
+					$colour = $e['tape_colour'];
+					$type = $e['type'];
+					if ( ! empty( $colour ) ) {
+						$header_mods['colour'] = $e['tape_colour'];
+					}
+					if ( ! empty( $type ) ) {
+						$header_mods['type'] = $e['type'];
+					}
+					$subheader = new SectionHeader( $e['text'], $this->element, $header_mods );
+					$this->output .= $subheader->embed();
+					break;
 				case 'emphasis_block':
 					$block_mods = array();
 					$type = $e['block_type'];
