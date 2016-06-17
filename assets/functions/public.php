@@ -30,6 +30,22 @@ function exchange_hex_to_slug( $hex ) {
 	return 'default';
 }
 
+
+/**
+ * Pick black or white to contrast with chosen hexcolor
+ *
+ * @param string $hex Colour value
+
+ * @return string black or white
+ */
+function exchange_get_contrast_YIQ( $hex ) {
+	$r = hexdec( substr( $hex,0,2 ) );
+	$g = hexdec( substr( $hex,2,2 ) );
+	$b = hexdec( substr( $hex,4,2 ) );
+	$yiq = ( ( $r*299 )+( $g*587 )+( $b*114 ) )/1000;
+	return ( $yiq >= 128 ) ? 'white' : 'black';
+}
+
 /**
  * Create link (or simply an opening tag)
  *

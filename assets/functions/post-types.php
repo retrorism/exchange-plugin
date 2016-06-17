@@ -85,11 +85,11 @@ function tandem_create_collaboration() {
 		'menu_icon'           => 'dashicons-editor-paste-text',
 		'menu_position'       => 12,
 		'public'              => true,
-		'hierarchical'        => true,
 		// Other items that are available for this array: 'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'.
-		'supports'            => array( 'title', 'thumbnail', 'editor', 'revisions' ),
 		'exclude_from_search' => false,
+		'hierarchical'        => true,
 		'capability_type'     => 'post',
+		'supports'            => array( 'title', 'thumbnail', 'editor', 'revisions' ),
 		'rewrite'             => array( 'slug' => 'collaborations' ),
 		'taxonomies'          => array( 'post_tag','location','topic','discipline','methodology','output'),
 		)

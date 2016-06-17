@@ -56,7 +56,7 @@ class Section extends BasePattern {
 		$this->output .= '<div class="section-inner">';
 		$this->build_section_header();
 
-		if ( count( $this->input['story_elements'] ) ) {
+		if ( ! empty( $this->input['story_elements'] ) && count( $this->input['story_elements'] ) ) {
 			$this->story_elements = $this->input['story_elements'];
 			$this->build_story_elements();
 		}
@@ -96,7 +96,7 @@ class Section extends BasePattern {
 	 **/
 	protected function build_story_elements() {
 		// Check for story elements, return when none present.
-		if ( ! count( $this->story_elements ) ) {
+		if ( empty( $this->story_elements ) ) {
 			return;
 		}
 		foreach ( $this->story_elements as $e ) {
@@ -168,6 +168,7 @@ class Section extends BasePattern {
 					$type = $e['type'];
 					if ( ! empty( $colour ) ) {
 						$header_mods['colour'] = $e['tape_colour'];
+						$header_mods['data'] = array( 'tape_colour' => $colour );
 					}
 					if ( ! empty( $type ) ) {
 						$header_mods['type'] = $e['type'];
