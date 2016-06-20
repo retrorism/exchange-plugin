@@ -125,7 +125,7 @@ class Image extends BasePattern {
 		$this->anchor( 'open' );
 
 		// Add placeholder for images that need lazy-loading.
-		if ( in_array( $this->context, array( 'griditem','lightbox' ), true ) ) {
+		if ( in_array( $this->context, array( 'griditem','lightbox','contactblock' ), true ) ) {
 			$this->lazy = false;
 			$this->output .= $this->build_image_element();
 		} else {

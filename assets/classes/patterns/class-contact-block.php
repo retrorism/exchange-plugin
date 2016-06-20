@@ -43,11 +43,14 @@ class ContactBlock extends BasePattern {
 	 * @access protected
 	 **/
 	protected function create_output() {
+
 		if ( is_array( $this->input ) && ! empty( $this->input['ID'] ) ) {
 			$this->set_user_acf();
 			$this->set_user_image();
 			$this->output_tag_open();
+
 			$this->output .= $this->create_contact_block();
+
 			$this->output_tag_close();
 		}
 	}
@@ -96,10 +99,10 @@ class ContactBlock extends BasePattern {
 	protected function create_contact_block() {
 		if ( '' !== locate_template( 'parts/contact-block.php' ) ) {
 			ob_start();
-			if ( isset( $this->user_image ) ) {
+			if ( ! empty( $this->user_image ) ) {
 				$user_image = $this->user_image;
 			}
-			if ( isset( $this->user_acf ) ) {
+			if ( ! empty( $this->user_acf ) ) {
 				$user_acf = $this->user_acf;
 			}
 			$user_info = $this->input;

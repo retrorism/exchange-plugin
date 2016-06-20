@@ -27,7 +27,7 @@ function exchange_hex_to_slug( $hex ) {
 		  return $retval[0];
 		}
 	}
-	return 'default';
+	return 'custom-colour';
 }
 
 
