@@ -369,18 +369,19 @@ class BaseController {
 		switch ( $this->container->type ) {
 			case 'story':
 				foreach( $tax_list as $taxonomy ) {
-					if ( $taxonomy === 'topics'
-						|| $taxonomy === 'locations'
-						|| $taxonomy === 'post_tag' ) {
-						$tax_results = get_field( $taxonomy, $this->container->post_id );
-						if ( $tax_results ) {
-							if ( is_object( $tax_results ) ) {
-								$tax_results = array( $tax_results );
-							}
-							$results = array_merge( $results, $tax_results );
-						}
+					if ( ! in_array( $taxonomy, array( 'topics', 'locations', 'post_tag', 'tandem' ), true ) ) {
+						continue;
 					}
+					$tax_results = get_field( $taxonomy, $this->container->post_id );
+					if ( empty( $tax_results ) ) {
+						continue;
+					}
+					if ( is_object( $tax_results ) ) {
+						$tax_results = array( $tax_results );
+					}
+					$results = array_merge( $results, $tax_results );
 				}
+				// End with the language tag.
 				if ( isset( $this->container->language ) ) {
 					$results[] = $this->container->language;
 				}
@@ -389,7 +390,7 @@ class BaseController {
 				$results[] = get_term_by( 'name', $this->container->programme_round->title, 'topic' );
 				foreach( $tax_list as $taxonomy ) {
 					$tax_results = get_field( $taxonomy, $this->container->post_id );
-					if ( $tax_results ) {
+					if ( ! empty( $tax_results ) ) {
 						$results = array_merge( $results, $tax_results );
 					}
 				}
