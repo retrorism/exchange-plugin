@@ -43,6 +43,15 @@ class Section extends BasePattern {
 	 **/
 	protected $story_elements;
 
+	/**
+	 * Array containing map data.
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 * @var array $story_elements Elements-list.
+	 **/
+	protected $map_data = array();
+
 
 
 	public function create_output() {
@@ -69,6 +78,10 @@ class Section extends BasePattern {
 
 		if ( ! empty( $this->input['gravity_forms'] ) ) {
 			$this->build_form();
+		}
+
+		if ( 'has_map' === $this->input['section_contents'] ) {
+			$this->set_map_data()->build_map();
 		}
 
 		if ( ! empty( $this->input['contact_details'] ) ) {
@@ -210,36 +223,7 @@ class Section extends BasePattern {
 					$this->output .= $emphasis_block->embed();
 					break;
 				case 'map':
-					$map_mods = array();
-					$data = array();
-					$style = $e['map_style'];
-					$size = $e['map_size'];
-					$center = $e['map_center'];
-					$zoom_level = $e['map_zoom_level'];
-					$markers = $e['map_markers'];
-
-					// Set map style.
-					if ( isset( $style ) && in_array( $style, array( 'dots','network', 'route', true ) ) ) {
-						$map_mods['style'] = $style;
-					}
-
-					// Set map size.
-					if ( isset( $size ) && in_array( $size, array( 'wide','square', 'small', true ) ) ) {
-						$map_mods['size'] = $size;
-					}
-					// Set map center.
-					if ( is_array( $center ) && array_key_exists( 'lat', $center ) && array_key_exists( 'lng', $center ) ) {
-						$map_mods['data']['center'] = $center['lat'] . ';' . $center['lng'];
-					}
-					// Set zoom level.
-					if ( isset( $zoom_level ) ) {
-						$map_mods['data']['zoom_level'] = $zoom_level;
-					}
-					if ( isset( $map_mods['data']['zoom_level'] ) && isset( $map_mods['data']['center'] ) ) {
-						$map = new SimpleMap( $e, $this->element, $map_mods );
-						//var_dump( $map );
-						$this->output .= $map->embed();
-					} else
+					$this->build_map( $e );
 					break;
 				default:
 					$this->output .= '<div data-alert class="alert-box alert">';
@@ -254,7 +238,7 @@ class Section extends BasePattern {
 	 * Build contact block from user object input.
 	 *
 	 */
-	 function build_contact_block() {
+	 public function build_contact_block() {
 		$team_members = $this->input['contact_details'];
 		if ( count( $team_members ) < 1 ) {
 			return;
@@ -262,6 +246,69 @@ class Section extends BasePattern {
 		foreach( $team_members as $team_member ) {
 			$contact_block = new ContactBlock( $team_member, $this->element );
 			$this->output .= $contact_block->embed();
+		}
+	}
+
+	/**
+	 * Callback for map_settings_filter
+	 *
+	 * @return bool that allows the filter to pick input value
+	 */
+	private function map_key_filter_cb( $var ) {
+		return 0 === strpos( $var, 'map_' );
+	}
+
+	/**
+	 * Set up section map data from ACF input.
+	 *
+	 * @return the section object.
+	 */
+	protected function set_map_data() {
+		$map_data = array_filter( $this->input, array( $this, 'map_key_filter_cb'), ARRAY_FILTER_USE_KEY );
+		// At least four map settings must be provided: style, size, map_center, map_zoom, map_markers / map_collabs.
+		if ( count( $map_data ) > 4 ) {
+			$this->map_data = $map_data;
+		}
+		return $this;
+	}
+
+	/**
+	 * Build map from input array
+	 *
+	 */
+	public function build_map( $map_element = array() ) {
+		$map_mods = array();
+		$data = array();
+		// attach section map data if element turns out to be empty, otherwise return void.
+		$e = ! empty( $map_element ) ? $map_element : $this->map_data;
+		if ( empty( $e ) ) {
+			return;
+		}
+		$style = $e['map_style'];
+		$size = $e['map_size'];
+		$center = $e['map_center'];
+		$zoom_level = $e['map_zoom_level'];
+		$markers = $e['map_markers'];
+
+		// Set map style.
+		if ( isset( $style ) && in_array( $style, array( 'dots','network', 'route', true ) ) ) {
+			$map_mods['style'] = $style;
+		}
+		// Set map size.
+		if ( isset( $size ) && in_array( $size, array( 'wide','square', 'small', true ) ) ) {
+			$map_mods['size'] = $size;
+		}
+		// Set map center.
+		if ( is_array( $center ) && array_key_exists( 'lat', $center ) && array_key_exists( 'lng', $center ) ) {
+			$map_mods['data']['center'] = $center['lat'] . ';' . $center['lng'];
+		}
+		// Set zoom level.
+		if ( isset( $zoom_level ) ) {
+			$map_mods['data']['zoom_level'] = $zoom_level;
+		}
+		if ( isset( $map_mods['data']['zoom_level'] ) ) {
+			$map = new SimpleMap( $e, $this->element, $map_mods );
+			$this->output .= $map->embed();
 		}
 	}
 
