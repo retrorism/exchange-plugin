@@ -75,6 +75,10 @@ class StoryController extends BaseController {
 				$this->container->storyteller = new Participant( $acf_storyteller );
 			}
 		}
+
+		// Add tags
+		$this->set_ordered_tag_list();
+
 	}
 	/**
 	 * Return story object with properties taken from ACF Fields.
@@ -90,7 +94,6 @@ class StoryController extends BaseController {
 		// Retrieve post_id variable from basic mapping.
 		$post_id = $this->container->post_id;
 
-
 		// Throw Exception when the input is not a valid story post type object.
 		if ( ! ( $post_id >= 1 ) ) {
 			unset( $this->container );
@@ -100,7 +103,6 @@ class StoryController extends BaseController {
 		$acf_sections = get_field( 'sections', $post_id );
 		$acf_related_content = get_field( 'related_content', $post_id );
 		$acf_has_custom_byline = get_field( 'has_custom_byline', $post_id );
-
 
 		// Set related content.
 		if ( is_array( $acf_related_content ) && count( $acf_related_content ) > 0 ) {
@@ -121,24 +123,7 @@ class StoryController extends BaseController {
 			$this->set_custom_byline();
 		}
 
-		$this->set_ordered_tag_list();
-
 		$this->set_gallery();
-	}
-
-	/**
-	 * Returns one story with all its properties.
-	 *
-	 * @param mixed $post_id_or_object Post ID or Object.
-	 * @return Story object or null
-	 */
-	public static function get_full_story( $post_id_or_object ) {
-		if ( $post_id_or_object ) {
-			$post = get_post( $post_id_or_object );
-			return $this->map_story( $post );
-		} else {
-			return null;
-	   	}
 	}
 
 	/**
@@ -153,7 +138,7 @@ class StoryController extends BaseController {
 	}
 
 	/**
-	 * Returna story set.
+	 * Return a story set.
 	 *
 	 * @return array of stories
 	 *

@@ -111,7 +111,7 @@ function exchange_create_tax_topic() {
 			'public'       => true,
 			'query_var'    => true,
 			'rewrite'      => array(
-				'slug'       => 'topics', // This controls the base slug that will display before each term.
+				'slug'       => 'topic', // This controls the base slug that will display before each term.
 				'with_front' => false, // Don't display the category base before.
 			),
 		)
@@ -135,7 +135,7 @@ function exchange_create_tax_location() {
 			'public'       => true,
 			'query_var'    => true,
 			'rewrite'      => array(
-				'slug'       => 'locations', // This controls the base slug that will display before each term.
+				'slug'       => 'location', // This controls the base slug that will display before each term.
 				'with_front' => false, // Don't display the category base before.
 			),
 		)
@@ -158,7 +158,7 @@ function exchange_create_tax_methodology() {
 			'public'       => true,
 			'query_var'    => true,
 			'rewrite'      => array(
-				'slug'       => 'methodologies', // This controls the base slug that will display before each term
+				'slug'       => 'methodology', // This controls the base slug that will display before each term
 				'with_front' => false, // Don't display the category base before.
 			),
 		)
@@ -182,7 +182,7 @@ function exchange_create_tax_discipline() {
 			'public'       => true,
 			'query_var'    => true,
 			'rewrite'      => array(
-				'slug'       => 'disciplines', // This controls the base slug that will display before each term.
+				'slug'       => 'discipline', // This controls the base slug that will display before each term.
 				'with_front' => false, // Don't display the category base before.
 			),
 		)

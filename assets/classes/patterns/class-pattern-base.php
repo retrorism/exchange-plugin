@@ -446,10 +446,17 @@ abstract class BasePattern {
 	 *
 	 * @since 0.1.0
 	 * @access public
+	 * @param string $context
+	 * @param int $limit
 	 **/
-	public function publish_stripped( $context = '' ) {
+	public function publish_stripped( $context = '', $limit = 0 ) {
 		$this->prepare( $context )->create_output();
-		echo strip_tags( strip_shortcodes( $this->output ), '<div><p><em>' ) . PHP_EOL;
+		$out = strip_tags( strip_shortcodes( $this->output ), '<div><p><em>' ) . PHP_EOL;
+		if ( is_int( $limit ) && $limit > 0 ) {
+			echo wp_trim_words( $out, $limit, __( '...','exchange' ) );
+		} else {
+			echo $out;
+		}
 	}
 
 	/**

@@ -46,29 +46,25 @@ class CollaborationController extends BaseController {
 		}
 	}
 
-	public function map_collaboration_basics( $post ) {
-
-		if ( $post->post_parent >= 1 ) {
-			$this->set_programme_round( $post->post_parent );
-		}
-
+	public function map_collaboration_basics() {
 		// Add participants.
 		$this->set_participants();
-
 		// Add participants' locations
 		if ( $this->container->has_participants ) {
 			$this->set_collaboration_locations();
 		}
+
+		// Add tags
+		$this->set_ordered_tag_list();
 	}
 
 	public function map_full_collaboration() {
+		// Store post ID in a variable for faster access.
 		$post_id = $this->container->post_id;
 		// Add description.
 		$this->set_description();
 		// Add header image.
 		$this->set_header_image( $post_id, 'collaboration__header' );
-		// Add tags
-		$this->set_ordered_tag_list();
 
 		// // Dump ACF variables.
 		// $acf_related_content = get_field( 'related_content', $post_id );
@@ -139,10 +135,5 @@ class CollaborationController extends BaseController {
 	}
 
 
-	public function set_programme_round( $parent_id ) {
-		$parent = get_post( $parent_id );
-		if ( 'programme_round' === $parent->post_type ) {
-			$this->container->programme_round = new Programme_Round( $parent );
-		}
-	}
+
 }

@@ -54,13 +54,20 @@ function exchange_get_contrast_YIQ( $hex ) {
 
  * @return string Anchor tag with appropriate attributes and / or title.
  */
-function exchange_create_link( $obj, $with_text = true ) {
+function exchange_create_link( $obj, $with_text = true, $class = '' ) {
 	if ( $obj instanceof Exchange ) {
 		$url = $obj->link;
 		$title = $obj->title;
+		$cat = $obj->category;
+	}
+	if ( 'griditem__button button--small' === $class && ! empty( $cat ) ) {
+		$title = strtoupper( __( sprintf( 'Read the full %s', $cat ), 'exchange' ) );
+		$class .= ' button--' . $cat;
+	} else {
+		$title = strtoupper( __( 'Read more', 'exchange' ) );
 	}
 	if ( ! empty( $url ) && ! empty( $title ) ) {
-		$output  = '<a href="' . $url . '" title="' .sprintf( esc_html__( 'Navigate to %s', EXCHANGE_PLUGIN ), esc_attr( $title ) ).'">';
+		$output  = '<a class="' . $class . '" href="' . $url . '" title="' .sprintf( esc_html__( 'Navigate to %s', EXCHANGE_PLUGIN ), esc_attr( $title ) ).'">';
 		if ( $with_text ) {
 			$output .= $title . '</a>';
 		}

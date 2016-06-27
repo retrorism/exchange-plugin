@@ -143,11 +143,13 @@ class BaseController {
 		// Set post_type.
 		$exchange->type = $post->post_type;
 
+		if ( $post->post_parent >= 1 ) {
+			$exchange->controller->set_programme_round( $post->post_parent );
+		}
+
 		// Set permalink.
 		$exchange->link = get_permalink( $post );
 
-		// Set tags.
-		$this->set_tag_list();
 	}
 
 	// Store sections in Exchange object
@@ -377,7 +379,7 @@ class BaseController {
 				$term_results = array_merge( $term_results, $tax_terms );
 			}
 		}
-		if ( count( $term_results ) > 0 ) {
+		if ( ! empty( $term_results ) ) {
 			return $term_results;
 		}
 	}
@@ -413,7 +415,7 @@ class BaseController {
 		switch ( $this->container->type ) {
 			case 'story':
 				foreach( $tax_list as $taxonomy ) {
-					if ( ! in_array( $taxonomy, array( 'topics', 'locations', 'post_tag', 'tandem' ), true ) ) {
+					if ( ! in_array( $taxonomy, array( 'topic', 'location', 'post_tag', 'tandem' ), true ) ) {
 						continue;
 					}
 					$tax_results = get_field( $taxonomy, $this->container->post_id );
@@ -433,7 +435,7 @@ class BaseController {
 			case 'collaboration':
 				//$results[] = get_term_by( 'name', $this->container->programme_round->title, 'topic' );
 				foreach( $tax_list as $taxonomy ) {
-					if ( ! in_array( $taxonomy, array( 'topics', 'locations', 'post_tag' ), true ) ) {
+					if ( ! in_array( $taxonomy, array( 'topic', 'location', 'post_tag' ), true ) ) {
 						continue;
 					}
 					$tax_results = get_field( $taxonomy, $this->container->post_id );
@@ -462,7 +464,7 @@ class BaseController {
 	 **/
 	public function set_ordered_tag_list() {
 		$ordered_tag_list = $this->get_ordered_tag_list();
-		if ( is_array( $ordered_tag_list ) && count( $ordered_tag_list ) > 0 ) {
+		if ( ! empty( $ordered_tag_list ) ) {
 			$this->container->ordered_tag_list = $ordered_tag_list;
 			$this->container->has_tags = true;
 		}
@@ -479,16 +481,22 @@ class BaseController {
 	 * @TODO Expand selection options.
 	 **/
 	public function get_tag_short_list() {
+		$tag_list = $this->container->ordered_tag_list;
+		if ( empty( $tag_list ) ) {
+			return;
+		}
 		$i = 0;
 		$shortlist = array();
 		$tax_order = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['display_priority'];
 		foreach ( $tax_order as $taxonomy ) {
-			if ( array_key_exists( $taxonomy, $this->container->ordered_tag_list ) ) {
-				foreach ( $this->container->ordered_tag_list[$taxonomy] as $term ) {
-					if ( $i < $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['grid_tax_max'] ) {
-						$shortlist[] = $term;
-						$i++;
-					} else {
+			foreach ( $tag_list as $tag_term ) {
+				if ( ! is_object( $tag_term ) ) {
+					continue;
+				}
+				if ( $taxonomy === $tag_term->taxonomy ) {
+					$shortlist[] = $tag_term;
+					$i++;
+					if ( $i === $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['grid_tax_max'] ) {
 						continue 2;
 					}
 				}
@@ -562,6 +570,13 @@ class BaseController {
 			)
 		);
 		return $term_mods;
+	}
+
+	protected function set_programme_round( $parent_id ) {
+		$parent = get_post( $parent_id );
+		if ( 'programme_round' === $parent->post_type ) {
+			$this->container->programme_round = new Programme_Round( $parent );
+		}
 	}
 
 

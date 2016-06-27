@@ -58,11 +58,11 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 			'display_priority' => array(
 				0 => 'post_tag',
 				1 => 'tandem',
-				2 => 'topics',
-				3 => 'disciplines',
-				4 => 'methodologies',
-				5 => 'outputs',
-				6 => 'locations',
+				2 => 'topic',
+				3 => 'discipline',
+				4 => 'methodology',
+				5 => 'output',
+				6 => 'location',
 			),
 			// Maximum number of tags on grid items
 			'grid_tax_max' => 3,
