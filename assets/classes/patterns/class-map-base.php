@@ -151,6 +151,7 @@ abstract class BaseMap extends BasePattern {
 			return;
 		} else {
 			foreach( $collaborations as $collaboration ) {
+				var_dump( $collaboration );
 				$this->set_collaboration_data( $collaboration );
 			}
 			if ( ! empty( $this->collaboration_data ) ) {

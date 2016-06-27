@@ -29,29 +29,46 @@ class ParticipantController extends BaseController {
 	 *
 	 * @param object $participant Newly instantiated participant class object.
 	 * @param object $post Participant post type object.
-	 * @return participant with added properties
 	 *
 	 * @throws Exception When no participant has been provided.
 	 **/
-	public function map_participant( $participant, $post_object ) {
-		$post_id = $post_object->ID;
-		if ( ! ( $post_id >= 1 ) || ! ( $post_object->post_type === 'participant') ) {
-			unset( $participant );
-			throw new Exception( 'This is not a valid participant' );
-		}
-		// Dump ACF variables.
-		$acf = get_fields( $post_id );
+	public function map_participant_basics() {
 
-		if ( ! empty( $post_object->post_title ) ) {
-			$participant->name = $post_object->post_title;
-		}
+		// Mapping / aliasing title to name.
+		$this->container->name = $this->container->title;
 
+	}
+
+	public function set_organisation_data() {
+		$post_id = $this->container->post_id;
+		$org_name = get_field( 'organisation_name', $post_id );
+		$org_coords = get_field( 'organisation_location', $post_id );
+		$org_city = get_field( 'organisation_city', $post_id );
+		$org_country = get_field( 'organisation_country', $post_id );
+		$org_website = get_field( 'organisation_website', $post_id );
+
+		if ( !empty( $org_name ) ) {
+			$this->container->org_name = $org_name;
+		}
+		if ( 2 === count( $org_coords ) ) {
+			$this->container->org_coords = $org_coords;
+		}
+		if ( ! empty( $org_city ) ) {
+			$this->container->org_city = $org_city;
+		}
+		if ( ! empty( $org_country ) ) {
+			$this->container->org_country = $org_country;
+		}
+		if ( ! empty( $org_website ) ) {
+			$this->container->org_website = $org_website;
+		}
+	}
+
+	public function set_collaboration() {
 		$collaboration = CollaborationController::get_collaboration_by_participant_id( $post_id );
 		if ( ! empty( $collaboration ) ) {
-			$participant->collaboration = $collaboration;
+			$this->container->collaboration = $collaboration;
 		}
-
-		return $participant;
 	}
 }
 

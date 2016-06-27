@@ -126,55 +126,6 @@ class StoryController extends BaseController {
 		$this->set_gallery();
 	}
 
-
-	protected function get_header_image_source( $post_id ) {
-		return get_field( 'header_image' );
-	}
-
-
-
-
-	protected function get_header_image( $post_id, $context ) {
-		switch ( $this->get_header_image_source( $post_id ) ) {
-			case 'upload_new_image':
-				$thumb = get_field( 'upload_header_image', $post_id );
-				break;
-			case 'use_featured_image':
-				$thumb_id = get_post_thumbnail_id( $post_id );
-				// Use ACF function to create array for Image object constructor.
-				$thumb = acf_get_attachment( $thumb_id );
-				break;
-			case 'none':
-				break;
-		}
-		if ( isset( $thumb ) && count( $thumb ) ) {
-			$focus_points = exchange_get_focus_points( $thumb );
-			$image_mods = array();
-			if ( ! empty( $focus_points ) ) {
-				$image_mods['data'] = $focus_points;
-				$image_mods['classes'] = array('focus');
-			}
-			return new Image( $thumb, $context, $image_mods );
-		}
-	}
-
-
-
-	/**
-	 * Attaches header image to story
-	 *
-	 * @param string $acf_header_image Advanced Custom Fields Header selection option
-	 * @param integer $post_id.
-	 * @return HeaderImage object or null
-	 */
-	protected function set_header_image( $post_id, $context = '' ) {
-		$image = $this->get_header_image( $post_id, $context );
-		if ( is_object( $image ) && is_a($image, 'Image') ) {
-			$this->container->header_image = $image;
-			$this->container->has_header_image = true;
-		}
-	}
-
 	/**
 	 * Returns one story with all its properties.
 	 *

@@ -145,7 +145,7 @@ class Image extends BasePattern {
 
 			$this->set_image_caption();
 
-			if ( is_object( $this->caption ) ) {
+			if ( is_object( $this->caption && $this->context !== 'collaboration_header' ) ) {
 				$this->output .= $this->build_image_caption();
 			}
 		}
@@ -175,6 +175,10 @@ class Image extends BasePattern {
 				// Add wrapper for centering if this is a header image.
 				$res = $this->is_hq ? '' : 'lowres-';
 				$el['open'] = '<div class="story__header__' . $res . 'image-wrapper">';
+				$el['close'] = '</div>';
+				break;
+			case 'collaboration__header':
+				$el['open'] = '<div class="collaboration__header__image-wrapper" data-equalizer-watch>';
 				$el['close'] = '</div>';
 				break;
 			case 'lightbox':
@@ -312,17 +316,18 @@ class Image extends BasePattern {
 		$full = $this->get_src_set_part( 'full', $src_sets );
 		if ( 'contactblock' === $this->context ) {
 			$thumb = $this->get_src_set_part( 'thumbnail', $src_sets );
+		} elseif ( 'portrait' !== $this->orientation ) {
+			$wide = $this->get_src_set_part( 'header-image', $src_sets );
+			$large = $this->get_src_set_part( 'large', $src_sets );
+			$mlarge = $this->get_src_set_part( 'medium-large', $src_sets );
+			$medium = $this->get_src_set_part( 'medium', $src_sets );
 		} else {
-			if ( 'portrait' !== $this->orientation ) {
-				$wide = $this->get_src_set_part( 'header-image', $src_sets );
-				$large = $this->get_src_set_part( 'large', $src_sets );
-				$mlarge = $this->get_src_set_part( 'medium-large', $src_sets );
-				$medium = $this->get_src_set_part( 'medium', $src_sets );
-			} else {
-				$large = $this->get_src_set_part( 'large-portrait', $src_sets );
-				$mlarge = $this->get_src_set_part( 'medium-large-portrait', $src_sets );
-				$medium = $this->get_src_set_part( 'medium-portrait', $src_sets );
-			}
+			$large = $this->get_src_set_part( 'large-portrait', $src_sets );
+			$mlarge = $this->get_src_set_part( 'medium-large-portrait', $src_sets );
+			$medium = $this->get_src_set_part( 'medium-portrait', $src_sets );
+		}
+		if ( 'collaboration__header' === $this->context ) {
+			$mlarge = $this->get_src_set_part( 'medium-large-square', $src_sets );
 		}
 		switch ( $this->context ) {
 			case 'story__header':
@@ -330,6 +335,9 @@ class Image extends BasePattern {
 				break;
 			case 'contactblock' :
 				$order = array( $thumb );
+				break;
+			case 'collaboration_header' :
+				$order = array( $mlarge, $large );
 				break;
 			case 'griditem' :
 			case 'lightbox' :
@@ -568,7 +576,7 @@ class Image extends BasePattern {
 					$this->ratio = 1;
 					break;
 				case 'griditem':
-					$this->ratio = 0.75;
+					$this->ratio = 0.6;
 					break;
 				case 'section':
 				case 'imageduo':
@@ -576,7 +584,7 @@ class Image extends BasePattern {
 						break;
 					}
 					if ( $this->is_hq && 'landscape' === $this->orientation ) {
-						$this->ratio = 0.67;
+						$this->ratio = 0.6667;
 					} else {
 						$this->ratio = $rounded;
 					}

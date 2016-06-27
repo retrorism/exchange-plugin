@@ -65,6 +65,7 @@ class BaseController {
 					'programme_round' => 'programme_round',
 					'grid_breaker'    => 'grid_breaker',
 					'collaboration'   => 'collaboration',
+					'participant'     => 'participant',
 				);
 				if ( array_key_exists( $post_object->post_type, $allowed_types ) ) {
 					$exchange = $allowed_types[ $post_object->post_type ];
@@ -164,6 +165,49 @@ class BaseController {
 	}
 
 
+	protected function get_header_image_source( $post_id ) {
+		return get_field( 'header_image' );
+	}
+
+	protected function get_header_image( $post_id, $context ) {
+		switch ( $this->get_header_image_source( $post_id ) ) {
+			case 'upload_new_image':
+				$thumb = get_field( 'upload_header_image', $post_id );
+				break;
+			case 'none':
+				break;
+			case 'use_featured_image':
+			default:
+				$thumb_id = get_post_thumbnail_id( $post_id );
+				// Use ACF function to create array for Image object constructor.
+				$thumb = acf_get_attachment( $thumb_id );
+				break;
+		}
+		if ( isset( $thumb ) && count( $thumb ) ) {
+			$focus_points = exchange_get_focus_points( $thumb );
+			$image_mods = array();
+			if ( ! empty( $focus_points ) ) {
+				$image_mods['data'] = $focus_points;
+				$image_mods['classes'] = array('focus');
+			}
+			return new Image( $thumb, $context, $image_mods );
+		}
+	}
+
+	/**
+	 * Attaches header image to story or collab
+	 *
+	 * @param string $acf_header_image Advanced Custom Fields Header selection option
+	 * @param integer $post_id.
+	 * @return HeaderImage object or null
+	 */
+	protected function set_header_image( $post_id, $context = '' ) {
+		$image = $this->get_header_image( $post_id, $context );
+		if ( is_object( $image ) && is_a($image, 'Image') ) {
+			$this->container->header_image = $image;
+			$this->container->has_header_image = true;
+		}
+	}
 
 
 	/**
@@ -175,7 +219,7 @@ class BaseController {
 	protected function get_featured_image( $post_id, $context ) {
 		$thumb_props = $this->get_featured_image_props( $post_id );
 		if ( ! empty( $thumb_props ) ) {
-			return new Image( $thumb_props, 'griditem' );
+			return new Image( $thumb_props, $context );
 		}
 	}
 
@@ -387,12 +431,19 @@ class BaseController {
 				}
 				break;
 			case 'collaboration':
-				$results[] = get_term_by( 'name', $this->container->programme_round->title, 'topic' );
+				//$results[] = get_term_by( 'name', $this->container->programme_round->title, 'topic' );
 				foreach( $tax_list as $taxonomy ) {
-					$tax_results = get_field( $taxonomy, $this->container->post_id );
-					if ( ! empty( $tax_results ) ) {
-						$results = array_merge( $results, $tax_results );
+					if ( ! in_array( $taxonomy, array( 'topics', 'locations', 'post_tag' ), true ) ) {
+						continue;
 					}
+					$tax_results = get_field( $taxonomy, $this->container->post_id );
+					if ( empty( $tax_results ) ) {
+						continue;
+					}
+					if ( is_object( $tax_results ) ) {
+						$tax_results = array( $tax_results );
+					}
+					$results = array_merge( $results, $tax_results );
 				}
 				break;
 			default:
@@ -406,9 +457,6 @@ class BaseController {
 
 	/**
 	 * Sets ordered tag list
-	 *
-	 * @param string $acf_header_image Advanced Custom Fields Header selection option
-	 * @param object $exchange Content type to attach featured image to.
 	 *
 	 * @return void.
 	 **/

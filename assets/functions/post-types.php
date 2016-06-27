@@ -85,12 +85,17 @@ function tandem_create_collaboration() {
 		'menu_icon'           => 'dashicons-editor-paste-text',
 		'menu_position'       => 12,
 		'public'              => true,
-		// Other items that are available for this array: 'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'.
 		'exclude_from_search' => false,
-		'hierarchical'        => true,
+		// Awkwardly, WordPress routing finds it difficult to deal with parent posts that are of a different post type. So although we can still fill in the parent type.
+		// So although we can still fill in the parent_ID columnt, we cannot create routing (easily).
+		'hierarchical'        => false,
 		'capability_type'     => 'post',
+		// Other items that are available for this array: 'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'.
 		'supports'            => array( 'title', 'thumbnail', 'editor', 'revisions' ),
-		'rewrite'             => array( 'slug' => 'collaborations' ),
+		'rewrite'             => array(
+			'slug'       => 'collaborations',
+			'with_front' => true,
+		),
 		'taxonomies'          => array( 'post_tag','location','topic','discipline','methodology','output'),
 		)
 	);
@@ -168,3 +173,13 @@ function tandem_create_programme_round() {
 		)
 	);
 }
+
+function mmp_rewrite_rules($rules) {
+    $newRules  = array();
+    $newRules['basename/(.+)/(.+)/(.+)/(.+)/?$'] = 'index.php?custom_post_type_name=$matches[4]'; // my custom structure will always have the post name as the 5th uri segment
+    $newRules['basename/(.+)/?$']                = 'index.php?taxonomy_name=$matches[1]';
+
+    return array_merge($newRules, $rules);
+}
+
+add_filter('rewrite_rules_array', 'mmp_rewrite_rules');

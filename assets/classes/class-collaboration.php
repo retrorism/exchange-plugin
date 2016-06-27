@@ -81,6 +81,25 @@ class Collaboration extends Exchange {
 	public $has_locations = false;
 
 	/**
+	 * Collab description
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var string $description Text describing the collaboration's (final) plan / outcome.
+	 */
+	public $description;
+
+	/**
+	 * Collab description check
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var bool $has_description See if description is available.
+	 */
+	public $has_description;
+
+
+	/**
 	 * Constructor for collaboration objects.
 	 *
 	 * @since 0.1.0
@@ -91,8 +110,11 @@ class Collaboration extends Exchange {
 	 **/
 	public function __construct( $post, $context = '', $controller = null ) {
 		Parent::__construct( $post, $context, $controller );
+		// Add standard WordPress data
 		$this->controller->map_collaboration_basics( $post );
-		if ( 'grid' === $context ) {
+		// Add featured image.
+
+		if ( 'griditem' === $context ) {
 			$this->controller->set_featured_image( $context );
 			$this->controller->set_ordered_tag_list();
 		} else {

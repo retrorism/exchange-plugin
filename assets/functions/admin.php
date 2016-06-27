@@ -150,35 +150,34 @@ function exchange_add_meta_boxes_for_collaboration( $post ) {
 }
 
 
-/* Displays the meta box. */
-function tandem_story_parent_meta_box( $post ) {
-
-	$args = array(
-		'post_type'   => 'collaboration',
-		'orderby'     => 'title',
-		'order'       => 'ASC',
-		'numberposts' => -1,
-		'posts_per_page' => -1,
-	);
-
-	$parent_query = new WP_Query( $args );
-	$parents = $parent_query->posts;
-
-	if ( ! empty( $parents ) ) {
-
-		$output = '<select name="parent_id" class="widefat">'; // !Important! Don't change the 'parent_id' name attribute.
-
-		foreach ( $parents as $parent ) {
-			$output .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $parent->ID ), selected( $parent->ID, $post->post_parent, false ), esc_html( $parent->post_title ) );
-		}
-
-		$output .= '</select>';
-	} else {
-		$output = __( 'You have to add a collaboration first', 'exchange-plugin' );
-	}
-
-	echo $output;
-}
+// /* Displays the meta box. */
+// function tandem_story_parent_meta_box( $post ) {
+//
+// 	$args = array(
+// 		'post_type'   => 'collaboration',
+// 		'orderby'     => 'title',
+// 		'order'       => 'ASC',
+// 		'numberposts' => -1,
+// 		'posts_per_page' => -1,
+// 	);
+//
+// 	$parent_query = new WP_Query( $args );
+// 	$parents = $parent_query->posts;
+//
+// 	if ( ! empty( $parents ) ) {
+//
+// 		$output = '<select name="parent_id" class="widefat">'; // !Important! Don't change the 'parent_id' name attribute.
+// 		foreach ( $parents as $parent ) {
+// 			$output .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $parent->ID ), selected( $parent->ID, $post->post_parent, false ), esc_html( $parent->post_title ) );
+// 		}
+//
+// 		$output .= '</select>';
+// 	} else {
+// 		$output = __( 'You have to add a collaboration first', 'exchange-plugin' );
+// 	}
+//
+// 	echo $output;
+// }
 
 /* Display meta box proramme rounds. */
 function tandem_programme_rounds_parent_meta_box( $post ) {
@@ -196,6 +195,7 @@ function tandem_programme_rounds_parent_meta_box( $post ) {
 	if ( ! empty( $parents ) ) {
 
 		$output = '<select name="parent_id" class="widefat">'; // !Important! Don't change the 'parent_id' name attribute.
+		$output .= '<option value="null">None</option>';
 		foreach ( $parents as $parent ) {
 			$output .= sprintf( '<option value="%s"%s>%s</option>', esc_attr( $parent->ID ), selected( $parent->ID, $post->post_parent, false ), esc_html( $parent->post_title ) );
 		}

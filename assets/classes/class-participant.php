@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 0.1.0
  **/
-class Participant {
+class Participant extends Exchange {
 
 	/**
 	 * Contains a reference to the Participant controller, once instantiated.
@@ -62,6 +62,53 @@ class Participant {
 	 */
 	public $collaboration;
 
+
+	/**
+	 * The organisation this person works/worked for at the time of participation in a Tandem Programme
+	 * Participant admin page.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var string $org_name
+	 */
+	public $org_name;
+
+	/**
+	 * The coordinates of the organisation (not always accurate).
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var string $org_name
+	 */
+	public $org_coords = array();
+
+	/**
+	 * The city where this organisation is based.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var string $org_name
+	 */
+	public $org_city;
+
+	/**
+	 * The country where this organisation is based.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var string $org_country
+	 */
+	public $org_country;
+
+	/**
+	 * The organisation's website.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var string $org_website
+	 */
+	public $org_website;
+
 	/**
 	 * Constructor for participant objects.
 	 *
@@ -69,19 +116,9 @@ class Participant {
 	 * @access public
 	 * @param object $postobj Participant post object.
 	 **/
-	public function __construct( $postobj ) {
-		$this->set_controller();
-		$this->controller->map_participant( $this, $postobj );
-	}
-
-	/**
-	 * Set controller property to a new instance of Participant controller.
-	 *
-	 * @since 0.1.0
-	 * @access private
-	 **/
-	private function set_controller() {
-		$this->controller = new ParticipantController();
+	 public function __construct( $post, $context = '', $controller = null ) {
+ 		Parent::__construct( $post );
+		$this->controller->map_participant_basics( $post );
 	}
 
 	public function publish_name() {

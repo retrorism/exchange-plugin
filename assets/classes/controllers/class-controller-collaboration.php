@@ -47,6 +47,7 @@ class CollaborationController extends BaseController {
 	}
 
 	public function map_collaboration_basics( $post ) {
+
 		if ( $post->post_parent >= 1 ) {
 			$this->set_programme_round( $post->post_parent );
 		}
@@ -62,6 +63,12 @@ class CollaborationController extends BaseController {
 
 	public function map_full_collaboration() {
 		$post_id = $this->container->post_id;
+		// Add description.
+		$this->set_description();
+		// Add header image.
+		$this->set_header_image( $post_id, 'collaboration__header' );
+		// Add tags
+		$this->set_ordered_tag_list();
 
 		// // Dump ACF variables.
 		// $acf_related_content = get_field( 'related_content', $post_id );
@@ -77,18 +84,18 @@ class CollaborationController extends BaseController {
 			if ( ! is_numeric( $p_id ) ) {
 				continue;
 			}
-			$org_name = get_field( 'organisation_name', $p_id );
-			$org_coords = get_field( 'organisation_location', $p_id );
-			$org_city = get_field( 'organisation_city', $p_id );
-			if ( !empty( $org_name ) ) {
-				$locations[$p_id]['org_name'] = $org_name;
+			$p_obj = new Participant( get_post( $p_id ) );
+			$p_obj->controller->set_organisation_data();
+
+			if ( !empty( $p_obj->org_name ) ) {
+				$locations[$p_id]['org_name'] = $p_obj->org_name;
 			}
-			if ( ! empty( $org_coords ) ) {
-				$locations[$p_id]['org_lat'] = $org_coords['lat'];
-				$locations[$p_id]['org_lat'] = $org_coords['lng'];
+			if ( ! empty( $p_obj->org_coords ) ) {
+				$locations[$p_id]['org_lat'] = $p_obj->org_coords['lat'];
+				$locations[$p_id]['org_lat'] = $p_obj->org_coords['lng'];
 			}
-			if ( ! empty( $org_city ) ) {
-				$locations[$p_id]['org_city'] = $org_city;
+			if ( ! empty( $p_obj->org_city ) ) {
+				$locations[$p_id]['org_city'] = $p_obj->org_city;
 			}
 		}
 		if ( count( $locations ) > 1 ) {
@@ -104,17 +111,33 @@ class CollaborationController extends BaseController {
 	 */
 	protected function set_participants() {
 		$participants = get_field( 'participants', $this->container->post_id );
-		if ( is_array( $participants ) && count( $participants ) > 0 ) {
-			foreach( $participants as $participant ) {
-				if ( exchange_post_exists( $participant ) ) {
-					$this->container->participants[] = $participant;
-				}
-			}
-			if ( count( $this->container->participants ) > 0 ) {
-				$this->container->has_participants = true;
+		if ( empty( $participants ) || ! is_array( $participants ) ) {
+			return;
+		}
+		foreach( $participants as $participant ) {
+			if ( exchange_post_exists( $participant ) ) {
+				$this->container->participants[] = $participant;
 			}
 		}
+		if ( ! empty( $this->container->participants ) ) {
+			$this->container->has_participants = true;
+		}
 	}
+
+	/**
+	 * Set collaboration description
+	 *
+	 * @return void.
+	 */
+	protected function set_description() {
+		$description = get_field( 'description', $this->container->post_id );
+		if ( empty( $description ) || ! is_string( $description ) ) {
+			return;
+		}
+		$this->container->description = new Paragraph( $description );
+		$this->container->has_description = true;
+	}
+
 
 	public function set_programme_round( $parent_id ) {
 		$parent = get_post( $parent_id );

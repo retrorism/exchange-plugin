@@ -69,9 +69,9 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 				'admin-acf.php',
 				'admin-options.php',
 				'admin-roles.php',
+				'taxonomies.php',
 				'post-types.php',
 				'public.php',
-				'taxonomies.php',
 				'import_projects.php',
 			);
 			foreach ( $files as $file ) {
@@ -83,6 +83,7 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 		 * Runs on activation of the plugin.
 		 **/
 		public function exchange_plugin_activate() {
+			flush_rewrite_rules();
 			require_once( EXCHANGE_PLUGIN_PATH . 'assets/functions/admin-roles.php' );
 			if ( function_exists( 'exchange_add_user_management_for_editors') ) {
 				exchange_add_user_management_for_editors();
@@ -96,6 +97,7 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 		 * Runs on plugin deactivation.
 		 **/
 		public function exchange_plugin_deactivate() {
+			flush_rewrite_rules();
 			exchange_remove_user_management_for_editors();
 			return;
 		}
