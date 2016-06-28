@@ -29,9 +29,9 @@ class Image extends BasePattern {
 	 *
 	 * @since 0.1.0
 	 * @access public
-	 * @var string $orientation Image orientation.
+	 * @var string $orientation Image orientation. Defaults to landscape.
 	 **/
-	public $orientation;
+	public $orientation = 'landscape';
 
 	/**
 	 * Image quality according to standard set as global variable.
@@ -140,14 +140,14 @@ class Image extends BasePattern {
 		$this->output .= $this->build_image_placeholder();
 
 		// Add caption if available.
-		if ( ! empty( $this->input['caption'] )
-			|| ! empty( $this->title ) ) {
+		if ( ! empty( $this->input['caption'] ) || ! empty( $this->title ) ) {
 
 			$this->set_image_caption();
 
-			if ( is_object( $this->caption && $this->context !== 'collaboration_header' ) ) {
-				$this->output .= $this->build_image_caption();
-			}
+		}
+
+		if ( is_object( $this->caption ) && $this->context !== 'collaboration__header' ) {
+			$this->output .= $this->build_image_caption();
 		}
 
 		// Close anchor.
@@ -518,10 +518,10 @@ class Image extends BasePattern {
 	 * @TODO resolve difference between user input and actual size.
 	 **/
 	protected function set_image_orientation( $w, $h ) {
-		// Default to landscape if 'portrait' is not explicitly set.
-		$this->orientation = 'portrait' === $this->modifiers['orientation'] ?
-			'portrait' :
-			'landscape';
+		// Defaults to landscape if 'portrait' is not explicitly set.
+		if ( isset( $this->modifiers['orientation'] ) ) {
+			$this->orientation = $this->modifiers['orientation'];
+		}
 	}
 
 	/**

@@ -123,7 +123,6 @@ class Section extends BasePattern {
 			return;
 		}
 		foreach ( $this->story_elements as $e ) {
-
 			// Loop through elements.
 			switch ( $e['acf_fc_layout'] ) {
 
