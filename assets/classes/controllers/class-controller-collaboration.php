@@ -66,6 +66,19 @@ class CollaborationController extends BaseController {
 		// Add header image.
 		$this->set_header_image( $post_id, 'collaboration__header' );
 
+		$acf_sections = get_field( 'sections', $post_id );
+		$acf_related_content = get_field( 'related_content', $post_id );
+
+		// Set related content.
+		if ( is_array( $acf_related_content ) && count( $acf_related_content ) > 0 ) {
+			$this->set_related_grid_content( $acf_related_content );
+		}
+
+		// Set sections.
+		if ( ! empty( $acf_sections ) ) {
+			$this->set_sections( $acf_sections );
+		}
+
 		// // Dump ACF variables.
 		// $acf_related_content = get_field( 'related_content', $post_id );
 		//
