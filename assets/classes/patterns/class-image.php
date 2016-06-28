@@ -518,17 +518,10 @@ class Image extends BasePattern {
 	 * @TODO resolve difference between user input and actual size.
 	 **/
 	protected function set_image_orientation( $w, $h ) {
-		// Check for orientation modifier.
-		if ( empty( $this->modifiers['orientation'] ) ) {
-			$this->orientation = $h > $w ?
-				'portrait' :
-				'landscape';
-		} else {
-			// Default to landscape if 'portrait' is not explicitly set.
-			$this->orientation = 'portrait' === $this->modifiers['orientation'] ?
-				'portrait' :
-				'landscape';
-		}
+		// Default to landscape if 'portrait' is not explicitly set.
+		$this->orientation = 'portrait' === $this->modifiers['orientation'] ?
+			'portrait' :
+			'landscape';
 	}
 
 	/**
