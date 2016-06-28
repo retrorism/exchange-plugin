@@ -58,9 +58,12 @@ function exchange_create_link( $obj, $with_text = true, $class = '' ) {
 	if ( $obj instanceof Exchange ) {
 		$url = $obj->link;
 		$title = $obj->title;
-		$cat = $obj->category;
+		$cat = 'story';
 	}
-	if ( 'griditem__button button--small' === $class && ! empty( $cat ) ) {
+	if ( 'griditem__button button--small' === $class && 'story' === $obj->type ) {
+		if ( isset( $obj->category ) ) {
+			$cat = $obj->category;
+		}
 		$title = strtoupper( __( sprintf( 'Read the full %s', $cat ), 'exchange' ) );
 		$class .= ' button--' . $cat;
 	} else {

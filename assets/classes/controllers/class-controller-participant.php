@@ -37,6 +37,8 @@ class ParticipantController extends BaseController {
 		// Mapping / aliasing title to name.
 		$this->container->name = $this->container->title;
 
+		// Mapping organisation data.
+		$this->set_organisation_data();
 	}
 
 	public function set_organisation_data() {
@@ -71,13 +73,3 @@ class ParticipantController extends BaseController {
 		}
 	}
 }
-
-/**
- * Map participant properties.
- *
- * @param object $participant Newly instantiated participant class object.
- * @param object $post Participant post type object.
- * @return participant with added properties
- *
- * @throws Exception When no participant has been provided.
- **/

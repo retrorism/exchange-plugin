@@ -58,7 +58,7 @@ class Participant extends Exchange {
 	 *
 	 * @since 0.1.0
 	 * @access public
-	 * @var object $collaboration Collaboration object.
+	 * @var int $collaboration Collaboration ID.
 	 */
 	public $collaboration;
 

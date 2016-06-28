@@ -56,24 +56,30 @@ class BaseController {
 	 * @param string $type Optional. Class name to be checked against.
 	 * @return content type, if the post is right for content creation.
 	 **/
-	public static function is_correct_content_type( $post_object, $type = null ) {
-		if ( is_object( $post_object ) ) {
-			if ( 'WP_Post' === get_class( $post_object ) ) {
-				$allowed_types = array(
-					'story'           => 'story',
-					'page'            => 'story',
-					'programme_round' => 'programme_round',
-					'grid_breaker'    => 'grid_breaker',
-					'collaboration'   => 'collaboration',
-					'participant'     => 'participant',
-				);
-				if ( array_key_exists( $post_object->post_type, $allowed_types ) ) {
-					$exchange = $allowed_types[ $post_object->post_type ];
-					if ( $exchange === $type || null === $type ) {
-						return $exchange;
-					}
-				}
-			}
+	public static function is_correct_content_type( $post_id_or_object, $type = null ) {
+		if ( is_numeric( $post_id_or_object ) && $post_id_or_object > 0 ) {
+			$post_id_or_object = get_post( $post_id_or_object );
+		}
+		if ( ! is_object( $post_id_or_object ) ) {
+			return;
+		}
+		if ( 'WP_Post' != get_class( $post_id_or_object ) ) {
+			return;
+		}
+		$allowed_types = array(
+			'story'           => 'story',
+			'page'            => 'story',
+			'programme_round' => 'programme_round',
+			'grid_breaker'    => 'grid_breaker',
+			'collaboration'   => 'collaboration',
+			'participant'     => 'participant',
+		);
+		if ( ! array_key_exists( $post_id_or_object->post_type, $allowed_types ) ) {
+			return;
+		}
+		$content_type = $post_id_or_object->post_type;
+		if ( $allowed_types[ $content_type ] === $type || null === $type ) {
+			return $content_type;
 		}
 	}
 
@@ -81,33 +87,37 @@ class BaseController {
 	 * Returns an Exchange class object based upon post type.
 	 *
 	 * @access public
-	 * @param WP_Post $post WP_Post types passed in function.
+	 * @param WP_Post $post_id_or_object WP_Post types / IDs passed in function.
 	 * @param string $context Optional. Context in which the object will be instantiated.
 	 *
 	 * @throws Exception when wrong post type is supplied.
 	 **/
-	public static function exchange_factory( $post_object, $context = '' ) {
-		$type = self::is_correct_content_type( $post_object );
-		if ( ! empty( $type ) ) {
-			$args = array( $post_object, $context );
-			switch ( $type ) {
-				case 'collaboration':
-					return new Collaboration( ...$args );
-				case 'programme_round':
-					return new Programme_Round( ...$args );
-				case 'grid_breaker':
-					// Context grid is required for now.
-					if ( 'griditem' === $context ) {
-						return new Grid_Breaker( ...$args );
-					}
-					break;
-				case 'story':
-				case 'page':
-				default:
-					return new Story( ...$args );
-			}
-		} else {
+	public static function exchange_factory( $post_id_or_object, $context = '' ) {
+		if ( is_numeric( $post_id_or_object ) && $post_id_or_object > 0 ) {
+			$post_id_or_object = get_post( $post_id_or_object );
+		}
+		$type = self::is_correct_content_type( $post_id_or_object );
+		if ( empty( $type ) ) {
 			throw new Exception( __( 'The factory disagrees' ) );
+		}
+		$args = array( $post_id_or_object, $context );
+		switch ( $type ) {
+			case 'collaboration':
+				return new Collaboration( ...$args );
+			case 'programme_round':
+				return new Programme_Round( ...$args );
+			case 'participant':
+				return new Participant( ...$args );
+			case 'grid_breaker':
+				// Context grid is required for now.
+				if ( 'griditem' === $context ) {
+					return new Grid_Breaker( ...$args );
+				}
+				break;
+			case 'story':
+			case 'page':
+			default:
+				return new Story( ...$args );
 		}
 	}
 
@@ -123,6 +133,7 @@ class BaseController {
 	 * @throws Exception when this is not the right content type.
 	 **/
 	public function map_basics( $exchange, $post ) {
+		// Check if the post and the newly created CPT object are of the same type
 		$class_lower = strtolower( get_class( $exchange ) );
 		if ( empty( self::is_correct_content_type( $post, $class_lower ) ) ) {
 			unset( $exchange );

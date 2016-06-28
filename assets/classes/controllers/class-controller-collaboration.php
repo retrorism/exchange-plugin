@@ -76,12 +76,11 @@ class CollaborationController extends BaseController {
 
 	protected function set_collaboration_locations() {
 		$locations = array();
-		foreach( $this->container->participants as $p_id ) {
-			if ( ! is_numeric( $p_id ) ) {
+		foreach( $this->container->participants as $p_obj ) {
+			$p_id = $p_obj->post_id;
+			if ( ! is_a( $p_obj, 'Participant' ) ) {
 				continue;
 			}
-			$p_obj = new Participant( get_post( $p_id ) );
-			$p_obj->controller->set_organisation_data();
 
 			if ( !empty( $p_obj->org_name ) ) {
 				$locations[$p_id]['org_name'] = $p_obj->org_name;
@@ -111,8 +110,9 @@ class CollaborationController extends BaseController {
 			return;
 		}
 		foreach( $participants as $participant ) {
-			if ( exchange_post_exists( $participant ) ) {
-				$this->container->participants[] = $participant;
+			$participant_obj = self::exchange_factory( $participant );
+			if ( $participant_obj ) {
+				$this->container->participants[] = $participant_obj;
 			}
 		}
 		if ( ! empty( $this->container->participants ) ) {

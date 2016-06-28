@@ -132,7 +132,6 @@ function tandem_create_participant() {
 		'supports'            => array( 'title' ),
 		'exclude_from_search' => true,
 		'capability_type'     => 'post',
-		'rewrite'             => array( 'slug' => 'participant' ),
 		)
 	);
 }
