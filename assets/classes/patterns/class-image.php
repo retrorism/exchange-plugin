@@ -336,8 +336,8 @@ class Image extends BasePattern {
 			case 'contactblock' :
 				$order = array( $thumb );
 				break;
-			case 'collaboration_header' :
-				$order = array( $mlarge, $large );
+			case 'collaboration__header' :
+				$order = array( $mlarge );
 				break;
 			case 'griditem' :
 			case 'lightbox' :
@@ -349,7 +349,7 @@ class Image extends BasePattern {
 				} else {
 					$order = array( $medium, $mlarge, $large );
 				}
-				$sizes = '(min-width: 1080px) 60vw, 100vw';
+				//$sizes = '(min-width: 1080px) 60vw, 100vw';
 				break;
 		}
 		// Remove empty values in the src_set list with array_filter
