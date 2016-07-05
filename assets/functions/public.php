@@ -60,14 +60,14 @@ function exchange_create_link( $obj, $with_text = true, $class = '' ) {
 		$title = $obj->title;
 		$cat = 'story';
 	}
-	if ( 'griditem__button button--small' === $class && 'story' === $obj->type ) {
-		if ( isset( $obj->category ) ) {
+	if ( 'griditem__button button--small' === $class ) {
+		if  ( 'story' === $obj->type && isset( $obj->category ) ) {
 			$cat = $obj->category;
+			$title = strtoupper( __( sprintf( 'Read the full %s', $cat ), 'exchange' ) );
+			$class .= ' button--' . $cat;
+		} else {
+			$title = strtoupper( __( 'Read more', 'exchange' ) );
 		}
-		$title = strtoupper( __( sprintf( 'Read the full %s', $cat ), 'exchange' ) );
-		$class .= ' button--' . $cat;
-	} else {
-		$title = strtoupper( __( 'Read more', 'exchange' ) );
 	}
 	if ( ! empty( $url ) && ! empty( $title ) ) {
 		$output  = '<a class="' . $class . '" href="' . $url . '" title="' .sprintf( esc_html__( 'Navigate to %s', EXCHANGE_PLUGIN ), esc_attr( $title ) ).'">';
@@ -121,3 +121,12 @@ function exchange_get_focus_points( $thumb ) {
 function exchange_post_exists( $id ) {
   return is_string( get_post_status( $id ) );
 }
+
+
+add_filter( 'get_the_archive_title', function ( $title ) {
+
+	$title = str_replace('Archives:','', $title);
+
+    return $title;
+
+});
