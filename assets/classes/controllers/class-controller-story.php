@@ -43,10 +43,7 @@ class StoryController extends BaseController {
 		// Map ACF variables.
 		$acf_editorial_intro = get_field( 'editorial_intro', $post_id );
 		$acf_language = get_field( 'language', $post_id );
-		$acf_storyteller_is_participant = get_field( 'storyteller_is_participant', $post_id );
-		if ( $acf_storyteller_is_participant ) {
-			$acf_storyteller = get_field( 'storyteller', $post_id );
-		}
+		$acf_storyteller = get_field( 'storyteller', $post_id );
 		$acf_category = get_field( 'category', $post_id );
 
 		// Set editorial introduction.
@@ -69,12 +66,17 @@ class StoryController extends BaseController {
 			}
 		}
 
-		// Set participant
-		if ( $acf_storyteller_is_participant && is_object( $acf_storyteller ) ) {
-			if ( 'WP_Post' === get_class( $acf_storyteller ) && $acf_storyteller->post_type = 'participant' ) {
-				$this->container->storyteller = new Participant( $acf_storyteller );
+		// Set participant as storyteller
+		if ( is_numeric( $acf_storyteller ) ) {
+			$storyteller = self::exchange_factory( $acf_storyteller );
+			if ( is_a( $storyteller, 'Participant' ) ) {
+				$this->container->storyteller = $storyteller;
 			}
 		}
+
+
+		// Add featured image
+		$this->set_featured_image();
 
 		// Add tags
 		$this->set_ordered_tag_list();
@@ -101,13 +103,19 @@ class StoryController extends BaseController {
 		}
 
 		$acf_sections = get_field( 'sections', $post_id );
-		$acf_related_content = get_field( 'related_content', $post_id );
-		$acf_has_custom_byline = get_field( 'has_custom_byline', $post_id );
 
-		// Set related content.
-		if ( is_array( $acf_related_content ) && count( $acf_related_content ) > 0 ) {
-			$this->set_related_grid_content( $acf_related_content );
+		// Get related
+		if ( get_field( 'related_content_auto_select', $post_id ) ) {
+			$related_content = $this->get_related_grid_content_by_tags();
+		} else {
+			$related_content = get_field( 'related_content', $post_id );
 		}
+
+		if ( is_array( $related_content ) && count( $related_content ) > 0 ) {
+			$this->container->has_related_content = true;
+			$this->set_related_grid_content( $related_content );
+		}
+		$acf_has_custom_byline = get_field( 'has_custom_byline', $post_id );
 
 		// Set sections.
 		if ( ! empty( $acf_sections ) ) {

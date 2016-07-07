@@ -193,10 +193,12 @@ class BaseController {
 			default:
 				$thumb_id = get_post_thumbnail_id( $post_id );
 				// Use ACF function to create array for Image object constructor.
-				$thumb = acf_get_attachment( $thumb_id );
+				if ( ! empty( $thumb_id ) ) {
+					$thumb = acf_get_attachment( $thumb_id );
+				}
 				break;
 		}
-		if ( isset( $thumb ) && count( $thumb ) ) {
+		if ( isset( $thumb ) ) {
 			$focus_points = exchange_get_focus_points( $thumb );
 			$image_mods = array();
 			if ( ! empty( $focus_points ) ) {
@@ -231,16 +233,22 @@ class BaseController {
 	 **/
 	protected function get_featured_image( $post_id, $context ) {
 		$thumb_props = $this->get_featured_image_props( $post_id );
+		$focus_points = exchange_get_focus_points( $thumb_props );
+		$image_mods = array();
+		if ( ! empty( $focus_points ) ) {
+			$image_mods['data'] = $focus_points;
+			$image_mods['classes'] = array('focus');
+		}
 		if ( ! empty( $thumb_props ) ) {
-			return new Image( $thumb_props, $context );
+			return new Image( $thumb_props, $context, $image_mods );
 		}
 	}
 
 	protected function get_featured_image_props( $post_id ) {
-		if ( ! has_post_thumbnail( $post_id ) ) {
+		$thumb_id = get_post_thumbnail_id( $post_id );
+		if ( empty( $thumb_id ) ) {
 			$thumb_props = acf_get_attachment( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['IMAGES']['fallback_image_att_id'] );
 		} else {
-			$thumb_id = get_post_thumbnail_id( $post_id );
 			if ( 'attachment' === get_post( $thumb_id )->post_type ) {
 				$thumb_props = acf_get_attachment( $thumb_id );
 			}
@@ -256,7 +264,7 @@ class BaseController {
 	 *
 	 * @return void.
 	 **/
-	public function set_featured_image( $context ) {
+	public function set_featured_image( $context = '' ) {
 		$image = $this->get_featured_image( $this->container->post_id, $context );
 		if ( is_a( $image, 'Image' ) ) {
 			$this->container->has_featured_image = true;
@@ -284,6 +292,11 @@ class BaseController {
 				$gallery[] = $img_obj;
 			}
 		}
+		return $gallery;
+	}
+
+	protected function get_gallery_from_acf() {
+		$gallery = get_field( $this->container->type . '_gallery', $this->container->post_id );
 		return $gallery;
 	}
 
@@ -338,37 +351,30 @@ class BaseController {
 		// Filter IDs and sort by key
 		$unique_ids = array_unique( $ids );
 		ksort( $unique_ids );
-		$gallery = array();
-		$index = 1;
-		foreach ( $unique_ids as $image_id ) {
-			$img_arr = acf_get_attachment( $image_id );
-			if ( empty( $img_arr ) ) {
-				continue;
-			}
-			$image_mods = array();
-			// Add Image post ID and index to gallery item
-			$image_mods['data'] = array(
-				'img_id' => $image_id,
-			 	'index'  => $index,
-			);
-			$focus_points = exchange_get_focus_points( $img_arr );
-			if ( ! empty( $focus_points ) ) {
-				$image_mods['data'] = array_merge( $image_mods['data'], $focus_points );
-				$image_mods['classes'] = array('focus');
-			}
-			// Add lightbox context
-			$img_obj = new Image( $img_arr, 'lightbox', $image_mods );
-			if ( is_object( $img_obj ) && is_a( $img_obj, 'Image' ) ) {
-				$gallery[] = $img_obj;
-			}
-			$index++;
-		}
-		return $gallery;
+		return $unique_ids;
 	}
 
-	public function set_gallery() {
-		$gallery = $this->get_gallery_from_query();
-		if ( ! count( $gallery ) ) {
+	protected function set_gallery() {
+		if ( $this->container->has_gallery ) {
+			return;
+		}
+		$unique_arrs = $this->get_gallery_from_acf();
+		if ( empty( $unique_arrs ) && 'story' === $this->container->type ) {
+		// Start over with a new gallery array to be filled with a query.
+			$unique_arrs = array();
+			$unique_ids = $this->get_gallery_from_query();
+			if ( empty( $unique_ids ) ) {
+				return;
+			}
+			foreach ( $unique_ids as $img_id ) {
+				$img_arr = acf_get_attachment( $img_id );
+				if ( ! empty( $img_arr ) ) {
+					$unique_arrs[] = $img_arr;
+				}
+			}
+		}
+		$gallery = $this->prepare_gallery_images( $unique_arrs );
+		if ( empty( $gallery ) ) {
 			return;
 		} else {
 			$this->container->gallery = $gallery;
@@ -376,38 +382,30 @@ class BaseController {
 		}
 	}
 
-	/**
-	 * Retrieves tag list.
-	 *
-	 * @return array of tags or void.
-	 **/
-	protected function get_tag_list() {
-		$taxonomies = get_object_taxonomies( $this->container->type );
-		$term_results = array();
-		foreach ( $taxonomies as $taxonomy ) {
-			$tax_terms = get_the_terms( $this->container->post_id, $taxonomy );
-			if ( ! empty( $tax_terms ) ) {
-				$term_results = array_merge( $term_results, $tax_terms );
+	protected function prepare_gallery_images( $unique_arrs ) {
+		if ( empty( $unique_arrs ) ) {
+			return;
+		}
+		$index = 1;
+		$gallery = array();
+		foreach ( $unique_arrs as $img_arr ) {
+			$image_mods = array();
+			// Add Image post ID and index to gallery item
+			$image_mods['data'] = array(
+				'img_id' => $img_arr['ID'],
+			 	'index'  => $index,
+			);
+			$focus_points = exchange_get_focus_points( $img_arr );
+			if ( ! empty( $focus_points ) ) {
+				$image_mods['data'] = array_merge( $image_mods['data'], $focus_points );
+				$image_mods['classes'] = array('focus');
 			}
-		}
-		if ( ! empty( $term_results ) ) {
-			return $term_results;
-		}
-	}
-
-	/**
-	 * Attaches tags.
-	 *
-	 * @param string $acf_header_image Advanced Custom Fields Header selection option
-	 * @param object $exchange Content type to attach featured image to.
-	 *
-	 * @return void.
-	 **/
-	protected function set_tag_list() {
-		$tag_list = $this->get_tag_list();
-		if ( $tag_list ) {
-			$this->container->tag_list = $tag_list;
-			$this->container->has_tags = true;
+			// Add gallery context
+			$img_obj = new Image( $img_arr, 'gallery', $image_mods );
+			if ( is_object( $img_obj ) && is_a( $img_obj, 'Image' ) ) {
+				$gallery[] = $img_obj;
+			}
+			$index++;
 		}
 	}
 
@@ -421,52 +419,36 @@ class BaseController {
 	 * @return void.
 	 **/
 	protected function get_ordered_tag_list() {
-		$tax_list = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['display_priority'];
-		$results = array();
+		$results = wp_get_post_terms( $this->container->post_id );
 		switch ( $this->container->type ) {
 			case 'story':
-				foreach( $tax_list as $taxonomy ) {
-					if ( ! in_array( $taxonomy, array( 'topic', 'location', 'post_tag', 'tandem' ), true ) ) {
-						continue;
-					}
-					$tax_results = get_field( $taxonomy, $this->container->post_id );
-					if ( empty( $tax_results ) ) {
-						continue;
-					}
-					if ( is_object( $tax_results ) ) {
-						$tax_results = array( $tax_results );
-					}
-					$results = array_merge( $results, $tax_results );
-				}
-				// End with the language tag.
-				if ( isset( $this->container->language ) ) {
-					$results[] = $this->container->language;
-				}
+				$tax_list = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['display_priority_story'];
 				break;
 			case 'collaboration':
-				//$results[] = get_term_by( 'name', $this->container->programme_round->title, 'topic' );
-				foreach( $tax_list as $taxonomy ) {
-					if ( ! in_array( $taxonomy, array( 'topic', 'location', 'post_tag' ), true ) ) {
-						continue;
-					}
-					$tax_results = get_field( $taxonomy, $this->container->post_id );
-					if ( empty( $tax_results ) ) {
-						continue;
-					}
-					if ( is_object( $tax_results ) ) {
-						$tax_results = array( $tax_results );
-					}
-					$results = array_merge( $results, $tax_results );
-				}
+				$tax_list = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['display_priority_collaboration'];
 				break;
 			default:
-				$results = false;
-				break;
+				return;
+		}
+		foreach( $tax_list as $taxonomy ) {
+			$tax_results = get_field( $taxonomy, $this->container->post_id );
+			if ( empty( $tax_results ) ) {
+				continue;
+			}
+			if ( is_object( $tax_results ) ) {
+				$tax_results = array( $tax_results );
+			}
+			$results = array_merge( $results, $tax_results );
+		}
+		if ( isset( $this->container->language ) ) {
+			$results[] = $this->container->language;
 		}
 		if ( ! empty( $results ) ) {
 			return $results;
 		}
 	}
+
+
 
 	/**
 	 * Sets ordered tag list
@@ -496,22 +478,15 @@ class BaseController {
 		if ( empty( $tag_list ) ) {
 			return;
 		}
-		$i = 0;
 		$shortlist = array();
-		$tax_order = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['display_priority'];
-		foreach ( $tax_order as $taxonomy ) {
-			foreach ( $tag_list as $tag_term ) {
-				if ( ! is_object( $tag_term ) ) {
-					continue;
-				}
-				if ( $taxonomy === $tag_term->taxonomy ) {
-					$shortlist[] = $tag_term;
-					$i++;
-					if ( $i === $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['grid_tax_max'] ) {
-						continue 2;
-					}
-				}
+		$tag_number = count( $tag_list );
+		$i = 0;
+		while ( $i < $tag_number && count( $shortlist ) < $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['grid_tax_max'] ) {
+			$term = $tag_list[$i];
+			if ( is_a( $term, 'WP_Term' ) ) {
+				$shortlist[] = $term;
 			}
+			$i++;
 		}
 		return $shortlist;
 	}
@@ -558,8 +533,55 @@ class BaseController {
 		$grid_content = $this->get_grid_content( $related_content );
 		if ( isset( $grid_content ) ) {
 			$this->container->has_related_content = true;
-			$grid = new RelatedGrid( $grid_content );
+			$grid = new RelatedGrid( $grid_content, $this->container->type );
 			$this->container->related_content = $grid;
+		}
+	}
+
+	/**
+	 * undocumented function summary
+	 *
+	 * Undocumented function long description
+	 *
+	 * @param type var Description
+	 * @return {11:return type}
+	 * @TODO POST_TAGS FOR COLLABORATIONS!!!
+	 */
+	protected function get_related_grid_content_by_tags() {
+		if( ! $this->container->has_tags ) {
+			$related_posts = $this->get_related_grid_content_by_cat();
+			return $related_posts;
+		} else {
+			$tag_arr = array();
+			$tags = $this->container->ordered_tag_list;
+			foreach( $tags as $tag ) {
+				$tag_arr[] = $tag->term_id;
+			}
+
+			$args = array(
+				'post_type' => array('story','collaboration','programme_round','page'),
+				'tag__in' => $tag_arr,
+				'numberposts' => 3, /* you can change this to show more */
+				'post__not_in' => array( $this->container->post_id ),
+			);
+			$related_posts = get_posts( $args );
+		}
+		return $related_posts;
+	}
+
+	protected function get_related_grid_content_by_cat() {
+		$cat = $this->container->category;
+		if( empty( $cat ) ) {
+			return;
+		} else {
+			$args = array(
+				'post_type' => array('story'),
+				'cat' => $cat,
+				'numberposts' => 3, /* you can change this to show more */
+				'post__not_in' => array( $this->container->post_id ),
+			);
+			$related_posts = get_posts( $args );
+			return $related_posts;
 		}
 	}
 

@@ -55,14 +55,17 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 				'Ukraine' => 'Tandem Ukraine',
 			),
 			// Priority in taxonomy types, listed by ACF Field label.
-			'display_priority' => array(
-				0 => 'post_tag',
+			'display_priority_story' => array(
 				1 => 'tandem',
 				2 => 'topic',
+				3 => 'location',
+			),
+			'display_priority_collaboration' => array(
+				1 => 'topic',
+				2 => 'location',
 				3 => 'discipline',
 				4 => 'methodology',
 				5 => 'output',
-				6 => 'location',
 			),
 			// Maximum number of tags on grid items
 			'grid_tax_max' => 3,

@@ -88,10 +88,10 @@ abstract class BaseMap extends BasePattern {
 			} elseif ( 'network' === $this->input['map_style'] ) {
 				$this->set_map_collaborations();
 			}
-
 			$this->set_caption();
 
 			$this->output_tag_open( $el );
+
 			$this->output .= apply_filters('the_content', $map_shortcode);
 
 			// Add individual marker script elements.
@@ -114,6 +114,8 @@ abstract class BaseMap extends BasePattern {
 
 			// Close map element.
 			$this->output_tag_close( $el );
+
+
 		} else {
 			$this->output_tag_open( $el );
 			$this->output .= '<span>Normally, we would see a map here!</span>';
@@ -162,10 +164,13 @@ abstract class BaseMap extends BasePattern {
 	protected function prepare_map_attributes() {
 		$sizes = $this->get_map_size();
 		$map_shortcode = '[leaflet-map zoomcontrol=1 ';
-		$map_shortcode .= 'zoom=' . $this->input['map_zoom_level'] . ' ';
-		$map_shortcode .= 'height=' . $sizes[1] . ' ';
-		$map_shortcode .= 'lat=' . $this->input['map_center']['lat'] . ' ';
-		$map_shortcode .= 'lng=' . $this->input['map_center']['lng'] . ']';
+		$map_shortcode .= 'height=' . $sizes[1] ;
+		if ( 'network' !== $this->input['map_style'] ) {
+			$map_shortcode .= ' zoom=' . $this->input['map_zoom_level'] . ' ';
+			$map_shortcode .= 'lat=' . $this->input['map_center']['lat'] . ' ';
+			$map_shortcode .= 'lng=' . $this->input['map_center']['lng'];
+		}
+		$map_shortcode .= ']';
 		return $map_shortcode;
 	}
 
@@ -195,7 +200,7 @@ abstract class BaseMap extends BasePattern {
 	 * @return void
 	 */
 	 protected function set_collaboration_data( $collaboration ) {
-		$c_object = BaseController::exchange_factory( $collaboration );
+		$c_object = BaseController::exchange_factory( $collaboration, 'simplemap' );
 		if ( ! $c_object instanceof Collaboration ) {
 			return;
 		}
@@ -263,7 +268,7 @@ abstract class BaseMap extends BasePattern {
 	 * @return string $line Map line shortcode with either addresses or coordinates.
 	 */
 	protected function create_map_line( $locations, $line_label = '' ) {
-		$line = '[leaflet-line ';
+		$line = '[leaflet-line fitline=1 ';
 		$line .= 'color="#' . $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-tandem'] . '" ';
 
 		$latlngs = array();

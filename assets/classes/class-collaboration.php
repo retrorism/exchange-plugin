@@ -81,6 +81,24 @@ class Collaboration extends Exchange {
 	public $has_locations = false;
 
 	/**
+	 * Stories list.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var array $stories For gathering all related stories
+	 */
+	public $stories = array();
+
+	/**
+	 * Story check.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var boolean $has_stories When there's one or more stories shared by this collaboration.
+	 */
+	public $has_stories = false;
+
+	/**
 	 * Collab description
 	 *
 	 * @since 0.1.0
@@ -98,6 +116,15 @@ class Collaboration extends Exchange {
 	 */
 	public $has_description;
 
+	/**
+	 * Map
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var bool $has_description See if description is available.
+	 */
+	public $map_data;
+
 
 	/**
 	 * Constructor for collaboration objects.
@@ -114,11 +141,44 @@ class Collaboration extends Exchange {
 		$this->controller->map_collaboration_basics( $post );
 		// Add featured image.
 
-		if ( 'griditem' === $context ) {
-			$this->controller->set_featured_image( $context );
-			$this->controller->set_ordered_tag_list();
-		} else {
+		if ( ! in_array( $context, array( 'griditem', 'simplemap' ) ) ) {
 			$this->controller->map_full_collaboration();
+		}
+	}
+
+	public function publish_related_stories( $context = '' ) {
+		$grid_mods = array(
+			'related' => 'has_stories'
+		);
+		if ( ! $this->has_stories ) {
+			return;
+		}
+		$grid = new RelatedGrid( $this->stories, $this->type, $grid_mods );
+		$grid->publish( $context );
+
+	}
+
+	/**
+	 * undocumented function summary
+	 *
+	 * Undocumented function long description
+	 *
+	 * @param type var Description
+	 * @return {11:return type}
+	 */
+	public function publish_collab_map( $context = '' ) {
+		$input = array(
+			'map_style' => 'network',
+			'map_size'  => 'wide',
+			'map_markers' => false,
+			'map_collaborations' => array(
+				0 => $this->post_id
+			),
+			'map_caption' => __( 'Showing a connection between two cities', 'exchange' ),
+		);
+		$map = new SimpleMap( $input, 'collaboration' );
+		if ( ! empty( $map ) ) {
+			$map->publish();
 		}
 	}
 }

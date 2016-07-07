@@ -48,7 +48,7 @@ class ImageDuo extends BasePattern {
 
 			// Open element.
 			$this->output_tag_open();
-			$this->set_gallery();
+			$this->set_duo_gallery();
 			// Close element.
 			$this->output_tag_close();
 		}
@@ -59,7 +59,7 @@ class ImageDuo extends BasePattern {
 	 *
 	 * @since 0.1.0
 	 **/
-	protected function set_gallery() {
+	protected function set_duo_gallery() {
 		$i = 0;
 		$orientations = $this->input['image_orientation'];
 		$pos = 'left';

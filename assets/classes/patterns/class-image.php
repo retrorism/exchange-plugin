@@ -146,7 +146,7 @@ class Image extends BasePattern {
 
 		}
 
-		if ( is_object( $this->caption ) && $this->context !== 'collaboration__header' ) {
+		if ( is_object( $this->caption ) && ! in_array( $this->context, array('collaboration__header', 'griditem' ) ) ) {
 			$this->output .= $this->build_image_caption();
 		}
 
@@ -181,7 +181,7 @@ class Image extends BasePattern {
 				$el['open'] = '<div class="collaboration__header__image-wrapper" data-equalizer-watch>';
 				$el['close'] = '</div>';
 				break;
-			case 'lightbox':
+			case 'gallery':
 				$orbit = '';
 				$orbit_is_active = '';
 				// Add wrapper for gallery list, optionally add orbit-slide class
@@ -340,11 +340,11 @@ class Image extends BasePattern {
 				$order = array( $mlarge );
 				break;
 			case 'griditem' :
-			case 'lightbox' :
+			case 'gallery' :
 			case 'section' :
 			default :
 				// Add full size if the ratio is severe pano or severe portrait.
-				if ( $this->ratio < 0.5 || $this->ratio > 2 ) {
+				if ( $this->ratio < 0.5 || $this->ratio > 1 ) {
 					$order = array( $medium, $mlarge, $large, $full );
 				} else {
 					$order = array( $medium, $mlarge, $large );
@@ -569,7 +569,7 @@ class Image extends BasePattern {
 					$this->ratio = 1;
 					break;
 				case 'griditem':
-					$this->ratio = 0.6;
+					$this->ratio = 0.75;
 					break;
 				case 'section':
 				case 'imageduo':
@@ -586,12 +586,14 @@ class Image extends BasePattern {
 					if ( empty( $rounded ) ) {
 						break;
 					}
-					if ( 'landscape' === $this->orientation ) {
-						$this->ratio = $rounded;
+					if ( $this->is_hq && 'landscape' === $this->orientation ) {
+						$this->ratio = 0.5;
 					} else {
-						$this->ratio = 0.75;
+						$this->ratio = $rounded;
 					}
-				case 'lightbox':
+					break;
+
+				case 'gallery':
 				default:
 					if ( ! empty( $rounded ) )  {
 						$this->ratio = $rounded;

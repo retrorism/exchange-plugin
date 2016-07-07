@@ -54,6 +54,9 @@ class CollaborationController extends BaseController {
 			$this->set_collaboration_locations();
 		}
 
+		// Add featured image
+		$this->set_featured_image();
+
 		// Add tags
 		$this->set_ordered_tag_list();
 	}
@@ -67,24 +70,28 @@ class CollaborationController extends BaseController {
 		$this->set_header_image( $post_id, 'collaboration__header' );
 
 		$acf_sections = get_field( 'sections', $post_id );
-		$acf_related_content = get_field( 'related_content', $post_id );
-
-		// Set related content.
-		if ( is_array( $acf_related_content ) && count( $acf_related_content ) > 0 ) {
-			$this->set_related_grid_content( $acf_related_content );
-		}
 
 		// Set sections.
 		if ( ! empty( $acf_sections ) ) {
 			$this->set_sections( $acf_sections );
 		}
 
-		// // Dump ACF variables.
-		// $acf_related_content = get_field( 'related_content', $post_id );
-		//
-		// if ( is_array( $acf_related_content ) && count( $acf_related_content ) > 0 ) {
-		// 	$this->set_related_content_grid( $collaboration, $acf_related_content );
-		// }
+		$this->set_gallery();
+
+		if ( $this->container->has_participants ) {
+			$this->set_collaboration_stories();
+		}
+
+		if ( get_field( 'related_content_auto_select', $post_id ) ) {
+			$related_content = $this->get_related_grid_content_by_tags();
+		} else {
+			$related_content = get_field( 'related_content', $post_id );
+		}
+
+		if ( is_array( $related_content ) && count( $related_content ) > 0 ) {
+			$this->container->has_related_content = true;
+			$this->set_related_grid_content( $related_content );
+		}
 	}
 
 	protected function set_collaboration_locations() {
@@ -109,6 +116,36 @@ class CollaborationController extends BaseController {
 		if ( count( $locations ) > 1 ) {
 			$this->container->locations = $locations;
 			$this->container->has_locations = true;
+		}
+	}
+
+	protected function set_collaboration_stories() {
+		if ( ! $this->container->participants ) {
+			return;
+		}
+		foreach ( $this->container->participants as $p_obj ) {
+			$meta_query_arr[] = $p_obj->post_id;
+		}
+		$args = array(
+			'post_type' => 'story',
+			'post_status' => 'publish',
+	    	'meta_query' => array(
+				array(
+					'key'   => 'storyteller',
+					'value' => $meta_query_arr,
+					'compare' => 'IN'
+				),
+			)
+		);
+		$query = new WP_Query( $args );
+		if ( empty( $query->posts ) ) {
+			return;
+		}
+		foreach( $query->posts as $post ) {
+			$this->container->stories[] = $post;
+		}
+		if ( count( $this->container->stories ) > 0 ) {
+			$this->container->has_stories = true;
 		}
 	}
 
