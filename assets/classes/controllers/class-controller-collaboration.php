@@ -107,7 +107,8 @@ class CollaborationController extends BaseController {
 			}
 			if ( ! empty( $p_obj->org_coords ) ) {
 				$locations[$p_id]['org_lat'] = $p_obj->org_coords['lat'];
-				$locations[$p_id]['org_lat'] = $p_obj->org_coords['lng'];
+				$locations[$p_id]['org_lng'] = $p_obj->org_coords['lng'];
+				$locations[$p_id]['org_address'] = $p_obj->org_coords['address'];
 			}
 			if ( ! empty( $p_obj->org_city ) ) {
 				$locations[$p_id]['org_city'] = $p_obj->org_city;

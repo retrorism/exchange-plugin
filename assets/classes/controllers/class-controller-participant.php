@@ -53,7 +53,7 @@ class ParticipantController extends BaseController {
 		if ( !empty( $org_name ) ) {
 			$this->container->org_name = $org_name;
 		}
-		if ( 2 === count( $org_coords ) ) {
+		if ( ! empty( $org_coords['address'] ) || ( ! empty( $org_coords['lat'] ) && ! empty( $org_coords['lng'] ) ) ) {
 			$this->container->org_coords = $org_coords;
 		}
 		if ( ! empty( $org_city ) ) {

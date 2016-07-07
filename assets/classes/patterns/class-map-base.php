@@ -275,14 +275,16 @@ abstract class BaseMap extends BasePattern {
 		$cities = array();
 		foreach ( $locations as $location ) {
 			if ( ! empty( $location['org_lat'] ) && ! empty( $location['org_lng'] ) ) {
-				$latlngs[] = $location['org_lat'] . ', '. $locations['org_lng'];
+				$latlngs[] = $location['org_lat'] . ', '. $location['org_lng'];
 			}
-			if ( !empty( $location['org_city'] ) ) {
+			if ( ! empty( $location['org_address'] ) ) {
+				$cities[] = $location['org_address'];
+			} elseif ( !empty( $location['org_city'] ) ) {
 				$cities[] = $location['org_city'];
 			}
 		}
 		if ( count( $latlngs ) > 1 ) {
-			$line .= 'latlngs' . implode( '; ', $latlngs ) . ';"]';
+			$line .= 'latlngs="' . implode( '; ', $latlngs ) . ';"]';
 		} elseif ( count( $cities ) > 1 ) {
 			$line .= 'addresses="' . implode( '; ', $cities ) . ';"]';
 		} else {
