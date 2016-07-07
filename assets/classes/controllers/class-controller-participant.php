@@ -48,6 +48,7 @@ class ParticipantController extends BaseController {
 		$org_city = get_field( 'organisation_city', $post_id );
 		$org_country = get_field( 'organisation_country', $post_id );
 		$org_website = get_field( 'organisation_website', $post_id );
+		$p_contactme = get_field( 'participant_email', $post_id );
 
 		if ( !empty( $org_name ) ) {
 			$this->container->org_name = $org_name;
@@ -63,6 +64,9 @@ class ParticipantController extends BaseController {
 		}
 		if ( ! empty( $org_website ) ) {
 			$this->container->org_website = $org_website;
+		}
+		if ( !empty( $p_contactme ) ) {
+			$this->container->set_contactme( $p_contactme );
 		}
 	}
 

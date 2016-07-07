@@ -44,6 +44,24 @@ class Participant extends Exchange {
 	public $name;
 
 	/**
+	 * E-mail Address
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 * @var string Contactme
+	 **/
+	protected $contactme;
+
+	/**
+	 * E-mail Address Check
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var bool Contactme
+	 **/
+	public $has_contactme = false;
+
+	/**
 	 * Is this indidual currently active in a programme? Defaults to true
 	 *
 	 * @since 0.1.0
@@ -124,6 +142,24 @@ class Participant extends Exchange {
 	public function publish_name() {
 		if ( null !== $this->name ) {
 			echo esc_html( $this->name );
+		}
+	}
+
+	public function set_contactme( $e ) {
+		$this->contactme = $e;
+		$this->has_contactme = true;
+	}
+
+	public function get_contactme() {
+		if ( $this->has_contactme ) {
+			return $this->get_contactme;
+		}
+	}
+
+	public function publish_contactme() {
+		if ( $this->has_contactme ) {
+			$cm = eae_encode_str( $this->contactme );
+			echo '<a href="mailto:' . $cm . '">' . $cm . '</a>';
 		}
 	}
 }
