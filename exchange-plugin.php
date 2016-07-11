@@ -127,6 +127,7 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 
 					'basepattern' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-pattern-base.php',
 					'basegrid' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-grid-base.php',
+					'simplegrid' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-grid-simple.php',
 					'relatedgrid' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-grid-related.php',
 					'griditem' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-grid-item.php',
 
@@ -135,6 +136,8 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 					'contactblock' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-contact-block.php',
 					'editorialintro' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-editorial-intro.php',
 					'paragraph' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-paragraph.php',
+					'translatedparagraph' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-paragraph-translated.php',
+
 					'basequote' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-quote-base.php',
 					'pullquote' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-quote-pull.php',
 					'blockquote' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-quote-block.php',

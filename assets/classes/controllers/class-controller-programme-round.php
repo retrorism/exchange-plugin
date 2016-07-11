@@ -24,7 +24,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  **/
 class Programme_RoundController extends BaseController {
 
-	public function map_programme_round_full( $programme_round, $post_obj ) {
+	public function map_programme_round_basics() {
+		// Set CTA check
+		if ( ! empty( $acf_has_cta ) ) {
+			$this->container->has_cta = $acf_has_cta;
+		}
+	}
+
+	public function map_full_programme_round( $programme_round, $post_obj ) {
 
 		$post_id = $post_obj->ID;
 

@@ -40,7 +40,57 @@ class Programme_Round extends Exchange {
 		if ( 'grid' === $context ) {
 			$this->controller->set_featured_image( $this, $post->ID );
 		} else {
-			$this->controller->map_programme_round_full( $this, $post );
+			$this->controller->map_full_programme_round( $this, $post );
 		}
+	}
+
+	public function publish_grid_programme_round( $modifier = '' ) {
+		$prog_name = explode( ' ', $this->title )[1];
+		$acf_editorial_intro = get_field( 'editorial_intro', $this->post_id );
+		$paragraph = ! empty( $acf_editorial_intro ) ? $acf_editorial_intro : __('Click below for more programme information', EXCHANGE_PLUGIN );
+		if ( in_array( $prog_name, array( 'C&P', 'Community', 'C' ), true ) ) {
+			$prog_name = 'C_P';
+		}
+		$properties = array(
+			'block_type' => 'cta',
+			'cta_colour' => '#' . $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['rose-1-web'],
+			'block_alignment' => false,
+			'cta_block_elements' => array(
+				0 => array(
+						'acf_fc_layout' => 'block_header',
+						'block_header_text' => $this->title,
+					),
+				1 => array(
+						'acf_fc_layout' => 'block_logo',
+						'block_programme' => $prog_name,
+					),
+				2 => array(
+						'acf_fc_layout' => 'block_paragraph',
+						'block_paragraph_text' => $paragraph,
+					),
+				3 => array(
+						'acf_fc_layout' => 'block_button',
+						'button_size' => 'small',
+						'button_text' => __('Read more', EXCHANGE_PLUGIN ),
+						'button_help_text' => __('See all collaborations', EXCHANGE_PLUGIN ),
+						'button_link' => '#',
+						'button_target' => '_self',
+					),
+				4 => array(
+						'acf_fc_layout' => 'block_button',
+						'button_size' => 'small',
+						'button_text' => __('All collaborations', EXCHANGE_PLUGIN ),
+						'button_help_text' => __('See all collaborations', EXCHANGE_PLUGIN ),
+						'button_target' => '_self',
+						'button_link' => '#',
+					),
+			),
+		);
+		if ( $modifier === 'grid_full' ) {
+			$properties['block_alignment'] = 'full';
+		}
+		$block = BasePattern::pattern_factory( $properties, 'emphasis_block', 'griditem' );
+
+		echo $block;
 	}
 }

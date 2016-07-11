@@ -66,6 +66,12 @@ class CollaborationController extends BaseController {
 		$post_id = $this->container->post_id;
 		// Add description.
 		$this->set_description();
+
+		$acf_website = get_field( 'collaboration_website', $post_id );
+		if ( ! empty( $acf_website ) ) {
+			$this->container->website = $acf_website;
+		}
+
 		// Add header image.
 		$this->set_header_image( $post_id, 'collaboration__header' );
 

@@ -33,7 +33,4 @@ abstract class BaseInterview extends BasePattern {
 		$this->output .= $this->build_interview() . PHP_EOL;
 		$this->output_tag_close();
 	}
-
-
-
 }

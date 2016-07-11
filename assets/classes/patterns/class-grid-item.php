@@ -31,6 +31,7 @@ class GridItem extends BasePattern {
 	 * @access protected
 	 **/
 	 protected function create_output() {
+
 		if ( is_object( $this->input ) ) {
 			$this->output_tag_open();
 	 		$this->output .= $this->build_grid_item();
@@ -45,16 +46,29 @@ class GridItem extends BasePattern {
 	 *
 	 * @since 0.1.0
 	 **/
-	protected function build_grid_item() {
-		if ( locate_template( 'parts/grid-' . $this->input->type . '.php' ) !== '') {
+	protected function build_grid_item( $cta = false ) {
+		if (
+			( 'archive__grid' === $this->context && 'everywhere' === $this->input->has_cta ) ||
+			( ( 'simplegrid' === $this->context || 'relatedgrid' === $this->context ) && 'no' !== $this->input->has_cta )
+		) {
+			$cta = true;
+		}
+		if ( $cta && locate_template( 'parts/grid-cta.php') !== '' ) {
+			$template = 'cta';
+		} elseif ( locate_template( 'parts/grid-' . $this->input->type . '.php' ) !== '') {
 			$template = $this->input->type;
 		} elseif ( locate_template( 'parts/grid-default.php' ) !== '') {
 			$template = 'default';
 		} else {
 			$template = false;
+			var_dump( $template );
 		}
 		if ( $template ) {
 			$exchange = $this->input;
+			$modifier = false;
+			if ( isset( $this->modifiers['grid_width'] ) ) {
+				$modifier = $this->modifiers['grid_width'];
+			}
 			ob_start();
 			include( locate_template( 'parts/grid-' . $template .'.php' ) );
 			$grid_item = ob_get_contents();

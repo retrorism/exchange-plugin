@@ -28,7 +28,7 @@ class InterviewConversation extends BaseInterview {
 	 * @return HTML string with names and statements.
 	 **/
 	public function build_interview() {
-		if ( is_array( $this->input ) && count( $this->input ) ) {
+		if ( is_array( $this->input ) && ! empty( $this->input ) ) {
 			$output = '';
 			foreach ( $this->input as $vs ) {
 				if ( ! empty( $vs['voice'] ) && ! empty( $vs['statement'] ) ) {

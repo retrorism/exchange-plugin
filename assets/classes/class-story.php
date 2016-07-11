@@ -92,9 +92,12 @@ class Story extends Exchange {
 	public function __construct( $post, $context = '', $controller = null ) {
 		Parent::__construct( $post );
 		$this->controller->map_story_basics();
+
 		if ( 'griditem' === $context ) {
-			$this->controller->set_featured_image( 'griditem' );
-			$this->controller->set_ordered_tag_list();
+			if ( empty( $this->has_cta ) || ( $this->has_cta == 'no' ) ) {
+				$this->controller->set_featured_image( 'griditem' );
+				$this->controller->set_ordered_tag_list();
+			}
 		} else {
 			$this->controller->map_full_story();
 		}

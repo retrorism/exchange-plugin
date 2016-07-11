@@ -45,6 +45,7 @@ class StoryController extends BaseController {
 		$acf_language = get_field( 'language', $post_id );
 		$acf_storyteller = get_field( 'storyteller', $post_id );
 		$acf_category = get_field( 'category', $post_id );
+		$acf_has_cta = get_field( 'has_cta', $post_id );
 
 		// Set editorial introduction.
 		if ( ! empty( $acf_editorial_intro ) ) {
@@ -74,6 +75,10 @@ class StoryController extends BaseController {
 			}
 		}
 
+		// Set CTA check
+		if ( ! empty( $acf_has_cta ) ) {
+			$this->container->has_cta = $acf_has_cta;
+		}
 
 		// Add featured image
 		$this->set_featured_image();
@@ -95,6 +100,12 @@ class StoryController extends BaseController {
 
 		// Retrieve post_id variable from basic mapping.
 		$post_id = $this->container->post_id;
+
+
+		// Set language global to language category
+		if ( isset( $this->container->language ) ) {
+			$GLOBALS['story_language'] = $this->container->language->name;
+		}
 
 		// Throw Exception when the input is not a valid story post type object.
 		if ( ! ( $post_id >= 1 ) ) {

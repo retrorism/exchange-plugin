@@ -75,7 +75,11 @@ abstract class BaseGrid extends BasePattern {
 			// Reset grid items array.
 			$this->grid_items = array();
 			foreach ( $this->input as $item ) {
-				$this->add_grid_item( $this->create_grid_item( $item ) );
+				if ( is_array( $item ) ) {
+					$this->add_grid_item( $this->create_grid_item_from_layout( $item ) );
+				} elseif ( is_object( $item ) ) {
+					$this->add_grid_item( $this->create_grid_item_from_post( $item ) );
+				}
 			}
 			if ( count( $this->grid_items ) > 0 ) {
 				$this->has_grid_items = true;
@@ -123,18 +127,50 @@ abstract class BaseGrid extends BasePattern {
 	}
 
 	/**
-	 * Create grid item.
+	 * Create grid item from post
 	 *
 	 * Creates grid item with post_item data, add modifiers when necessary.
 	 *
 	 * @param integer $item Post object to be represented by grid item.
 	 */
-	protected function create_grid_item( $item ) {
+	protected function create_grid_item_from_post( $item ) {
 		$exchange = BaseController::exchange_factory( $item, 'griditem' );
 		$item_mods = self::add_grid_modifiers( $exchange );
 		$grid_item = new GridItem( $exchange, $this->element, $item_mods );
 		return $grid_item;
 	}
+
+	/**
+	 * Create grid item from ACF Layout
+	 *
+	 * Creates grid item with post_item data, add modifiers when necessary.
+	 *
+	 * @param integer $item Post object to be represented by grid item.
+	 */
+	protected function create_grid_item_from_layout( $item ) {
+		if ( ! isset( $item[ 'acf_fc_layout' ] ) ) {
+			return;
+		}
+		switch ( $item[ 'acf_fc_layout' ] ) {
+			case 'grid_exchange_story':
+			case 'grid_exchange_collaboration':
+			case 'grid_exchange_page':
+				if ( ! is_int( $item['grid_exchange_object'] ) ) {
+					return;
+				}
+				$exchange = BaseController::exchange_factory( $item['grid_exchange_object'], 'griditem' );
+				$item_mods = self::add_grid_modifiers( $exchange );
+				if ( ! empty( $item['grid_width'] ) ) {
+					$item_mods['grid_width'] = $item['grid_width'];
+				}
+				$grid_item = new GridItem( $exchange, $this->element, $item_mods );
+				return $grid_item;
+				break;
+			case 'grid_paragraph' :
+				break;
+		}
+	}
+
 	/**
 	 * Add term modifiers to post before creating Pattern object.
 	 *
@@ -148,7 +184,11 @@ abstract class BaseGrid extends BasePattern {
 		if ( ! is_array( $modifiers ) ) {
 			throw Exception( __( 'This is not a valid modifiers array' ) );
 		}
-		$modifiers['type'] = $exchange->type;
+		if ( ! empty( $exchange->has_cta ) && $exchange->has_cta !== 'no' ) {
+			$modifiers['type'] = 'cta';
+		} else {
+			$modifiers['type'] = $exchange->type;
+		}
 		$modifiers['data']['date'] = $exchange->date;
 		if ( $exchange->has_tags ) {
 			// Empty array to store 'all-purpose-tags'.

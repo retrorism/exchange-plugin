@@ -36,22 +36,49 @@ abstract class BasePattern {
 	public $classes = array();
 
 	/**
+	 * Attributes check
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var bool $has_attributes Whether there are special attributes for this pattern;
+	 **/
+	protected $has_attributes = false;
+
+	/**
 	 * List of data-attributes for pattern container element.
 	 *
 	 * @since 0.1.0
 	 * @access protected
-	 * @var array $data Attributes-list.
+	 * @var array $data_attributes Attributes-list.
 	 **/
-	protected $data = array();
+	protected $data_attributes = array();
 
 	/**
 	 * List of link-attributes for pattern container element.
 	 *
 	 * @since 0.1.0
 	 * @access protected
-	 * @var array $data Link attributes-list.
+	 * @var array $link_attributes Link attributes-list.
 	 **/
 	protected $link_attributes = array();
+
+	/**
+	 * List of link-attributes for pattern container element.
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 * @var array $misc_attributes Link attributes-list.
+	 **/
+	protected $misc_attributes = array();
+
+	/**
+	 * List of aria-attributes for pattern container element.
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 * @var array $aria_attributes Aria attributes-list.
+	 **/
+	protected $aria_attributes = array();
 
 	/**
 	 * List of classes for pattern container element.
@@ -162,7 +189,7 @@ abstract class BasePattern {
 		if ( 'section' === $this->context ) {
 			$this->classes['section__default-element'] = 'section__slice';
 		}
-		// Add
+		// Add base class;
 		if ( ! array_key_exists('base__element', $this->classes )
 			|| empty( $this->classes['base__element'] ) ) {
 			if ( ! empty( $this->context ) ) {
@@ -190,84 +217,73 @@ abstract class BasePattern {
 	}
 
 	/**
-	 * Stringify link attributes for use in HTML.
-	 *
-	 * @since 0.1.0
-	 * @access protected
-	 **/
-	protected function stringify_link_attributes() {
-		if ( ! empty( $this->link_attributes ) ) {
-			$list = array();
-			foreach ( $this->link_attributes as $key => $val ) {
-				if ( ! empty( $val ) ) {
-					$list[] = $key . '="' . esc_attr( $val ) . '"';
-				}
-			}
-			if ( count( $list ) > 0 ) {
-				$string = implode( ' ', $list );
-			}
-			return $string;
-		}
-	}
-
-	/**
-	 * Stringify data attributes for use in HTML.
+	 * Stringify attributes for use in HTML.
 	 *
 	 * @since 0.1.0
 	 * @access protected
 	 *
 	 * @TODO move HTML output to template parts instead?
 	 **/
-	protected function stringify_data() {
-		if ( ! empty( $this->data ) ) {
-			$list = array();
-			foreach ( $this->data as $key => $val ) {
-				$list[] = 'data-' . $key . '="' . esc_attr( $val ) . '"';
+	protected function stringify_attributes() {
+		$attribute_list = array();
+		$allowed_types = array( 'data','aria','link','misc' );
+		foreach ( $allowed_types as $type ) {
+			$prop = $type . '_attributes';
+			$prefix = '';
+			if ( ! empty( $this->$prop ) ) {
+				$list = array();
+				if ( $type === 'data' || $type === 'aria' ) {
+					$prefix = $type . '-';
+				}
+				foreach ( $this->$prop as $key => $val ) {
+					$attribute = $prefix . $key;
+					if ( $val !== true ) {
+						$attribute .= '="' . esc_attr( $val ) . '"';
+					}
+					$list[] = $attribute;
+				}
+				if ( count( $list ) > 0 ) {
+					$string = implode( ' ', $list );
+					$attribute_list[] = $string;
+				}
 			}
-			if ( count( $list ) > 0 ) {
-				$string = implode( ' ', $list );
-			}
-			return $string;
+		}
+		if ( count( $attribute_list ) > 0 ) {
+			$attribute_string = implode( ' ', $attribute_list );
+			return $attribute_string;
 		}
 	}
 
 	/**
-	 * Stringify data attributes for use in HTML.
+	 * Prepare attributes for use in HTML.
 	 *
 	 * @since 0.1.0
 	 * @access protected
 	 *
 	 * @param array $modifiers Modifiers array passed in Constructor.
+	 * @TODO Make this more DRY.
 	 **/
 	protected function process_modifiers() {
 		foreach ( $this->modifiers as $key => $val ) {
 			switch ( $key ) {
-				case 'data' :
-					$data_atts = $this->modifiers[ $key ];
-					if ( ! empty( $data_atts ) && is_array( $data_atts ) ) {
-						foreach ( $data_atts as $k => $v ) {
+				case 'data':
+				case 'aria':
+				case 'link':
+				case 'misc':
+					$atts = $this->modifiers[ $key ];
+					if ( is_array( $atts ) && ! empty( $atts ) ) {
+						foreach ( $atts as $k => $v ) {
 							if ( is_string( $k ) ) {
-								$this->set_data_attribute( $k, $v );
-							}
-						}
-					}
-					break;
-				case 'link_attributes' :
-					$link_atts = $this->modifiers[ $key ];
-					if ( ! empty( $link_atts ) && is_array( $link_atts ) ) {
-						foreach ( $link_atts as $k => $v ) {
-							if ( is_string( $k ) ) {
-								$this->set_link_attribute( $k, $v );
+								$this->set_attribute( $key, $k, $v );
+								$this->has_attributes = true;
 							}
 						}
 					}
 					break;
 				case 'classes' :
-					$classes = $this->modifiers[ $key ];
+					$classes = $this->modifiers[ 'classes' ];
 					if ( ! empty( $classes ) && is_array( $classes ) ) {
-						foreach ( $classes as $class ) {
-							$this->classes[] = $class ;
-						}
+						$this->classes = array_merge( $this->classes, $classes );
 					}
 					break;
 				default :
@@ -314,24 +330,14 @@ abstract class BasePattern {
 	 * @param string $key Data-attribute identifier.
 	 * @param string $val Contains the value for this data-attribute.
 	 **/
-	protected function set_data_attribute( $key, $val ) {
-		if (  null !== $val || 'undefined' !== $val || 'NaN' !== $val ) {
-			$this->data[ $key ] = $val;
+	protected function set_attribute( $type, $key, $val ) {
+		$allowed_types = array( 'data','aria','link','misc' );
+		if ( ! in_array( $type, $allowed_types, true ) ) {
+			return;
 		}
-	}
-
-	/**
-	 * Add link-attribute.
-	 *
-	 * @since 0.1.0
-	 * @access protected
-	 *
-	 * @param string $key Link-attribute identifier.
-	 * @param string $val Contains the value for this link-attribute.
-	 **/
-	protected function set_link_attribute( $key, $val ) {
-		if ( ! empty( $val ) && is_string( $val ) ) {
-			$this->link_attributes[ $key ] = $val;
+		if (  ! empty( $val ) ) {
+			$prop = $type . '_attributes';
+			$this->$prop[ $key ] = $val;
 		}
 	}
 
@@ -357,21 +363,19 @@ abstract class BasePattern {
 	 **/
 	protected function output_tag_open( $tag = 'div' ) {
 		if ( in_array( $tag, array( 'p', 'span', 'a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ), true ) ) {
-			$eol = '';
+			$inputol = '';
 		} else {
-			$eol = PHP_EOL;
+			$inputol = PHP_EOL;
 		}
 		$this->output .= '<' . $tag;
 		if ( count( $this->classes ) > 0 ) {
 			$this->output .= ' ' . $this->stringify_classes();
 		}
-		if ( count( $this->link_attributes ) > 0 ) {
-			$this->output .= ' ' . $this->stringify_link_attributes();
+		if ( $this->has_attributes ) {
+			$this->output .= ' ' . $this->stringify_attributes();
 		}
-		if ( count( $this->data ) > 0 ) {
-			$this->output .= ' ' . $this->stringify_data();
-		}
-		$this->output .= '>' . $eol;
+
+		$this->output .= '>' . $inputol;
 	}
 
 	/**
@@ -469,5 +473,137 @@ abstract class BasePattern {
 	public function embed( $context = '' ) {
 		$this->prepare( $context )->create_output();
 		return $this->output;
+	}
+
+	/**
+	 * Returns a pattern string
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 *
+	 * @var array $input ACF field input
+	 * @var string $type ACF layout type (pattern class name)
+	 * @var string $context The pattern's container.
+	 * @return string $output HTML output consisting of tags and content.
+	 **/
+	public static function pattern_factory( $input, $type, $context = '' ) {
+		switch ( $type ) {
+			case 'image':
+				$image_mods = array();
+				$focus_points = exchange_get_focus_points( $input['image'] );
+				$image_mods['data'] = array( 'img_id' => $input['image']['id'] );
+				if ( ! empty( $focus_points ) ) {
+					$image_mods['data'] = array_merge( $image_mods['data'], $focus_points );
+					$image_mods['classes'] = array('focus');
+				}
+				if ( 'portrait' === $input['image_orientation']  ) {
+					$image_mods['orientation'] = 'portrait';
+				}
+				$image = new Image( $input['image'], $context, $image_mods );
+				if ( is_object( $image ) && is_a( $image, 'Image' ) ) {
+					$output = $image->embed();
+				}
+				break;
+
+			case 'two_images':
+				$duo = new ImageDuo( $input, $context );
+				$output = $duo->embed();
+				break;
+
+			case 'paragraph':
+				$p_mods = array();
+				$translations = $input['translations'];
+				if ( $input['add_translation'] && ! empty( $translations ) ) {
+					$p_mods['type'] = 'has_translations';
+					$languages = array();
+					foreach( $translations as $t ) {
+						if ( ! empty ( $t['translation_text'] ) ) {
+							$languages[] = $t['translation_language'];
+						}
+					}
+					$p_mods['data']['languages'] = implode(',', $languages );
+					$paragraph = new TranslatedParagraph( $input, $context, $p_mods );
+					$output = $paragraph->embed();
+					break;
+				}
+				$paragraph = new Paragraph( $input['text'], $context );
+				$output = $paragraph->embed();
+				break;
+
+			case 'block_quote':
+				$blockquote = new BlockQuote( $input, $context );
+				$output = $blockquote->embed();
+				break;
+
+			case 'pull_quote':
+				$pquote_mods = array();
+				if ( ! empty( $input['pquote_colour'] ) ) {
+					$pquote_mods['colour'] = $input['pquote_colour'];
+				}
+				$pullquote = new PullQuote( $input, $context, $pquote_mods );
+				$output = $pullquote->embed();
+				break;
+
+			case 'embedded_video':
+				$video = new Video( $input, $context );
+				$output = $video->embed();
+				break;
+
+			case 'interview_conversation':
+				$interview = new InterviewConversation( $input['interview'], $context );
+				$output = $interview->embed();
+				break;
+			case 'interview_q_and_a':
+				$interview = new InterviewQA( $input['interview'], $context );
+				$output = $interview->embed();
+				break;
+			case 'subheader':
+				$subheader = new SubHeader( $input['text'], $context );
+				$output = $subheader->embed();
+				break;
+			case 'section_header':
+				$header_mods = array();
+				$colour = $input['tape_colour'];
+				$type = $input['type'];
+				if ( ! empty( $colour ) ) {
+					$header_mods['colour'] = $input['tape_colour'];
+					$header_mods['data'] = array( 'tape_colour' => $colour );
+				}
+				if ( ! empty( $type ) ) {
+					$header_mods['type'] = $input['type'];
+				}
+				$subheader = new SectionHeader( $input['text'], $context, $header_mods );
+				$output = $subheader->embed();
+				break;
+			case 'emphasis_block':
+				$block_mods = array();
+				$type = $input['block_type'];
+				$align = $input['block_alignment'];
+				$block_elements = $input[ $type . '_block_elements' ];
+				if (  empty( $type ) || ! count( $block_elements ) ) {
+					break;
+				}
+				switch ( $align ) {
+					case 'left':
+					case 'right':
+						$block_mods['classes'] = array( 'floated' );
+					case 'full':
+						$block_mods['align'] = $align;
+					default:
+						break;
+				}
+				$block_mods['type'] = $type;
+				$block_mods['colour'] = $input[ $type . '_colour' ];
+				$block_mods['data'] = array( 'element_count' => count( $block_elements ) );
+				$emphasis_block = new EmphasisBlock( $block_elements, $context, $block_mods );
+				$output = $emphasis_block->embed();
+				break;
+			default:
+				$output = '<div data-alert class="alert-box alert">';
+				$output .= '<strong>' . __( 'Error: This layout has not yet been defined', EXCHANGE_PLUGIN ) . '</strong>';
+				$output .= '</div>';
+				break;
+		}
+		return $output;
 	}
 }

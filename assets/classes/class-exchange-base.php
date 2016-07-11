@@ -54,6 +54,16 @@ class Exchange {
 	public $link;
 
 	/**
+	 * Has CTA check
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var string $has_cta Set when grid should show a CTA block. Defaults to 'no'.
+	 **/
+	public $has_cta = 'no';
+
+
+	/**
 	 * Featured image.
 	 *
 	 * @since 0.1.0
@@ -258,6 +268,31 @@ class Exchange {
 		if ( $this->has_related_content ) {
 			$this->related_content->publish( $context );
 		}
+	}
+
+	public function publish_grid_cta( $modifier = '' ) {
+		$properties = array(
+			'block_type' => 'cta',
+			'block_alignment' => false,
+			'cta_block_elements' => get_field( 'cta_block_elements', $this->post_id ),
+			'cta_colour' => get_field( 'cta_colour', $this->post_id ),
+		);
+		if ( $modifier === 'grid_full' ) {
+			$properties['block_alignment'] = 'full';
+		}
+		if ( empty( $properties['cta_block_elements'] ) ) {
+			return;
+		} else {
+			$length = count( $properties['cta_block_elements'] );
+			for( $i = 0; $i < $length; $i++ ) {
+				// Add permalink to button if link left empty.
+				if ( 'block_button' === $properties['cta_block_elements'][$i]['acf_fc_layout'] && empty( $properties['cta_block_elements'][$i]['button_link'] ) ) {
+					$properties['cta_block_elements'][$i]['button_link'] = $this->link;
+				}
+			}
+		}
+		$block = BasePattern::pattern_factory( $properties, 'emphasis_block', 'griditem' );
+		echo $block;
 	}
 
 	public function publish_tags( $context = '' ) {

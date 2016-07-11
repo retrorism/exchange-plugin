@@ -108,6 +108,15 @@ class Collaboration extends Exchange {
 	public $description;
 
 	/**
+	 * Collab website
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var string $website URL for the project website.
+	 */
+	public $website;
+
+	/**
 	 * Collab description check
 	 *
 	 * @since 0.1.0

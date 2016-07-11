@@ -32,7 +32,7 @@ class Button extends BasePattern {
 	 **/
 	 protected function create_output() {
 		$el = 'button';
-		if ( ! empty( $this->modifiers['link_attributes'] ) ) {
+		if ( ! empty( $this->modifiers['link'] ) ) {
 			$el = 'a';
 		}
 		if ( 'emphasisblock' === $this->context ) {

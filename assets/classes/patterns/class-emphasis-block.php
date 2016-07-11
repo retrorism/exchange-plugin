@@ -77,7 +77,6 @@ class EmphasisBlock extends BasePattern {
 					break;
 
 				case 'block_paragraph':
-
 					$paragraph = new Paragraph( $e['block_paragraph_text'], $this->element );
 					$this->output .= $paragraph->embed();
 					break;
@@ -89,17 +88,17 @@ class EmphasisBlock extends BasePattern {
 
 				case 'block_button':
 					$button_mods = array(
-						'link_attributes' => array(),
-						'data_attributes' => array(),
+						'link' => array(),
+						'data' => array(),
 					);
 					if ( ! empty( $e['button_link'] ) ) {
-						$button_mods['link_attributes']['href'] = $e['button_link'];
+						$button_mods['link']['href'] = $e['button_link'];
 					}
 					if ( ! empty( $e['button_target'] ) ) {
-						$button_mods['link_attributes']['target'] = $e['button_target'];
+						$button_mods['link']['target'] = $e['button_target'];
 					}
 					if ( ! empty( $e['button_help_text'] ) ) {
-						$button_mods['link_attributes']['title'] = $e['button_help_text'];
+						$button_mods['link']['title'] = $e['button_help_text'];
 					}
 					if ( ! empty( $e['button_size'] ) ) {
 						$button_mods['size'] = $e['button_size'];
