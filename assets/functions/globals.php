@@ -108,7 +108,7 @@ if ( empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['boxes'] ) ) {
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['salmon-1-web'],
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-1-web'],
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['rose-1-web'],
-		$GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['white'],
+		$GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['blue-2-web'],
 
 
       );

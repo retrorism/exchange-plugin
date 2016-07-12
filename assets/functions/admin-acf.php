@@ -120,7 +120,7 @@ function exchange_change_acf_color_picker() {
 			  var acfpalette = ". $client_colors_bg_jquery . ";
 			}
 			if ( $(this).find('.wp-color-picker').parents('*[data-name=\"cta_colour\"]').length > 0 ) {
-			  var acfpalette = ". $client_colors_accents_jquery .";
+			  var acfpalette = ". $client_colors_boxes_jquery .";
 			}
 			if ( $(this).find('.wp-color-picker').parents('*[data-name=\"post-it_colour\"]').length > 0 ) {
 			  var acfpalette = " . $client_colors_bg_jquery . ";
@@ -130,7 +130,7 @@ function exchange_change_acf_color_picker() {
 			  var acfpalette = ". $client_colors_accents_jquery .";
 			}
 			if ( $(this).find('.wp-color-picker').parents('*[data-name=\"box_colour\"]').length > 0 ) {
-			  var acfpalette = ". $client_colors_accents_jquery . ";
+			  var acfpalette = ". $client_colors_boxes_jquery . ";
 			}
 			$(this).iris({
 			  color: $(this).find('.wp-color-picker').val(),

@@ -45,6 +45,7 @@ class GridItem extends BasePattern {
 	 * Build Item output
 	 *
 	 * @since 0.1.0
+	 * @TODO switch for context, switch for grid width
 	 **/
 	protected function build_grid_item( $cta = false ) {
 		if (
@@ -53,7 +54,13 @@ class GridItem extends BasePattern {
 		) {
 			$cta = true;
 		}
-		if ( $cta && locate_template( 'parts/grid-cta.php') !== '' ) {
+		if ( 'featuredgrid' === $this->context && locate_template( 'parts/grid-featured.php') !== '' ) {
+			if ( isset( $this->modifiers['grid_width'] ) && 'grid_full' === $this->modifiers['grid_width'] ) {
+				$template = 'featured';
+			} else {
+				$template = 'default';
+			}
+		} elseif ( $cta && locate_template( 'parts/grid-cta.php') !== '' ) {
 			$template = 'cta';
 		} elseif ( locate_template( 'parts/grid-' . $this->input->type . '.php' ) !== '') {
 			$template = $this->input->type;
@@ -61,7 +68,6 @@ class GridItem extends BasePattern {
 			$template = 'default';
 		} else {
 			$template = false;
-			var_dump( $template );
 		}
 		if ( $template ) {
 			$exchange = $this->input;

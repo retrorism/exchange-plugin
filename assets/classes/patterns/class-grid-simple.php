@@ -43,14 +43,11 @@ class SimpleGrid extends BaseGrid {
 		if ( $this->has_grid_items ) {
 			$this->set_modifier_class( 'colour', $colour );
 			$this->set_attribute( 'data', 'background-colour', $colour );
-			$this->output .= $this->build_edge_svg( 'top', $colour );
 			$this->output_tag_open( $el );
 			foreach ( $this->grid_items as $item ) {
 				$this->output .= $item->embed();
 			}
 			$this->output_tag_close( $el );
-			$this->output .= $this->build_edge_svg( 'top', $colour );
-
 		}
 	}
 }
