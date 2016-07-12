@@ -21,21 +21,17 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 			'yellow-tandem' => 'f4c522', /* Tandem styleguide */
 			'black-tandem'  => '4c4d53', /* Tandem styleguide */
 			'white'         => 'fefefe',
-			'salmon-1-web'  => 'fde1c7', /* Section / Box bg webguide */
-			'yellow-1-web'  => 'fffbdb', /* Section / Box bg webguide */
+			'yellow-1-web'  => 'fffbdb', /* Section bg webguide */
+			'salmon-1-web'  => 'fde1c7', /* Section bg webguide */
 			'blue-1-web'	=> 'dceff0', /* Section bg webguide */
 			'rose-1-web'	=> 'ff8e78', /* Box bg webguide */
-			'blue-2-web'	=> 'dceff0', /* Box bg webguide */
-			'yellow-1'      => 'fffac0', /* Sticky Notes styleguide */
+			'blue-2-web'	=> '9fd3d6', /* Box bg webguide */
 			'yellow-2'      => 'f0c063',
 			'yellow-3'      => 'eba847', /* Accents on yellow */
 			'yellow-4'      => 'e27f20',
-			'salmon-1'      => 'f7e6ce',
 			'salmon-2'      => 'f0c590',
 			'salmon-3'      => 'eaab73',
 			'salmon-4'      => 'e07856', /* Accents on orange */
-			'blue-1'        => 'bcdde9',
-			'blue-2'        => '93c9e4',
 			'blue-3'        => '0f9fd6', /* Accents on blue */
 			'blue-4'        => '1f588e',
 		),
@@ -95,7 +91,7 @@ if ( empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['accents'] ) ) 
       $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['accents'] = array(
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['salmon-4'],
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-3'],
-        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['blue-4'],
+        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['blue-3'],
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-tandem'],
 		$GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['black-tandem'],
       );
@@ -107,7 +103,8 @@ if ( empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['boxes'] ) ) {
       $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['boxes'] = array(
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['salmon-1-web'],
         $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-1-web'],
-        $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['rose-1-web'],
+		$GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['blue-1-web'],
+		$GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['rose-1-web'],
 		$GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['blue-2-web'],
 
 
