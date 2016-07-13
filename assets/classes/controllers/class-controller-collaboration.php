@@ -185,15 +185,68 @@ class CollaborationController extends BaseController {
 	 * @return void.
 	 */
 	protected function set_description() {
-		$description = get_field( 'description', $this->container->post_id );
+		$post_id = $this->container->post_id;
+		$description = get_field( 'description', $post_id  );
 		if ( empty( $description ) || ! is_string( $description ) ) {
 			return;
 		}
 		$length = str_word_count( $description );
-		$this->container->description = new Paragraph( $description );
-		$this->container->description_length = $length;
+		$add_translation = get_field( 'add_translation', $post_id );
+		if ( $add_translation ) {
+			$translations = get_field( 'translations' );
+		}
+		if ( ! isset( $translations ) || empty( $translations ) ) {
+			$this->container->description = new Paragraph( $description );
+			$this->container->description_length = $length;
+		} else {
+			$desc_mods = array(
+					'type' => 'has_translations',
+				);
+			$input = array(
+				'text'            => $description,
+				'add_translation' => true,
+				'translations'    => $translations,
+			);
+
+			// Replace desc. length with that of a translation (if it exceeds the original text's length.
+			foreach( $translations as $translation ) {
+				$text = $translation['translation_text'];
+				if ( ! empty( $text ) && is_string( $text ) && str_word_count( $text ) > $length ) {
+					$length = str_word_count( $text );
+				}
+			}
+			$translated_description = new TranslatedParagraph($input, 'collaboration__description', $desc_mods );
+			$this->container->description = $translated_description;
+
+
+			$this->container->description_length = $length;
+		}
 	}
 
+	public function create_map_caption() {
+		$collab_map_caption = '"' . $this->container->title . '"';
+		$tandem_length = count( $this->container->participants );
+		if ( $this->container->has_participants && $tandem_length > 1 ) {
+			$collab_map_caption .= ': a connection between ';
+			for( $i = 0; $i < $tandem_length; $i++ ) {
+				$city = $this->container->participants[$i]->org_city;
+				$country = $this->container->participants[$i]->org_country;
+
+				if ( empty ( $city ) ) {
+					continue;
+				}
+				if ( ! empty( $country ) ) {
+					$city .= ' (' . $country .')';
+				}
+				if ( $i !== $tandem_length - 1 ) {
+					$collab_map_caption .= $city . ' & ';
+				} else {
+					$collab_map_caption .= $city;
+				}
+			}
+		}
+		return $collab_map_caption;
+	}
 
 
 }

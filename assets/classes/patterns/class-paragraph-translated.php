@@ -28,7 +28,7 @@ class TranslatedParagraph extends BasePattern {
 	 *
 	 * @var array Associative array with language as key, text as input,
 	 */
-	private $translations = array();
+	public $translations = array();
 
 	/**
 	 * Overwrites initial output function.
@@ -64,13 +64,12 @@ class TranslatedParagraph extends BasePattern {
 		if ( empty( $translations ) ) {
 			$this->build_paragraph();
 		} else {
-			$this->output .= '<div class="translation-wrapper">';
 			$this->build_paragraph();
 			foreach ( $translations as $translation ) {
 				$this->build_translation( $translation );
 			}
 			$this->build_translation_dropdown();
-			$this->output .= '</div>';
+
 		}
 	}
 
@@ -78,7 +77,6 @@ class TranslatedParagraph extends BasePattern {
 		$p_mods = array(
 			'lang' => 'original',
 			'misc' => array( 'id' => 'original' ),
-			'data' => array( 'toggler' => '.show' ),
 		 	'classes' => array( 'show' ),
 		);
 		$p = new Paragraph( $this->input['text'], $this->element, $p_mods );

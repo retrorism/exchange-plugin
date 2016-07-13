@@ -176,6 +176,11 @@ class Collaboration extends Exchange {
 	 * @return {11:return type}
 	 */
 	public function publish_collab_map( $context = '' ) {
+		$collab_map_caption = $this->controller->create_map_caption();
+		$num_participants = count( $this->participants );
+		if ( $num_participants <= 1 ) {
+			return;
+		}
 		$input = array(
 			'map_style' => 'network',
 			'map_size'  => 'wide',
@@ -183,7 +188,7 @@ class Collaboration extends Exchange {
 			'map_collaborations' => array(
 				0 => $this->post_id
 			),
-			'map_caption' => __( 'Showing a connection between two cities', 'exchange' ),
+			'map_caption' => $collab_map_caption,
 		);
 		$map = new SimpleMap( $input, 'collaboration' );
 		if ( ! empty( $map ) ) {
