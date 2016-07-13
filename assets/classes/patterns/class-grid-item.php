@@ -55,7 +55,7 @@ class GridItem extends BasePattern {
 			$cta = true;
 		}
 		if ( 'featuredgrid' === $this->context && locate_template( 'parts/grid-featured.php') !== '' ) {
-			if ( isset( $this->modifiers['grid_width'] ) && 'grid_full' === $this->modifiers['grid_width'] ) {
+			if ( isset( $this->modifiers['grid_width_num'] ) && 12 === $this->modifiers['grid_width_num'] ) {
 				$template = 'featured';
 			} else {
 				$template = 'default';

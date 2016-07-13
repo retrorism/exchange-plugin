@@ -140,6 +140,20 @@ abstract class BaseGrid extends BasePattern {
 		return $grid_item;
 	}
 
+	private function get_grid_width_num( $grid_width ) {
+		$num = array(
+			'grid_full' => 12,
+			'grid_half' => 6,
+			'grid_third' => 4,
+			'grid_two_third' => 8,
+		);
+		if ( empty( $grid_width ) || ! array_key_exists( $grid_width, $num ) ) {
+			return false;
+		} else {
+			return $num[$grid_width];
+		}
+	}
+
 	/**
 	 * Create grid item from ACF Layout
 	 *
@@ -162,7 +176,12 @@ abstract class BaseGrid extends BasePattern {
 				$item_mods = self::add_grid_modifiers( $exchange );
 				if ( ! empty( $item['grid_width'] ) ) {
 					$item_mods['grid_width'] = $item['grid_width'];
+					$num = $this->get_grid_width_num( $item['grid_width'] );
+					if ( isset( $num ) & is_int( $num ) ) {
+						$item_mods['grid_width_num'] = $num;
+					}
 				}
+
 				$grid_item = new GridItem( $exchange, $this->element, $item_mods );
 				return $grid_item;
 				break;

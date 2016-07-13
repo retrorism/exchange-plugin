@@ -435,6 +435,19 @@ abstract class BasePattern {
 	}
 
 	/**
+	 * Return modifier from array;
+	 *
+	 * @return mixed
+	 */
+	public function get_modifier( $key ) {
+		if ( ! array_key_exists( $key, $this->modifiers ) ) {
+			return false;
+		} else {
+			return $this->modifiers[ $key ];
+		}
+	}
+
+	/**
 	 * Prints escaped pattern output. Make sure to escape anywhere else.
 	 *
 	 * @since 0.1.0

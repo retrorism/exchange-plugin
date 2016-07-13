@@ -37,17 +37,30 @@ class SimpleGrid extends BaseGrid {
 		} else {
 			$el = 'div';
 		}
-		$colour = '#' . $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['salmon-1-web'];
 		$this->set_grid_items();
 		 // Create grid with posts embedded.
 		if ( $this->has_grid_items ) {
-			$this->set_modifier_class( 'colour', $colour );
-			$this->set_attribute( 'data', 'background-colour', $colour );
 			$this->output_tag_open( $el );
+			$sum = 0;
 			foreach ( $this->grid_items as $item ) {
-				$this->output .= $item->embed();
+				if ( $sum == 0 ) {
+					$this->output .= '<div class="row" data-equalizer>';
+				}
+				$this->fill_rows( $item, $sum );
+				$width = $item->get_modifier( 'grid_width_num' );
+				if ( $width ) {
+					$sum = $sum + $width;
+				}
+				if ( $sum > 0 && 12 / $sum == 1 ) {
+					$this->output .= '</div><!--end equalizer-row-->';
+					$sum = 0;
+				}
 			}
 			$this->output_tag_close( $el );
 		}
+	}
+
+	protected function fill_rows( $item, $sum ) {
+		$this->output .= $item->embed();
 	}
 }

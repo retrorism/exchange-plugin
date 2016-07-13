@@ -30,8 +30,12 @@ class EmphasisBlock extends BasePattern {
 	 **/
 	 protected function create_output() {
 		if ( is_array( $this->input ) && count( $this->input ) > 0 ) {
+			$equalizer = '';
+			if ( $this->context === 'griditem' ) {
+				$equalizer .= 'data-equalizer-watch';
+			}
 			$this->output_tag_open();
-			$this->output .= '<div class="emphasisblock-inner">';
+			$this->output .= '<div class="emphasisblock-inner" ' . $equalizer . '>';
 			$this->output .= $this->build_block_elements();
 			$this->output .= '</div>';
 			$this->output_tag_close();
