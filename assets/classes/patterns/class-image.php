@@ -178,7 +178,11 @@ class Image extends BasePattern {
 				$el['close'] = '</div>';
 				break;
 			case 'collaboration__header':
-				$el['open'] = '<div class="collaboration__header__image-wrapper" data-equalizer-watch>';
+				$style = '';
+				if ( isset( $this->modifiers['style'] ) && 'tridem_or_more' === $this->modifiers['style'] ) {
+					$style = $this->modifiers['style'];
+				}
+				$el['open'] = '<div class="collaboration__header__image-wrapper ' . $style . '" data-equalizer-watch>';
 				$el['close'] = '</div>';
 				break;
 			case 'gallery':
@@ -327,7 +331,11 @@ class Image extends BasePattern {
 			$medium = $this->get_src_set_part( 'medium-portrait', $src_sets );
 		}
 		if ( 'collaboration__header' === $this->context ) {
-			$mlarge = $this->get_src_set_part( 'medium-large-square', $src_sets );
+			if ( ! isset( $this->modifiers['style'] ) || $this->modifiers['style'] !== 'tridem_or_more' ) {
+				$mlarge = $this->get_src_set_part( 'medium-large-square', $src_sets );
+			} else {
+				$mlarge = $large;
+			}
 		}
 		switch ( $this->context ) {
 			case 'story__header':
@@ -567,6 +575,9 @@ class Image extends BasePattern {
 				case 'contactblock':
 				case 'collaboration__header':
 					$this->ratio = 1;
+					if ( isset( $this->modifiers['style'] ) && $this->modifiers['style'] === 'tridem_or_more' ) {
+						$this->ratio = 0.5;
+					}
 					break;
 				case 'griditem':
 					$this->ratio = 0.75;

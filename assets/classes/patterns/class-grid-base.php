@@ -186,6 +186,7 @@ abstract class BaseGrid extends BasePattern {
 				return $grid_item;
 				break;
 			case 'grid_paragraph' :
+			default:
 				break;
 		}
 	}

@@ -98,7 +98,7 @@ class BaseController {
 		}
 		$type = self::is_correct_content_type( $post_id_or_object );
 		if ( empty( $type ) ) {
-			throw new Exception( __( 'The factory disagrees' ) );
+			throw new Exception( __( 'The factory disagrees: type = ' ) . $type );
 		}
 		$args = array( $post_id_or_object, $context );
 		switch ( $type ) {
@@ -204,6 +204,11 @@ class BaseController {
 			if ( ! empty( $focus_points ) ) {
 				$image_mods['data'] = $focus_points;
 				$image_mods['classes'] = array('focus');
+			}
+			if ( $this->container->type === 'collaboration' ) {
+				if ( $this->container->has_participants && count( $this->container->participants ) > 2 || $this->container->description_length > 100 ) {
+					$image_mods['style'] = 'tridem_or_more';
+				}
 			}
 			return new Image( $thumb, $context, $image_mods );
 		}

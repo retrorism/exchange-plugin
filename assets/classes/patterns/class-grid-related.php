@@ -41,6 +41,7 @@ class RelatedGrid extends BaseGrid {
 		if ( $this->has_grid_items ) {
 			$this->set_modifier_class( 'colour', $colour );
 			$this->set_attribute( 'data', 'background-colour', $colour );
+			$this->set_attribute( 'data', 'equalizer', true );
 			$this->output .= $this->build_edge_svg( 'top', $colour );
 			$this->output .= '<div class="section-inner">';
 			$header_text = __( 'Read more','exchange' );

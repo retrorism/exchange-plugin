@@ -273,7 +273,7 @@ abstract class BasePattern {
 					$atts = $this->modifiers[ $key ];
 					if ( is_array( $atts ) && ! empty( $atts ) ) {
 						foreach ( $atts as $k => $v ) {
-							if ( is_string( $k ) ) {
+							if ( is_string( $k ) || true === $k ) {
 								$this->set_attribute( $key, $k, $v );
 								$this->has_attributes = true;
 							}
@@ -338,6 +338,7 @@ abstract class BasePattern {
 		if (  ! empty( $val ) ) {
 			$prop = $type . '_attributes';
 			$this->$prop[ $key ] = $val;
+			$this->has_attributes = true;
 		}
 	}
 

@@ -123,7 +123,7 @@ class Collaboration extends Exchange {
 	 * @access public
 	 * @var bool $has_description See if description is available.
 	 */
-	public $has_description;
+	public $description_length = 0;
 
 	/**
 	 * Map

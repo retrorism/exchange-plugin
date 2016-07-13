@@ -47,8 +47,10 @@ class CollaborationController extends BaseController {
 	}
 
 	public function map_collaboration_basics() {
+
 		// Add participants.
 		$this->set_participants();
+
 		// Add participants' locations
 		if ( $this->container->has_participants ) {
 			$this->set_collaboration_locations();
@@ -67,6 +69,7 @@ class CollaborationController extends BaseController {
 		// Add description.
 		$this->set_description();
 
+		// Set project website.
 		$acf_website = get_field( 'collaboration_website', $post_id );
 		if ( ! empty( $acf_website ) ) {
 			$this->container->website = $acf_website;
@@ -75,9 +78,8 @@ class CollaborationController extends BaseController {
 		// Add header image.
 		$this->set_header_image( $post_id, 'collaboration__header' );
 
-		$acf_sections = get_field( 'sections', $post_id );
-
 		// Set sections.
+		$acf_sections = get_field( 'sections', $post_id );
 		if ( ! empty( $acf_sections ) ) {
 			$this->set_sections( $acf_sections );
 		}
@@ -162,11 +164,11 @@ class CollaborationController extends BaseController {
 	 * @return void.
 	 */
 	protected function set_participants() {
-		$participants = get_field( 'participants', $this->container->post_id );
-		if ( empty( $participants ) || ! is_array( $participants ) ) {
+		$acf_participants = get_field( 'participants', $this->container->post_id );
+		if ( empty( $acf_participants ) || ! is_array( $acf_participants ) ) {
 			return;
 		}
-		foreach( $participants as $participant ) {
+		foreach( $acf_participants as $participant ) {
 			$participant_obj = self::exchange_factory( $participant );
 			if ( $participant_obj ) {
 				$this->container->participants[] = $participant_obj;
@@ -187,8 +189,9 @@ class CollaborationController extends BaseController {
 		if ( empty( $description ) || ! is_string( $description ) ) {
 			return;
 		}
+		$length = str_word_count( $description );
 		$this->container->description = new Paragraph( $description );
-		$this->container->has_description = true;
+		$this->container->description_length = $length;
 	}
 
 
