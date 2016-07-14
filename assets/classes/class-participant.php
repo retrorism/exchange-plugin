@@ -128,6 +128,15 @@ class Participant extends Exchange {
 	public $org_website;
 
 	/**
+	 * The organisation's description
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var string $org_website
+	 */
+	public $org_description;
+
+	/**
 	 * Constructor for participant objects.
 	 *
 	 * @since 0.1.0
@@ -137,6 +146,14 @@ class Participant extends Exchange {
 	 public function __construct( $post, $context = '', $controller = null ) {
  		Parent::__construct( $post );
 		$this->controller->map_participant_basics( $post );
+	}
+
+	public function publish_org_description() {
+		$desc = $this->org_description;
+		if ( ! empty( $desc ) ) {
+			$desc_obj = new Paragraph( $desc,'participant__organisation__description' );
+			$desc_obj->publish_stripped();
+		}
 	}
 
 	public function publish_name() {

@@ -47,6 +47,7 @@ class ParticipantController extends BaseController {
 		$org_coords = get_field( 'organisation_location', $post_id );
 		$org_city = get_field( 'organisation_city', $post_id );
 		$org_country = get_field( 'organisation_country', $post_id );
+		$org_description = get_field( 'organisation_description', $post_id );
 		$org_website = get_field( 'organisation_website', $post_id );
 		$p_contactme = get_field( 'participant_email', $post_id );
 
@@ -61,6 +62,9 @@ class ParticipantController extends BaseController {
 		}
 		if ( ! empty( $org_country ) ) {
 			$this->container->org_country = $org_country;
+		}
+		if ( ! empty( $org_description ) ) {
+			$this->container->org_description = $org_description;
 		}
 		if ( ! empty( $org_website ) ) {
 			$this->container->org_website = $org_website;
