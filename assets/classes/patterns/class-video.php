@@ -44,6 +44,9 @@ class Video extends BasePattern {
 		// Get iframe HTML
 		$iframe = $this->set_video_attributes();
 
+		if ( $this->context === 'gallery' ) {
+			$this->output .= '<li class="gallery__item orbit-slide">';
+		}
 		$this->output_tag_open();
 
 		$this->output .= $iframe;
@@ -60,6 +63,10 @@ class Video extends BasePattern {
 
 		// Close element.
 		$this->output_tag_close();
+
+		if ( $this->context === 'gallery' ) {
+			$this->output .= '</li>';
+		}
 
 	}
 

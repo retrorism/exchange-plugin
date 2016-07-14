@@ -395,7 +395,9 @@ class BaseController {
 		}
 		$gallery = $this->prepare_gallery_images( $unique_arrs );
 		if ( empty( $gallery ) ) {
-			return;
+			if ( $this->container->has_video ) {
+				$this->container->has_gallery = true;
+			}
 		} else {
 			$this->container->gallery = $gallery;
 			$this->container->has_gallery = true;
