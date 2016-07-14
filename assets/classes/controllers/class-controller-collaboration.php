@@ -85,6 +85,7 @@ class CollaborationController extends BaseController {
 		}
 
 		$this->set_gallery();
+		$this->set_video();
 
 		if ( $this->container->has_participants ) {
 			$this->set_collaboration_stories();

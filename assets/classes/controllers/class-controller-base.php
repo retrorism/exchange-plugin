@@ -305,6 +305,21 @@ class BaseController {
 		return $gallery;
 	}
 
+	protected function get_video_from_acf() {
+		// Set empty array for video properties
+		$input = array();
+		$video = get_field( $this->container->type . '_video_embed_code', $this->container->post_id );
+		$video_caption = get_field( $this->container->type . '_video_caption', $this->container->post_id );
+		if ( empty( $video ) ) {
+			return;
+		}
+		$input['video_embed_code'] = $video;
+		if ( ! empty( $video_caption ) ) {
+			$input['video_caption'] = $video_caption;
+		}
+		return $input;
+	}
+
 	protected function get_gallery_from_query() {
 		global $wpdb;
 		$rows = $wpdb->get_results( $wpdb->prepare(
@@ -387,6 +402,17 @@ class BaseController {
 		}
 	}
 
+	protected function set_video() {
+		$input = $this->get_video_from_acf();
+		if ( ! empty( $input ) ) {
+			$video_obj = new Video( $input, 'section' );
+		}
+		if ( ! empty( $video_obj ) ) {
+			$this->container->video = $video_obj;
+			$this->container->has_video = true;
+		}
+	}
+
 	protected function prepare_gallery_images( $unique_arrs ) {
 		if ( empty( $unique_arrs ) ) {
 			return;
@@ -412,6 +438,7 @@ class BaseController {
 			}
 			$index++;
 		}
+		return $gallery;
 	}
 
 	 /**

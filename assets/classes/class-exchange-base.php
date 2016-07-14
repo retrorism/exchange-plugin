@@ -154,6 +154,24 @@ class Exchange {
 	public $sections = array();
 
 	/**
+	 * Video for publishing
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var object $video
+	 */
+	public $video;
+
+	/**
+	 * Video check.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var boolean $has_locations When there's two or more geolocations added for mapping. Defaults to false.
+	 */
+	public $has_video = false;
+
+	/**
 	 * Has related content check
 	 *
 	 * @since 0.1.0
@@ -300,6 +318,11 @@ class Exchange {
 		$griditem->publish();
 	}
 
+	public function publish_video( $context = '' ) {
+		if ( $this->has_video ) {
+			$this->video->publish();
+		}
+	}
 
 	public function publish_tags( $context = '' ) {
 		if ( $this->has_tags ) {
