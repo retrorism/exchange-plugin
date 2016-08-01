@@ -21,36 +21,32 @@ if ( ! defined( 'ABSPATH' ) ) {
  * This controller contains all collaboration logic
  *
  * @since 0.1.0
+ *
+ * TODO https://codex.wordpress.org/Rewrite_API/add_rewrite_rule
  **/
 class Programme_RoundController extends BaseController {
 
 	public function map_programme_round_basics() {
+
+		$post_id = $this->container->post_id;
+
+		$acf_has_cta = get_field( 'has_cta', $post_id );
 		// Set CTA check
 		if ( ! empty( $acf_has_cta ) ) {
 			$this->container->has_cta = $acf_has_cta;
 		}
-	}
 
-	public function map_full_programme_round( $programme_round, $post_obj ) {
-
-		$post_id = $post_obj->ID;
-
-		if ( ! ( $post_id >= 1 ) || ! ( 'programme_round' === $post_obj->post_type  ) ) {
-			unset( $programme_round );
-			throw new Exception( 'This is not a valid programme round' );
+		$acf_is_active = get_field( 'is_active', $post_id );
+		// Set active check
+		if ( $acf_is_active ) {
+			$this->container->is_active = true;
 		}
 
-		// Dump ACF variables.
-		$acf = get_fields( $post_id );
-		$link = get_permalink( $post_id );
-
-		if ( !empty( $postobj->post_title ) ) {
-			$programme_round->title = $postobj->post_title;
-		}
-
-		if ( !empty( $link ) ) {
-			$programme_round->link = $link;
+		// Set editorial introduction.
+		$acf_editorial_intro = get_field( 'editorial_intro', $post_id );
+		if ( ! empty( $acf_editorial_intro ) ) {
+			$this->container->has_editorial_intro = true;
+			$this->container->editorial_intro = new EditorialIntro( $acf_editorial_intro, 'programme_round' );
 		}
 	}
-
 }

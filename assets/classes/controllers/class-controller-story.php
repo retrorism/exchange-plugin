@@ -43,7 +43,6 @@ class StoryController extends BaseController {
 		// Map ACF variables.
 		$acf_editorial_intro = get_field( 'editorial_intro', $post_id );
 		$acf_language = get_field( 'language', $post_id );
-		$acf_storyteller = get_field( 'storyteller', $post_id );
 		$acf_category = get_field( 'category', $post_id );
 		$acf_has_cta = get_field( 'has_cta', $post_id );
 
@@ -64,14 +63,6 @@ class StoryController extends BaseController {
 		if ( is_object( $acf_category ) ) {
 			if ( 'WP_Term' === get_class( $acf_category ) ) {
 				$this->container->category = $acf_category->name;
-			}
-		}
-
-		// Set participant as storyteller
-		if ( is_numeric( $acf_storyteller ) ) {
-			$storyteller = self::exchange_factory( $acf_storyteller );
-			if ( is_a( $storyteller, 'Participant' ) ) {
-				$this->container->storyteller = $storyteller;
 			}
 		}
 
@@ -136,6 +127,16 @@ class StoryController extends BaseController {
 		// Set header image.
 		$this->set_header_image( $post_id, 'story__header' );
 
+
+		// Set participant as storyteller
+		$acf_storyteller = get_field( 'storyteller', $post_id );
+		if ( is_numeric( $acf_storyteller ) ) {
+			$storyteller = BaseController::exchange_factory( $acf_storyteller );
+			if ( is_a( $storyteller, 'Participant' ) ) {
+				$this->container->storyteller = $storyteller;
+			}
+		}
+
 		if ( is_object( $this->container->storyteller ) ) {
 			$this->set_byline();
 		} else {
@@ -143,100 +144,6 @@ class StoryController extends BaseController {
 		}
 
 		$this->set_gallery();
-	}
-
-	/**
-	 * Return posts with WP Query using supplied argument array.
-	 *
-	 * @param array $args Query arguments.
-	 * @return array of stories
-	 */
-	protected function execute_query( $args ) {
-		$query = new WP_Query( $args );
-		return $query->posts;
-	}
-
-	/**
-	 * Return a story set.
-	 *
-	 * @return array of stories
-	 *
-	 * @param array $args Query arguments.
-	 */
-	private function get_story_set( $args ) {
-		$posts = $this->execute_query( $args );
-		$stories = array();
-		foreach ( $posts as $p ) {
-			$stories[] = $this->map_story( $p );
-		}
-		return $stories;
-	}
-
-	/**
-	 * Returns all stories
-	 *
-	 * @return array of stories
-	 */
-	function get_all_stories() {
-		$stories = array();
-		foreach ( $this->get_all_story_posts() as $p ) {
-			$stories[] = $this->map_story( $p );
-		}
-		return $stories;
-	}
-
-	/**
-	 * Returns all story posts.
-	 *
-	 * @return array of story post objects
-	 **/
-	function get_all_story_posts() {
-		$args = array(
-			'post_type' => 'story',
-		);
-		$query = new WP_Query( $args );
-		return $query->posts;
-	}
-
-	/**
-	 * Retrieve stories by taxonomy.
-	 *
-	 * @param string $taxonomy Taxonomy name.
-	 * @param string $term Term name.
-	 * @return array of story objects
-	 **/
-	public function get_stories_by_taxonomy( $taxonomy, $term ) {
-		$args = array(
-			'post_type' => 'story',
-			'tax_query' => array(
-				array(
-					'taxonomy' => ''.$taxonomy,
-					'field'    => 'name',
-					'terms'    => ''.$term,
-				),
-			),
-		);
-		return $this->get_story_set( $arg );
-	}
-
-	/**
-	 * Returns all story posts by taxonomy.
-	 *
-	 * @param array $tax_params Tax parameters.
-	 *
-	 * @TODO Write function.
-	 **/
-	public function get_stories_by_programme_round( $tax_params ) {
-	}
-
-	/**
-	 * Returns all story posts by taxonomy.
-	 *
-	 * @param integer $collaboration_id Collaboration identifier.
-	 *
-	 * @TODO Write function.
-	 **/
-	public function get_stories_by_collaboration( $collaboration_id ) {
 	}
 
 	/**
@@ -275,20 +182,23 @@ class StoryController extends BaseController {
 		if ( ! is_object( $this->container->storyteller ) ) {
 			return;
 		}
+		$this->container->storyteller->controller->set_collaboration();
 		if ( ! is_object( $this->container->storyteller->collaboration ) ) {
 			return;
 		}
 		$templates = $this->get_byline_templates();
 
-		if ( $this->container->storyteller->is_active ) {
+		if ( $this->container->storyteller->collaboration->programme_round->is_active ) {
 			$byline_template = $templates['present'];
 		} else {
 			$byline_template = $templates['past'];
 		}
-
+		$collab_term = $this->container->storyteller->collaboration->programme_round->term;
+		$term = term_exists( $collab_term, 'post_tag' );
+		$term_link = ! empty( $term['term_id'] ) ? exchange_create_link( get_term( $term['term_id'] ) ) : $this->container->storyteller->collaboration->programme_round->title;
 		$byline_template = str_replace( '[[storyteller]]', $this->container->storyteller->name, $byline_template );
-		$byline_template = str_replace( '[[programme_round]]', exchange_create_link( $this->container->storyteller->collaboration->programme_round ), $byline_template );
-		$byline = str_replace( '[[collaboration]]', exchange_create_link( $this->container->storyteller->collaboration ), $byline_template );
+		$byline_template = str_replace( '[[programme_round]]', $term_link, $byline_template );
+		$byline = '<p>' . str_replace( '[[collaboration]]', exchange_create_link( $this->container->storyteller->collaboration ), $byline_template ) . '</p';
 		$this->container->byline = new Byline( $byline, 'footer' );
 	}
 

@@ -270,26 +270,37 @@ abstract class BaseMap extends BasePattern {
 	protected function create_map_line( $locations, $line_label = '' ) {
 		$line = '[leaflet-line fitline=1 ';
 		$line .= 'color="#' . $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-tandem'] . '" ';
-
+		$no_of_locations = count( $locations );
 		$latlngs = array();
 		$cities = array();
+		$addresses = array();
+
 		foreach ( $locations as $location ) {
 			if ( ! empty( $location['org_lat'] ) && ! empty( $location['org_lng'] ) ) {
 				$latlngs[] = $location['org_lat'] . ', '. $location['org_lng'];
 			}
-			if ( ! empty( $location['org_address'] ) ) {
-				$cities[] = $location['org_address'];
-			} elseif ( !empty( $location['org_city'] ) ) {
+			if ( ! empty( $location['org_city'] ) ) {
 				$cities[] = $location['org_city'];
+			} else {
+				$cities[] = '';
+			}
+			if ( ! empty( $location['org_address'] ) ) {
+				$addresses[] = $location['org_address'];
+			} elseif ( ! empty( $location['org_city'] ) ) {
+				$addresses[] = $location['org_city'];
 			}
 		}
 		if ( count( $latlngs ) > 1 ) {
-			$line .= 'latlngs="' . implode( '; ', $latlngs ) . ';"]';
-		} elseif ( count( $cities ) > 1 ) {
-			$line .= 'addresses="' . implode( '; ', $cities ) . ';"]';
+			$line .= 'latlngs="' . implode( '; ', $latlngs ) . ';"';
+		} elseif ( count( $addresses ) == $no_of_locations ) {
+			$line .= 'addresses="' . implode( '; ', $addresses ) . ';"';
 		} else {
 			return false;
 		}
+		if ( count( $cities ) == $no_of_locations ) {
+			$line .= ' cities="' . implode( '; ', $cities ) . ';"';
+		}
+		$line .=']';
 		if ( ! empty( $line_label ) ) {
 			$line .= $line_label . '[/leaflet-line]';
 		}

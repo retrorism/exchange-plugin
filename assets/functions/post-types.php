@@ -127,10 +127,10 @@ function tandem_create_participant() {
 		'has_archive'         => false,
 		'menu_icon'           => 'dashicons-groups',
 		'menu_position'       => 13,
-		'public'              => true,
+		'public'              => false,
+		'show_ui'             => true,
 		// Other items that are available for this array: 'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'.
 		'supports'            => array( 'title' ),
-		'exclude_from_search' => true,
 		'capability_type'     => 'post',
 		)
 	);
@@ -161,13 +161,13 @@ function tandem_create_programme_round() {
 		'has_archive'         => true,
 		'menu_icon'           => 'dashicons-chart-pie',
 		'menu_position'       => 14,
-		'public'              => true,
+		'public'              => false,
+		'show_ui'             => true,
 		'hierarchical'        => true,
 		// Supports can hold: 'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'.
 		'supports'            => array( 'title','editor', 'thumbnail' ),
-		'exclude_from_search' => false,
 		'capability_type'     => 'page',
-		'rewrite'             => array( 'slug' => 'programme-rounds' ),
+		//'rewrite'             => array( 'slug' => 'programme-rounds' ),
 		'taxonomies'          => array( 'post_tag' ),
 		)
 	);

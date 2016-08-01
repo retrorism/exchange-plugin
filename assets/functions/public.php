@@ -59,6 +59,9 @@ function exchange_create_link( $obj, $with_text = true, $class = '' ) {
 		$url = $obj->link;
 		$title = $obj->title;
 		$cat = 'story';
+	} elseif ( $obj instanceof WP_Term ) {
+			$url = get_term_link( $obj, 'post_tag' );
+			$title = $obj->name;
 	}
 	if ( 'griditem__button button--small' === $class ) {
 		if  ( 'story' === $obj->type && isset( $obj->category ) ) {

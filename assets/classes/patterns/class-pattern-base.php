@@ -232,7 +232,7 @@ abstract class BasePattern {
 			$prefix = '';
 			if ( ! empty( $this->$prop ) ) {
 				$list = array();
-				if ( $type === 'data' || $type === 'aria' ) {
+				if ( 'data' === $type ||  'aria' === $type ) {
 					$prefix = $type . '-';
 				}
 				foreach ( $this->$prop as $key => $val ) {
@@ -273,7 +273,7 @@ abstract class BasePattern {
 					$atts = $this->modifiers[ $key ];
 					if ( is_array( $atts ) && ! empty( $atts ) ) {
 						foreach ( $atts as $k => $v ) {
-							if ( is_string( $k ) || true === $k ) {
+							if ( ! empty( $v ) ) {
 								$this->set_attribute( $key, $k, $v );
 								$this->has_attributes = true;
 							}
@@ -335,9 +335,12 @@ abstract class BasePattern {
 		if ( ! in_array( $type, $allowed_types, true ) ) {
 			return;
 		}
-		if (  ! empty( $val ) ) {
-			$prop = $type . '_attributes';
-			$this->$prop[ $key ] = $val;
+		$prop = $type . '_attributes';
+		if (  ! empty( $val ) && is_array( $this->$prop ) ) {
+			// Apparently, it's not possible to set keys directly to an array that is an object property.
+			$arr = $this->$prop;
+			$arr[$key] = $val;
+			$this->$prop = $arr;
 			$this->has_attributes = true;
 		}
 	}
@@ -486,6 +489,12 @@ abstract class BasePattern {
 	 **/
 	public function embed( $context = '' ) {
 		$this->prepare( $context )->create_output();
+		return $this->output;
+	}
+
+	public function embed_stripped( $context = '', $limit = 0 ) {
+		$this->prepare( $context )->create_output();
+		$this->output = wp_trim_words( $this->output, $limit, __( '...','exchange' ) );
 		return $this->output;
 	}
 

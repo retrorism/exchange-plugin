@@ -118,6 +118,27 @@ class Exchange {
 	public $has_gallery = false;
 
 	/**
+	 * Has editorial intro check
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var Bool $has_editorial_intro Set to true when editorial intro is set.
+	 **/
+	public $has_editorial_intro = false;
+
+	/**
+	 * Editorial Intro text taken from excerpt (needs to allow for links).
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var string $editorial_intro Editorial Intro.
+	 *
+	 * @TODO Allow for links.
+	 **/
+	public $editorial_intro;
+
+
+	/**
 	 * Ordered array for use in grid / single display.
 	 *
 	 * @since 0.1.0
@@ -342,7 +363,7 @@ class Exchange {
 				$list = $this->ordered_tag_list;
 			}
 			foreach ( $list as $term ) {
-				$tag_mods = $this->controller->prepare_tag_modifiers( $term );
+				$tag_mods = $this->controller->prepare_tag_modifiers( $term, $context );
 				$tag = new Tag( $term, $context, $tag_mods );
 				$output .= "<li>" . $tag->embed() . "</li>";
 			}
@@ -350,6 +371,19 @@ class Exchange {
 			echo $output;
 		}
 	}
+
+	/**
+	 * Publish editorial intro, if available.
+	 *
+	 * @param string $context Optional. Context for the object.
+	 * @return void
+	 */
+	public function publish_intro( $context = '' ) {
+		if ( $this->has_editorial_intro ) {
+			$this->editorial_intro->publish();
+		}
+	}
+
 
 	public function publish_sharing_buttons( $context = '' ) {
 		$url = get_bloginfo('url');

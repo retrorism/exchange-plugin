@@ -119,7 +119,7 @@ function exchange_settings_byline_template_present_cb() {
 		<label for="<?php echo EXCHANGE_PLUGIN .'_byline_template_present' ?>">
 			<?php _e( 'Byline template for stories told by current participants. Use [[storyteller]], [[programme_round]] and [[collaboration]] as placeholders for the byline specifics.', EXCHANGE_PLUGIN ); ?>
 		</label>
-		<textarea style="display: block;"
+		<textarea style="display: block; width: 100%; min-height: 4em;"
 			name="<?php echo EXCHANGE_PLUGIN . '_byline_template_present' ?>"
 			id="<?php echo EXCHANGE_PLUGIN . '_byline_template_present' ?>"
 			placeholder="<?php _e( 'Use [[...]]', EXCHANGE_PLUGIN ); ?>"><?php if ( !empty( $present ) ) {
@@ -144,7 +144,7 @@ function exchange_settings_byline_template_past_cb() {
 		<label for="<?php echo EXCHANGE_PLUGIN .'_byline_template_past' ?>">
 			<?php _e( 'Byline template for stories told by alumni. Use [[storyteller]], [[programme_round]] and [[collaboration]] as placeholders for the byline specifics.', EXCHANGE_PLUGIN ); ?>
 		</label>
-		<textarea style="display: block;"
+		<textarea style="display: block; width: 100%; min-height: 4em;"
 			name="<?php echo EXCHANGE_PLUGIN . '_byline_template_past' ?>"
 			id="<?php echo EXCHANGE_PLUGIN . '_byline_template_past' ?>"
 			placeholder="<?php _e( 'Use [[...]]', EXCHANGE_PLUGIN ); ?>"><?php if ( !empty( $past ) ) {

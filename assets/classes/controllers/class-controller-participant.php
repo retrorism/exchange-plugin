@@ -75,6 +75,7 @@ class ParticipantController extends BaseController {
 	}
 
 	public function set_collaboration() {
+		$post_id = $this->container->post_id;
 		$collaboration = CollaborationController::get_collaboration_by_participant_id( $post_id );
 		if ( ! empty( $collaboration ) ) {
 			$this->container->collaboration = $collaboration;

@@ -158,6 +158,11 @@ class BaseController {
 			$exchange->controller->set_programme_round( $post->post_parent );
 		}
 
+		if ( 'programme_round' === $exchange->type ) {
+			 $slug = sanitize_title( $exchange->title );
+			 $exchange->term = term_exists( $slug, 'post_tag' ) ? $slug : null;
+		}
+
 		// Set permalink.
 		$exchange->link = get_permalink( $post );
 
@@ -619,31 +624,34 @@ class BaseController {
 		}
 	}
 
-	public function prepare_tag_modifiers( $term ) {
+	public function prepare_tag_modifiers( $term, $context = '' ) {
 		if ( 'WP_Term' !== get_class( $term ) ) {
 			throw new Exception( __('This is not a valid tag') );
 		}
 		$desc = ! empty( $term->description ) ? $tag->description : $term->name;
+		$term_link = get_term_link( $term );
+		$link = ! empty( $term_link ) ? $term_link : '#';
 		$term_mods = array(
 				'data' => array(
 				'term_id'     => $term->term_id,
 			),
-			'link_attributes' => array(
-				'title'       => $desc,
-				'href'        => '#',
-			),
 			'classes' => array(
 				'taxonomy' => $term->taxonomy,
 			)
+		);
+		$term_mods['link'] = array(
+			'title'       => $desc,
+			'href'        => $link,
 		);
 		return $term_mods;
 	}
 
 	protected function set_programme_round( $parent_id ) {
 		$parent = get_post( $parent_id );
-		if ( 'programme_round' === $parent->post_type ) {
-			$this->container->programme_round = new Programme_Round( $parent );
+		if ( ! 'programme_round' === $parent->post_type ) {
+			return;
 		}
+		$this->container->programme_round = $this::exchange_factory( $parent );
 	}
 
 

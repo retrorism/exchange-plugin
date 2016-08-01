@@ -26,6 +26,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Programme_Round extends Exchange {
 
 	/**
+	 *  Programme Round slug
+	 *
+	 * @var $term ID for programme_round tag
+	 */
+	public $term;
+
+	/**
+	 *  Is this progamme round currently running?
+	 *
+	 * @var bool $is_active for programme_round tag. Defaults to false.
+	 */
+	public $is_active = false;
+
+	/**
 	 * Constructor for Programme Round objects. If available, the constructor can use
 	 * a controller that's already there.
 	 *
@@ -35,19 +49,16 @@ class Programme_Round extends Exchange {
 	 * @param object $controller optional CollaborationController object.
 	 **/
 	public function __construct( $post, $context = '', $controller = null ) {
-		Parent::__construct( $post, $context, $controller );
-		$this->controller->map_basics( $this, $post );
-		if ( 'grid' === $context ) {
-			$this->controller->set_featured_image( $this, $post->ID );
-		} else {
-			$this->controller->map_full_programme_round( $this, $post );
-		}
+		Parent::__construct( $post );
+		$this->controller->map_programme_round_basics();
 	}
 
 	public function publish_grid_programme_round( $modifier = '' ) {
 		$prog_name = explode( ' ', $this->title )[1];
-		$acf_editorial_intro = get_field( 'editorial_intro', $this->post_id );
-		$paragraph = ! empty( $acf_editorial_intro ) ? $acf_editorial_intro : __('Click below for more programme information', EXCHANGE_PLUGIN );
+		$link = get_post_permalink( $this->post_id );
+		$paragraph = ! empty( $this->editorial_intro )
+			? $this->editorial_intro->embed_stripped('emphasisblock', 30)
+			: '<p>' . __('Click below for more programme information', EXCHANGE_PLUGIN ) . '</p>';
 		if ( in_array( $prog_name, array( 'C&P', 'Community', 'C' ), true ) ) {
 			$prog_name = 'C_P';
 		}
@@ -71,18 +82,19 @@ class Programme_Round extends Exchange {
 				3 => array(
 						'acf_fc_layout' => 'block_button',
 						'button_size' => 'small',
-						'button_text' => __('Read more', EXCHANGE_PLUGIN ),
-						'button_help_text' => __('See all collaborations', EXCHANGE_PLUGIN ),
-						'button_link' => '#',
+						'button_text' => __('Read the stories', EXCHANGE_PLUGIN ),
+						'button_help_text' => __('Read the stories', EXCHANGE_PLUGIN ),
+						'button_link' => get_post_type_archive_link('story') . '?programme-round=' . $this->term,
 						'button_target' => '_self',
 					),
 				4 => array(
 						'acf_fc_layout' => 'block_button',
 						'button_size' => 'small',
-						'button_text' => __('All collaborations', EXCHANGE_PLUGIN ),
-						'button_help_text' => __('See all collaborations', EXCHANGE_PLUGIN ),
+						'button_text' => __('Learn about the collaborations', EXCHANGE_PLUGIN ),
+						'button_help_text' => __('Learn about the collaborations', EXCHANGE_PLUGIN ),
 						'button_target' => '_self',
-						'button_link' => '#',
+						//'button_link' => get_post_type_archive_link('collaboration') . '?programme-round=' . $this->term,
+						'button_link' => get_bloginfo('url') . '?programme-round=' . $this->term,
 					),
 			),
 		);

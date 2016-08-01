@@ -27,23 +27,27 @@ class CollaborationController extends BaseController {
 	public static function get_collaboration_by_participant_id( $participant_id ) {
 		$args = array(
 			'post_type' => 'collaboration',
-			'numberposts' => 1,
-			'meta-query' => array(
-				'key' => 'participant',
-				'value' => '"' . $participant_id . '"', // Matches exaclty "123", not just 123. This prevents a match for "1234".
-				'compare' => 'LIKE',
+			'post_status' => 'publish',
+			'meta_query' => array(
+				array(
+					'key' => 'participants',
+					'value' => '"' . $participant_id . '"', // Matches exaclty "123", not just 123. This prevents a match for "1234".
+					'compare' => 'LIKE',
+				)
 			),
 		);
 		if ( ! $participant_id >= 1  ) {
 			throw new Exception( 'This is not a valid participant ID' );
 		} else {
-			$collaboration_query = new WP_Query( $args );
-			if ( ! empty( $collaboration_query->posts ) ) {
-				return new Collaboration( $collaboration_query->posts[0] );
+			$collab_query = new WP_Query( $args );
+
+			if ( ! empty( $collab_query->posts ) ) {
+				return new Collaboration( $collab_query->posts[0] );
 			} else {
 				return false;
 			}
 		}
+
 	}
 
 	public function map_collaboration_basics() {
@@ -66,8 +70,6 @@ class CollaborationController extends BaseController {
 	public function map_full_collaboration() {
 		// Store post ID in a variable for faster access.
 		$post_id = $this->container->post_id;
-		// Add description.
-		$this->set_description();
 
 		// Set project website.
 		$acf_website = get_field( 'collaboration_website', $post_id );
@@ -75,32 +77,34 @@ class CollaborationController extends BaseController {
 			$this->container->website = $acf_website;
 		}
 
-		// Add header image.
-		$this->set_header_image( $post_id, 'collaboration__header' );
-
 		// Set sections.
 		$acf_sections = get_field( 'sections', $post_id );
 		if ( ! empty( $acf_sections ) ) {
 			$this->set_sections( $acf_sections );
 		}
 
-		$this->set_gallery();
-		$this->set_video();
+		// Add description.
+		$this->set_description();
 
+		// Add header image.
+		$this->set_header_image( $post_id, 'collaboration__header' );
+
+		// Set video and gallery.
+		$this->set_media();
+
+		// Set shared stories.
 		if ( $this->container->has_participants ) {
 			$this->set_collaboration_stories();
 		}
 
-		if ( get_field( 'related_content_auto_select', $post_id ) ) {
-			$related_content = $this->get_related_grid_content_by_tags();
-		} else {
-			$related_content = get_field( 'related_content', $post_id );
-		}
+		// Set related content.
+		$this->set_related_content();
 
-		if ( is_array( $related_content ) && count( $related_content ) > 0 ) {
-			$this->container->has_related_content = true;
-			$this->set_related_grid_content( $related_content );
-		}
+	}
+
+	protected function set_media() {
+		$this->set_video();
+		$this->set_gallery();
 	}
 
 	protected function set_collaboration_locations() {
@@ -247,6 +251,19 @@ class CollaborationController extends BaseController {
 			}
 		}
 		return $collab_map_caption;
+	}
+
+	protected function set_related_content() {
+		$post_id = $this->container->post_id;
+		if ( get_field( 'related_content_auto_select', $post_id ) ) {
+			$related_content = $this->get_related_grid_content_by_tags();
+		} else {
+			$related_content = get_field( 'related_content', $post_id );
+		}
+		if ( is_array( $related_content ) && count( $related_content ) > 0 ) {
+			$this->container->has_related_content = true;
+			$this->set_related_grid_content( $related_content );
+		}
 	}
 
 

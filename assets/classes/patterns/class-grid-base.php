@@ -78,7 +78,7 @@ abstract class BaseGrid extends BasePattern {
 				if ( is_array( $item ) ) {
 					$this->add_grid_item( $this->create_grid_item_from_layout( $item ) );
 				} elseif ( is_object( $item ) ) {
-					$this->add_grid_item( $this->create_grid_item_from_post( $item ) );
+					$this->add_grid_item( $this::create_grid_item_from_post( $item, $this->element ) );
 				}
 			}
 			if ( count( $this->grid_items ) > 0 ) {
@@ -133,10 +133,10 @@ abstract class BaseGrid extends BasePattern {
 	 *
 	 * @param integer $item Post object to be represented by grid item.
 	 */
-	protected function create_grid_item_from_post( $item ) {
+	public static function create_grid_item_from_post( $item, $context ) {
 		$exchange = BaseController::exchange_factory( $item, 'griditem' );
 		$item_mods = self::add_grid_modifiers( $exchange );
-		$grid_item = new GridItem( $exchange, $this->element, $item_mods );
+		$grid_item = new GridItem( $exchange, $context, $item_mods );
 		return $grid_item;
 	}
 
@@ -216,16 +216,18 @@ abstract class BaseGrid extends BasePattern {
 			if ( ! array_key_exists( 'data', $modifiers ) ) {
 				$modifiers['data'] = array();
 			}
-			foreach ( $exchange->tag_list as $term ) {
+			foreach ( $exchange->ordered_tag_list as $term ) {
 				switch ( $term->taxonomy ) {
 					case 'language':
 					case 'category':
-					case 'location':
+					case 'post_tag':
 						$modifiers['data'][ $term->taxonomy ] = $term->term_id;
 						break;
 					case 'topic':
+					case 'tandem':
 					case 'discipline':
 					case 'output':
+					case 'location':
 						$tag_ids[] = $term->term_id;
 						break;
 				}

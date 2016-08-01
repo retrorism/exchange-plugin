@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /* Hook taxonomy creation to init. */
 add_action( 'init', 'exchange_connect_default_taxonomies' );
+add_action( 'init', 'exchange_modify_post_tag', 11 );
 add_action( 'init', 'exchange_fix_tag_labels' );
 add_action( 'init', 'exchange_create_tax_language' );
 add_action( 'init', 'exchange_create_tax_tandem' );
@@ -26,6 +27,7 @@ add_action( 'init', 'exchange_create_tax_discipline' );
 add_action( 'init', 'exchange_create_tax_methodology' );
 add_action( 'init', 'exchange_create_tax_project_output' );
 
+
 add_action( 'save_post_programme_round', 'exchange_create_tax_for_programme_round', 10, 3 );
 add_action( 'save_post_collaboration', 'exchange_set_post_tag_from_parent_id', 10, 3 );
 add_action( 'save_post_story', 'exchange_set_attachments_post_tag', 10, 4 );
@@ -34,12 +36,72 @@ add_action( 'save_post_programme_round', 'exchange_set_attachments_post_tag', 10
 add_action( 'attachment_updated', 'exchange_set_attachment_media_tags', 10, 3 );
 
 
+// add_filter( 'pre_option_tag_base', 'exchange_change_tag_base' );
+// function exchange_change_tag_base( $value ) {
+//
+//    // let's change our tag slug to ravings
+//    // this will change the permalink to http://wpdreamer.com/ravings/custom-post-types/
+//    return 'programme-rounds';
+//
+// }
+
 function exchange_connect_default_taxonomies() {
 	register_taxonomy_for_object_type( 'category', 'story' );
-	register_taxonomy_for_object_type( 'post_tag', 'story' );
-	register_taxonomy_for_object_type( 'post_tag', 'collaboration' );
-	register_taxonomy_for_object_type( 'post_tag', 'programme_round' );
+	// register_taxonomy_for_object_type( 'post_tag', 'story' );
+	// register_taxonomy_for_object_type( 'post_tag', 'collaboration' );
+	// register_taxonomy_for_object_type( 'post_tag', 'programme_round' );
 }
+
+function exchange_modify_post_tag() {
+    // get the arguments of the already-registered taxonomy
+    $programme_round_args = get_taxonomy( 'post_tag' ); // returns an object
+
+    // make changes to the args
+    // in this example there are three changes
+    // again, note that it's an object
+	$programme_round_args->query_var = 'programme-round';
+    $programme_round_args->rewrite['slug'] = 'programme-round';
+    $programme_round_args->rewrite['with_front'] = true;
+
+    // re-register the taxonomy
+    register_taxonomy( 'post_tag', array('story','collaboration','programme_round'), (array) $programme_round_args);
+}
+
+
+function exchange_modify_post_tag_query( $query ) {
+	$programme_round = get_query_var('programme-round');
+	if ( ! $query->is_main_query() || empty( $programme_round ) ) {
+		return;
+	}
+	$post_type = get_query_var( 'post_type' );
+	$query->query_vars['tag_slug__in'][] = $programme_round;
+	if ( empty( $post_type ) ) {
+		$query->set( 'post_type', array( 'collaboration','story' ) );
+	//elseif ( is_post_type_archive('collaboration') || is_post_type_archive('story') ) {
+	}
+}
+
+add_action( 'pre_get_posts', 'exchange_modify_post_tag_query' );
+
+function exchange_query_vars_filter($vars) {
+  $vars[] = 'programme-round';
+  return $vars;
+}
+add_filter( 'query_vars', 'exchange_query_vars_filter' );
+
+function exchange_url_rewrite_templates() {
+	$post_type = get_query_var( 'post_type' );
+	if ( ! empty( $post_type ) && ! is_array( $post_type ) ) {
+		return;
+	}
+    if ( get_query_var( 'programme-round' ) ) {
+        add_filter( 'template_include', function() {
+            return get_template_directory() . '/archive.php';
+        });
+    }
+}
+
+add_action( 'template_redirect', 'exchange_url_rewrite_templates' );
 
 
 // Register language as taxonomy.

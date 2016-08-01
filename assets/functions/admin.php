@@ -191,6 +191,7 @@ function tandem_programme_rounds_parent_meta_box( $post ) {
 
 	$parent_query = new WP_Query( $args );
 	$parents = $parent_query->posts;
+	wp_reset_postdata();
 
 	if ( ! empty( $parents ) ) {
 

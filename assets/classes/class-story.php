@@ -62,26 +62,6 @@ class Story extends Exchange {
 	public $has_custom_byline = false;
 
 	/**
-	 * Has editorial intro check
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 * @var Bool $has_editorial_intro Set to true when editorial intro is set.
-	 **/
-	public $has_editorial_intro = false;
-
-	/**
-	 * Editorial Intro text taken from excerpt (needs to allow for links).
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 * @var string $editorial_intro Editorial Intro.
-	 *
-	 * @TODO Allow for links.
-	 **/
-	public $editorial_intro;
-
-	/**
 	 * Constructor for story objects. Sets controller property.
 	 *
 	 * @since 0.1.0
@@ -100,18 +80,6 @@ class Story extends Exchange {
 			}
 		} else {
 			$this->controller->map_full_story();
-		}
-	}
-
-	/**
-	 * Publish editorial intro, if available.
-	 *
-	 * @param string $context Optional. Context for the object.
-	 * @return void
-	 */
-	public function publish_intro( $context = '' ) {
-		if ( $this->has_editorial_intro ) {
-			$this->editorial_intro->publish();
 		}
 	}
 
