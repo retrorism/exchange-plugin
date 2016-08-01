@@ -92,6 +92,16 @@ class Participant extends Exchange {
 	public $org_name;
 
 	/**
+	 * The abbreviated version of this name
+	 * Participant admin page.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var string $org_name
+	 */
+	public $org_short_name;
+
+	/**
 	 * The coordinates of the organisation (not always accurate).
 	 *
 	 * @since 0.1.0
