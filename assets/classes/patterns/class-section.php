@@ -212,13 +212,83 @@ class Section extends BasePattern {
 		}
 	}
 
+	private function update_form_ids() {
+		$ids = array();
+		$updateable = array( 'collaboration', 'participant' );
+		foreach( $updateable as $type ) {
+			$update_form = get_option( 'options_' . $type . '_update_form');
+			if ( ! empty( $update_form ) ) {
+				$ids[] = $update_form;
+			}
+		}
+		return $ids;
+	}
+
+	private function process_token( $form_id ) {
+		parse_str( $_SERVER[ 'QUERY_STRING' ] );
+		$updateable = array( 'collaboration', 'participant' );
+		$form_id_arr = $this->update_form_ids();
+		if ( empty( $form_id ) ) {
+			return;
+		}
+		if ( ! in_array( $form_id, $form_id_arr  ) ) {
+			return;
+		}
+		if ( isset( $update_id )
+			&& isset( $update_token )
+			&& is_numeric( $update_id )
+			&& in_array( get_post_type( $update_id ), $updateable  ) ) {
+				$exchange = BaseController::exchange_factory( $update_id );
+		}
+		if ( ! $exchange instanceof Exchange ) {
+			return;
+		}
+		switch( $exchange->type ) {
+			case 'collaboration':
+				$programme_round_id = $exchange->programme_round->post_id;
+				break;
+			case 'participant':
+				$exchange->controller->set_collaboration();
+				if ( is_object( $exchange->collaboration ) ) {
+					$programme_round_id = $exchange->collaboration->programme_round->post_id;
+				}
+				break;
+			default:
+				return;
+		}
+		if ( ! isset( $programme_round_id ) ) {
+			return;
+		}
+		$programme_round = BaseController::exchange_factory( $programme_round_id );
+		if ( ! is_a( $programme_round, 'Programme_Round' ) ) {
+			return;
+		} else {
+			$pr_update_token = $programme_round->controller->get_programme_round_token();
+		}
+		if ( $pr_update_token ) {
+			$verifications = array();
+			foreach( $form_id_arr as $id ) {
+				$verifications[] = sha1( $pr_update_token . $id );
+			}
+			if ( in_array( $update_token, $verifications ) ) {
+				$update_string = ' update="' . $update_id . '" ';
+				return $update_string;
+			}
+		}
+	}
+
 	/**
 	 * Build contact block from Gravity Forms input.
 	 *
 	 */
 	protected function build_form() {
 		$form = $this->input['gravity_forms'];
-		$this->output .= do_shortcode('[gravityform id="' . $form['id'] . '" title="true" description="true" ajax="true"]');
+		$update_string = '';
+		if ( ! empty( $_SERVER[ 'QUERY_STRING' ] ) ) {
+			$processed = $this->process_token( $form['id'] );
+			$update_string = ! empty( $processed ) ? $processed : '';
+		}
+		$this->output .= do_shortcode( '[gravityform id="' . $form['id'] . '"' . $update_string . ' title="true" description="true" ajax="true"]' );
 	}
 
 

@@ -165,6 +165,7 @@ abstract class BaseGrid extends BasePattern {
 		if ( ! isset( $item[ 'acf_fc_layout' ] ) ) {
 			return;
 		}
+		$item_mods = array();
 		switch ( $item[ 'acf_fc_layout' ] ) {
 			case 'grid_exchange_story':
 			case 'grid_exchange_collaboration':
@@ -172,23 +173,31 @@ abstract class BaseGrid extends BasePattern {
 				if ( ! is_int( $item['grid_exchange_object'] ) ) {
 					return;
 				}
-				$exchange = BaseController::exchange_factory( $item['grid_exchange_object'], 'griditem' );
-				$item_mods = self::add_grid_modifiers( $exchange );
-				if ( ! empty( $item['grid_width'] ) ) {
-					$item_mods['grid_width'] = $item['grid_width'];
-					$num = $this->get_grid_width_num( $item['grid_width'] );
-					if ( isset( $num ) & is_int( $num ) ) {
-						$item_mods['grid_width_num'] = $num;
-					}
-				}
-
-				$grid_item = new GridItem( $exchange, $this->element, $item_mods );
-				return $grid_item;
+				$object = BaseController::exchange_factory( $item['grid_exchange_object'], 'griditem' );
+				$item_mods = self::add_grid_modifiers( $object );
 				break;
 			case 'grid_paragraph' :
+				$object = BasePattern::pattern_factory( $item, 'paragraph', 'griditem__pattern', true );
+				break;
+			case 'grid_pull_quote' :
+				$object = BasePattern::pattern_factory( $item, 'pull_quote', 'griditem__pattern', true );
+				break;
+			case 'grid_image' :
+				$object = BasePattern::pattern_factory( $item, 'image', 'griditem__pattern', true );
+				break;
 			default:
+				return;
 				break;
 		}
+		if ( ! empty( $item['grid_width'] ) ) {
+			$item_mods['grid_width'] = $item['grid_width'];
+			$num = $this->get_grid_width_num( $item['grid_width'] );
+			if ( isset( $num ) & is_int( $num ) ) {
+				$item_mods['grid_width_num'] = $num;
+			}
+		}
+		$grid_item = new GridItem( $object, $this->element, $item_mods );
+		return $grid_item;
 	}
 
 	/**

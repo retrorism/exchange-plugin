@@ -48,5 +48,32 @@ class Programme_RoundController extends BaseController {
 			$this->container->has_editorial_intro = true;
 			$this->container->editorial_intro = new EditorialIntro( $acf_editorial_intro, 'programme_round' );
 		}
+
+		$this->retrieve_or_set_programme_round_token();
+	}
+
+	private function set_programme_round_token() {
+		$post_id = $this->container->post_id;
+		$token = sha1( 'token_constant' . $post_id . wp_salt() );
+		update_post_meta( $post_id, 'update_token', $token );
+		return $token;
+	}
+
+	private function retrieve_or_set_programme_round_token() {
+		$post_id = $this->container->post_id;
+		$acf_update_token = get_field( 'update_token', $post_id );
+		if ( empty( $acf_update_token ) ) {
+			$acf_update_token = $this->set_programme_round_token();
+		}
+		return $acf_update_token;
+	}
+
+	public function get_programme_round_token() {
+		$token = $this->retrieve_or_set_programme_round_token();
+		if ( ! empty( $token ) ) {
+			return $token;
+		} else {
+			return false;
+		}
 	}
 }

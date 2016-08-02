@@ -20,7 +20,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 //add_action( 'acf/save_post', 'save_post_with_each_acf_update', 20 );
 add_action( 'acf/input/admin_head', 'exchange_change_acf_color_picker' );
 //add_action( 'acf/validate_value/key=field_570b7d8c359c2', 'exchange_save_location_tax_to_story', 10, 4);
+add_action( 'admin_enqueue_scripts', 'exchange_plugin_admin_scripts' );
 
+
+function exchange_plugin_admin_scripts() {
+	wp_enqueue_script( 'admin-js', plugins_url( EXCHANGE_PLUGIN . '/assets/js/exchange_admin.js' ), array( 'jquery' ), '', false );
+};
 
 /**
  * Save post metadata when a post is saved.
@@ -45,7 +50,6 @@ function save_post_participant_meta( $post_id, $post, $update ) {
 	}
 }
 
-// @TODO 'Unhack the -locations- tax field which refuses to update the terms.
 function exchange_save_location_tax_to_story( $valid, $value, $field, $input ) {
 	if ( $_POST['post_type'] == 'story' ) {
 		$terms = array();
@@ -145,4 +149,62 @@ function exchange_change_acf_color_picker() {
 		});
 	})(jQuery);
 	</script>";
+}
+
+if( function_exists('acf_add_options_page') ) {
+
+	$option_page = acf_add_options_sub_page(array(
+		'page_title' 	=> 'Update Forms Settings',
+		'menu_title' 	=> 'Forms',
+		'parent_slug' 	=> EXCHANGE_PLUGIN,
+		'capability' 	=> 'edit_posts',
+		'redirect' 	=> false
+	));
+
+}
+
+
+add_action( 'save_post', 'exchange_add_update_form_link', 10, 3 );
+
+function exchange_add_update_form_link( $post_ID, $post_obj ) {
+	$update = false;
+	$type = $post_obj->post_type;
+
+	// Gather token / form info for token verification.
+	$form_id = get_option('options_' . $type . '_update_form');
+	$form_link = get_field( $type . '_update_form_link', $post_ID );
+	if ( 'participant' === $type ) {
+		$field = 'field_57a0a3eff2d3c';
+		$coll = CollaborationController::get_collaboration_by_participant_id( $post_ID );
+	} elseif ( 'collaboration' === $type ) {
+		$field = 'field_57a0a397c1cd6';
+		$coll = BaseController::exchange_factory( $post_ID );
+	}
+	if ( is_object( $coll ) && is_a( $coll->programme_round, 'Programme_Round' ) ) {
+		$pr_token = $coll->programme_round->controller->get_programme_round_token();
+	}
+	if ( ! isset( $pr_token ) ) {
+		return;
+	}
+
+	// See if anything needs to be changed.
+	$form_token = sha1( $pr_token . $form_id );
+	if ( ! empty( $form_link ) ) {
+		$parts = parse_url( $form_link );
+		parse_str( $parts[ 'query' ], $query );
+		if ( $query['update_token'] !== $form_token || $query['update_id'] !== $post_ID ) {
+			$update = true;
+		} else {
+			return;
+		}
+	}
+	// Update or save the link to the post.
+	$page_id = get_option('options_' . $type . '_update_form_page');
+	$page_url = get_permalink( $page_id );
+	$link = $page_url . '?update_token=' . $form_token . '&update_id=' . $post_ID;
+	if ( $update ) {
+		update_post_meta( $post_ID, $type . '_update_form_link', $link );
+	} else {
+		update_field( $field, $link, $post_ID );
+	}
 }

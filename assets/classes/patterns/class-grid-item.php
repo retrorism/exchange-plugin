@@ -32,14 +32,17 @@ class GridItem extends BasePattern {
 	 **/
 	 protected function create_output() {
 
-		if ( is_object( $this->input ) ) {
-			$this->output_tag_open();
-	 		$this->output .= $this->build_grid_item();
-	 		$this->output_tag_close();
-		} else {
-			throw new Exception('Calling griditem on non-post');
+		if ( ! is_object( $this->input ) ) {
+			throw new Exception("Testing {1:What are we testing?}");
 		}
- 	}
+		$this->output_tag_open();
+		if ( $this->input instanceof Exchange ) {
+ 			$this->output .= $this->build_grid_item_from_post();
+		} elseif ( $this->input instanceof BasePattern ) {
+			$this->output .= $this->build_grid_item_from_pattern();
+		}
+		$this->output_tag_close();
+	}
 
 	/**
 	 * Build Item output
@@ -47,7 +50,7 @@ class GridItem extends BasePattern {
 	 * @since 0.1.0
 	 * @TODO switch for context, switch for grid width
 	 **/
-	protected function build_grid_item( $cta = false ) {
+	protected function build_grid_item_from_post( $cta = false ) {
 		if (
 			( 'archive__grid' === $this->context && 'everywhere' === $this->input->has_cta ) ||
 			( ( 'simplegrid' === $this->context || 'relatedgrid' === $this->context ) && 'no' !== $this->input->has_cta )
@@ -71,6 +74,34 @@ class GridItem extends BasePattern {
 		}
 		if ( $template ) {
 			$exchange = $this->input;
+			$modifier = false;
+			if ( isset( $this->modifiers['grid_width'] ) ) {
+				$modifier = $this->modifiers['grid_width'];
+			}
+			ob_start();
+			include( locate_template( 'parts/grid-' . $template .'.php' ) );
+			$grid_item = ob_get_contents();
+			ob_end_clean();
+		} else {
+			$grid_item = "I couldn't find the right template";
+		}
+		return $grid_item;
+	}
+
+	/**
+	 * Build Item output
+	 *
+	 * @since 0.1.0
+	 * @TODO switch for context, switch for grid width
+	 **/
+	protected function build_grid_item_from_pattern() {
+		if ( locate_template( 'parts/grid-pattern.php' ) !== '') {
+			$template = 'pattern';
+		} else {
+			$template = 'default';
+		}
+		if ( $template ) {
+			$pattern = $this->input;
 			$modifier = false;
 			if ( isset( $this->modifiers['grid_width'] ) ) {
 				$modifier = $this->modifiers['grid_width'];

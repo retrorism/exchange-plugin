@@ -122,6 +122,8 @@ class Image extends BasePattern {
 	 **/
 	 protected function create_output() {
 
+		$caption = true;
+
 		$this->set_image_properties();
 
 		// Open wrapper.
@@ -134,20 +136,22 @@ class Image extends BasePattern {
 		$this->anchor( 'open' );
 
 		// Add placeholder for images that need lazy-loading.
-		if ( in_array( $this->context, array( 'griditem','contactblock' ), true ) ) {
+		if ( in_array( $this->context, array( 'collaboration__header', 'griditem','contactblock','griditem__pattern' ), true ) ) {
 			$this->lazy = false;
+			$caption = false;
 		}
+
 		$this->output .= $this->build_image_placeholder();
 
-		// Add caption if available.
-		if ( ! empty( $this->input['caption'] ) || ! empty( $this->title ) ) {
+		if ( $caption ) {
+			// Add caption if available.
+			if ( ! empty( $this->input['caption'] ) || ! empty( $this->title ) ) {
+				$this->set_image_caption();
+			}
 
-			$this->set_image_caption();
-
-		}
-
-		if ( is_object( $this->caption ) && ! in_array( $this->context, array('collaboration__header', 'griditem' ) ) ) {
-			$this->output .= $this->build_image_caption();
+			if ( is_object( $this->caption ) ) {
+				$this->output .= $this->build_image_caption();
+			}
 		}
 
 		// Close anchor.
@@ -338,6 +342,9 @@ class Image extends BasePattern {
 			}
 		}
 		switch ( $this->context ) {
+			case 'griditem__pattern' :
+				$order = array( $full );
+				break;
 			case 'story__header':
 				$order = array( $medium, $mlarge, $large, $wide );
 				break;
@@ -605,6 +612,7 @@ class Image extends BasePattern {
 					break;
 
 				case 'gallery':
+				case 'griditem__pattern':
 				default:
 					if ( ! empty( $rounded ) )  {
 						$this->ratio = $rounded;

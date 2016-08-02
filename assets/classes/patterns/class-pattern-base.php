@@ -509,7 +509,7 @@ abstract class BasePattern {
 	 * @var string $context The pattern's container.
 	 * @return string $output HTML output consisting of tags and content.
 	 **/
-	public static function pattern_factory( $input, $type, $context = '' ) {
+	public static function pattern_factory( $input, $type, $context = '', $object = false ) {
 		switch ( $type ) {
 			case 'image':
 				$image_mods = array();
@@ -522,15 +522,11 @@ abstract class BasePattern {
 				if ( 'portrait' === $input['image_orientation']  ) {
 					$image_mods['orientation'] = 'portrait';
 				}
-				$image = new Image( $input['image'], $context, $image_mods );
-				if ( is_object( $image ) && is_a( $image, 'Image' ) ) {
-					$output = $image->embed();
-				}
+				$pattern = new Image( $input['image'], $context, $image_mods );
 				break;
 
 			case 'two_images':
-				$duo = new ImageDuo( $input, $context );
-				$output = $duo->embed();
+				$pattern = new ImageDuo( $input, $context );
 				break;
 
 			case 'paragraph':
@@ -545,44 +541,33 @@ abstract class BasePattern {
 						}
 					}
 					$p_mods['data']['languages'] = implode(',', $languages );
-					$paragraph = new TranslatedParagraph( $input, $context, $p_mods );
-					$output = $paragraph->embed();
+					$pattern = new TranslatedParagraph( $input, $context, $p_mods );
 					break;
 				}
-				$paragraph = new Paragraph( $input['text'], $context );
-				$output = $paragraph->embed();
+				$pattern = new Paragraph( $input['text'], $context );
 				break;
 
 			case 'block_quote':
-				$blockquote = new BlockQuote( $input, $context );
-				$output = $blockquote->embed();
+				$pattern = new BlockQuote( $input, $context );
 				break;
-
 			case 'pull_quote':
 				$pquote_mods = array();
 				if ( ! empty( $input['pquote_colour'] ) ) {
 					$pquote_mods['colour'] = $input['pquote_colour'];
 				}
-				$pullquote = new PullQuote( $input, $context, $pquote_mods );
-				$output = $pullquote->embed();
+				$pattern = new PullQuote( $input, $context, $pquote_mods );
 				break;
-
 			case 'embedded_video':
-				$video = new Video( $input, $context );
-				$output = $video->embed();
+				$pattern = new Video( $input, $context );
 				break;
-
 			case 'interview_conversation':
-				$interview = new InterviewConversation( $input['interview'], $context );
-				$output = $interview->embed();
+				$pattern = new InterviewConversation( $input['interview'], $context );
 				break;
 			case 'interview_q_and_a':
-				$interview = new InterviewQA( $input['interview'], $context );
-				$output = $interview->embed();
+				$pattern = new InterviewQA( $input['interview'], $context );
 				break;
 			case 'subheader':
-				$subheader = new SubHeader( $input['text'], $context );
-				$output = $subheader->embed();
+				$pattern = new SubHeader( $input['text'], $context );
 				break;
 			case 'section_header':
 				$header_mods = array();
@@ -595,8 +580,7 @@ abstract class BasePattern {
 				if ( ! empty( $type ) ) {
 					$header_mods['type'] = $input['type'];
 				}
-				$subheader = new SectionHeader( $input['text'], $context, $header_mods );
-				$output = $subheader->embed();
+				$pattern = new SectionHeader( $input['text'], $context, $header_mods );
 				break;
 			case 'emphasis_block':
 				$block_mods = array();
@@ -618,15 +602,19 @@ abstract class BasePattern {
 				$block_mods['type'] = $type;
 				$block_mods['colour'] = $input[ $type . '_colour' ];
 				$block_mods['data'] = array( 'element_count' => count( $block_elements ) );
-				$emphasis_block = new EmphasisBlock( $block_elements, $context, $block_mods );
-				$output = $emphasis_block->embed();
+				$pattern = new EmphasisBlock( $block_elements, $context, $block_mods );
 				break;
 			default:
 				$output = '<div data-alert class="alert-box alert">';
 				$output .= '<strong>' . __( 'Error: This layout has not yet been defined', EXCHANGE_PLUGIN ) . '</strong>';
 				$output .= '</div>';
+				$pattern = new Paragraph( $output, $context );
 				break;
 		}
-		return $output;
+		if ( $object ) {
+			return $pattern;
+		} else {
+			return $pattern->embed();
+		}
 	}
 }
