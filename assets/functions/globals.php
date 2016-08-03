@@ -41,8 +41,16 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 			'size-in-story' => 'medium-large',
 			'fallback_image_att_id' => 970,
 		),
+		'CATEGORIES' => array (
+			'button_labels' => array(
+				'story' => 'Read the full story',
+				'video' => 'Watch the video',
+				'default' => 'Read the full %s'
+			),
+		),
 		'TAXONOMIES' => array(
 			// Parent programmes (not taxonomized for overall ease ).
+
 			'programmes' => array(
 				'C_P'     => 'Tandem Community & Participation',
 				'Europe'  => 'Tandem Europe',

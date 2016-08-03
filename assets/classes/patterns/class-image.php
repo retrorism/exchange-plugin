@@ -40,7 +40,7 @@ class Image extends BasePattern {
 	 * @access private
 	 * @var bool $is_hq Image quality according to standard.
 	 **/
-	private $is_hq;
+	private $is_hq = false;
 
 	/**
 	 *  Image title.
@@ -281,17 +281,17 @@ class Image extends BasePattern {
 		$combined_sizes = $this->get_all_image_sizes();
 		foreach( $combined_sizes as $size => $vals ) {
 		// Check if the available crops are more or less the same height as the ideal height
-			$diff_h = $input_sizes[ $size . '-height' ] / $vals['height'];
-			if ( ( $diff_h * 100 ) > 110 || ( $diff_h * 100 ) < 90  ) {
-				$src_sets[ $size ] = false;
-				continue;
-			}
+			// $diff_h = $input_sizes[ $size . '-height' ] / $vals['height'];
+			// if ( ( $diff_h * 100 ) > 102 || ( $diff_h * 100 ) < 98  ) {
+			// 	$src_sets[ $size ] = false;
+			// 	continue;
+			// }
 			// Check if the available crops are more or less the same width as the ideal width.
-			$diff_w = $input_sizes[ $size . '-width' ] / $vals['width'];
-			if ( ( $diff_w  * 100 ) > 110 || ( $diff_w * 100 ) < 90  ) {
-				$src_sets[ $size ] = false;
-				continue;
-			}
+			// $diff_w = $input_sizes[ $size . '-width' ] / $vals['width'];
+			// if ( ( $diff_w  * 100 ) > 102 || ( $diff_w * 100 ) < 98  ) {
+			// 	$src_sets[ $size ] = false;
+			// 	continue;
+			// }
 			// Check if the image ratio is too small to be rendered in landscape
 			$src_sets[ $size ] = array(
 				$input_sizes[ $size ],
@@ -343,7 +343,9 @@ class Image extends BasePattern {
 		}
 		switch ( $this->context ) {
 			case 'griditem__pattern' :
+			case 'gallery' :
 				$order = array( $full );
+				//$sizes = '(min-width: 60em) 80vw, 100vw';
 				break;
 			case 'story__header':
 				$order = array( $medium, $mlarge, $large, $wide );
@@ -355,16 +357,17 @@ class Image extends BasePattern {
 				$order = array( $mlarge );
 				break;
 			case 'griditem' :
-			case 'gallery' :
 			case 'section' :
 			default :
 				// Add full size if the ratio is severe pano or severe portrait.
 				if ( $this->ratio < 0.5 || $this->ratio > 1 ) {
-					$order = array( $medium, $mlarge, $large, $full );
+					$order = array( $full );
+				} elseif ( ! $this->is_hq ) {
+					$order = array( $full );
 				} else {
 					$order = array( $medium, $mlarge, $large );
 				}
-				//$sizes = '(min-width: 1080px) 60vw, 100vw';
+				//$sizes = '(max-width: 1080px) 60vw, 100vw';
 				break;
 		}
 		// Remove empty values in the src_set list with array_filter
@@ -461,17 +464,17 @@ class Image extends BasePattern {
 
 		// Add srcset to image element.
 		if ( $this->src_set ) {
-			$img .= ' data-sizes="auto"';
+			if ( $this->rwd_sizes ) {
+				$img .= ' data-sizes="' . esc_attr( $this->rwd_sizes ) . '"';
+			}
 			$img .= ' data-srcset="' . esc_attr( $this->src_set ) . '"';
 		}
 
 		// if ( $this->lazy ) {
 		// 	$img .= ' srcset="data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="';
 		// }
-		// // Add RWD_sizes to image element.
-		// if ( $this->rwd_sizes ) {
-		// 	$img .= ' sizes="' . esc_attr( $this->rwd_sizes ) . '"';
-		// }
+		// Add RWD_sizes to image element.
+
 
 		// Add title to image element.
 		if ( $this->title ) {
@@ -550,7 +553,6 @@ class Image extends BasePattern {
 	 * @param int $h Image height.
 	 **/
 	protected function set_image_quality( $w, $h ) {
-		$ratio = $w / $h;
 		$sum = $h * $w;
 		if ( is_int( $sum ) && $sum >= $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['IMAGES']['hq-norm'] ) {
 			$this->is_hq = true;
@@ -591,9 +593,6 @@ class Image extends BasePattern {
 					break;
 				case 'section':
 				case 'imageduo':
-					if ( empty( $rounded ) ) {
-						break;
-					}
 					if ( $this->is_hq && 'landscape' === $this->orientation ) {
 						$this->ratio = 0.6667;
 					} else {

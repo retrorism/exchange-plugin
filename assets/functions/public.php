@@ -66,7 +66,12 @@ function exchange_create_link( $obj, $with_text = true, $class = '' ) {
 	if ( 'griditem__button button--small' === $class ) {
 		if  ( 'story' === $obj->type && isset( $obj->category ) ) {
 			$cat = $obj->category;
-			$title = strtoupper( __( sprintf( 'Read the full %s', $cat ), 'exchange' ) );
+			$labels = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['CATEGORIES']['button_labels'];
+			if ( array_key_exists( $cat, $labels ) ) {
+				$title = strtoupper( $labels[ $cat ] );
+			} else {
+				$title = strtoupper( __( sprintf( $labels[ 'default' ], $cat ), 'exchange' ) );
+			}
 			$class .= ' button--' . $cat;
 		} else {
 			$title = strtoupper( __( 'Read more', 'exchange' ) );
@@ -133,3 +138,29 @@ add_filter( 'get_the_archive_title', function ( $title ) {
     return $title;
 
 });
+
+function exchange_build_svg( $svg_src, $fallback = false) {
+	if ( ! is_string( $svg_src ) || '' === $svg_src ) {
+		return;
+	}
+	if ( ! is_readable( $svg_src ) ) {
+		return;
+	}
+	$svg = file_get_contents( $svg_src );
+	if ( $fallback ) {
+		$png_src = str_replace( 'svg', 'png', $svg_src );
+		$svg = exchange_insert_svg_fallback( $svg, $png_src );
+	}
+	return $svg;
+}
+
+function exchange_insert_svg_fallback( $svg, $png_src ) {
+	// Add png fallback if available.
+	if ( ! is_readable( $png_src ) ) {
+		return $svg;
+	} else {
+		$png_insert = '<image src="' . $png_src . '" xlink:href=""></svg>';
+		$svg = substr_replace( $svg, $png_insert, -6 );
+		return $svg;
+	}
+}
