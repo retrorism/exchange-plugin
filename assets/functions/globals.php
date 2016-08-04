@@ -14,7 +14,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	header( 'HTTP/1.1 403 Forbidden' );
 	exit;
 };
-
 if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 	$GLOBALS['EXCHANGE_PLUGIN_CONFIG'] = array(
 		'COLOURS' => array(
@@ -73,7 +72,7 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 			),
 			// Maximum number of tags on grid items
 			'grid_tax_max' => 3,
-		),
+		)
 	);
 }
 

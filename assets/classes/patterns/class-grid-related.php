@@ -42,7 +42,7 @@ class RelatedGrid extends BaseGrid {
 			$this->set_modifier_class( 'colour', $colour );
 			$this->set_attribute( 'data', 'background-colour', $colour );
 			$this->set_attribute( 'data', 'equalizer', true );
-			$this->output .= $this->build_edge_svg( 'top', $colour );
+			$this->output .= BasePattern::build_edge_svg( 'top', $colour );
 			$this->output .= '<div class="section-inner">';
 			$header_text = __( 'Read more','exchange' );
 			if ( 'collaboration' === $this->context && 'has_stories' === $this->modifiers['related'] ) {
@@ -57,7 +57,7 @@ class RelatedGrid extends BaseGrid {
 			$this->output_tag_close( $el );
 
 			$this->output .= '</div>';
-			$this->output .= $this->build_edge_svg( 'top', $colour );
+			$this->output .= BasePattern::build_edge_svg( 'top', $colour );
 
 		}
 	}

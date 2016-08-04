@@ -153,9 +153,17 @@ function exchange_change_acf_color_picker() {
 
 if( function_exists('acf_add_options_page') ) {
 
-	$option_page = acf_add_options_sub_page(array(
+	$forms_page = acf_add_options_sub_page(array(
 		'page_title' 	=> 'Update Forms Settings',
 		'menu_title' 	=> 'Forms',
+		'parent_slug' 	=> EXCHANGE_PLUGIN,
+		'capability' 	=> 'edit_posts',
+		'redirect' 	=> false
+	));
+
+	$stories_page = acf_add_options_sub_page(array(
+		'page_title' 	=> 'Story Overview Settings',
+		'menu_title' 	=> 'Stories Settings',
 		'parent_slug' 	=> EXCHANGE_PLUGIN,
 		'capability' 	=> 'edit_posts',
 		'redirect' 	=> false

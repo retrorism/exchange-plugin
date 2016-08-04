@@ -65,7 +65,7 @@ class Section extends BasePattern {
 
 		$this->output_tag_open( 'section' );
 		if ( isset( $colour ) ) {
-			$this->output .= $this->build_edge_svg( 'top', $colour );
+			$this->output .= BasePattern::build_edge_svg( 'top', $colour );
 		}
 		$this->output .= '<div class="section-inner">';
 
@@ -94,7 +94,7 @@ class Section extends BasePattern {
 
 		$this->output .= '</div>';
 		if ( isset( $colour ) ) {
-			$this->output .= $this->build_edge_svg( 'bottom', $colour );
+			$this->output .= BasePattern::build_edge_svg( 'bottom', $colour );
 		}
 		$this->output_tag_close( 'section' );
 	}

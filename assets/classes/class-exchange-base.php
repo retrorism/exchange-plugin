@@ -343,7 +343,7 @@ class Exchange {
 		echo $block;
 	}
 
-	public function publish_grid_featured( $exchange, $context = '', $modifiers = array() ) {
+	public static function publish_grid_featured( $exchange, $context = '', $modifiers = array() ) {
 		$griditem = new Griditem( $exchange, $context, $modifiers );
 		$griditem->publish();
 	}
