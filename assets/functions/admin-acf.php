@@ -154,8 +154,8 @@ function exchange_change_acf_color_picker() {
 if( function_exists('acf_add_options_page') ) {
 
 	$forms_page = acf_add_options_sub_page(array(
-		'page_title' 	=> 'Update Forms Settings',
-		'menu_title' 	=> 'Forms',
+		'page_title' 	=> 'Page Settings',
+		'menu_title' 	=> 'Pages',
 		'parent_slug' 	=> EXCHANGE_PLUGIN,
 		'capability' 	=> 'edit_posts',
 		'redirect' 	=> false

@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 };
 
-function tandem_importer() {
+function exchange_importer() {
   $result = array();
   $args = array(
     'post_type' => 'participant',
@@ -62,7 +62,7 @@ function tandem_importer() {
   return $result;
 }
 
-function tandem_image_importer() {
+function exchange_image_importer() {
 	$result = array();
 	$collab_args = array(
 		'post_type' => 'collaboration',
@@ -138,7 +138,7 @@ function tandem_image_importer() {
 	}
 }
 
-function tandem_image_tag_swap() {
+function exchange_image_tag_swap() {
 	$attachment_args = array(
 		'post_type' => 'attachment',
 		'posts_per_page' => -1,
@@ -162,7 +162,7 @@ function tandem_image_tag_swap() {
 	}
 }
 
-function tandem_collab_tagger() {
+function exchange_collab_tagger() {
 	$result = array();
 	$collab_args = array(
 		'post_type' => 'collaboration',
@@ -194,7 +194,7 @@ function tandem_collab_tagger() {
 	}
 }
 
-function tandem_image_tagger() {
+function exchange_image_tagger() {
 	$result = array();
 	$collab_args = array(
 		'post_type' => 'collaboration',
@@ -278,7 +278,7 @@ function add_term_to_cid( $cid, $arr ) {
 	}
 }
 
-function tandem_tag_importer() {
+function exchange_tag_importer() {
 	$fh = fopen( EXCHANGE_PLUGIN_PATH . 'taxonomies.csv', 'r' );
 
 	if ($fh) {
@@ -336,7 +336,7 @@ function match_organisation_by_pid( $orgs, $pid ) {
 	update_field( 'organisation_name', $org, $participant->ID );
 }
 
-function tandem_organisation_name_matcher() {
+function exchange_organisation_name_matcher() {
 	$fh = fopen( EXCHANGE_PLUGIN_PATH . 'organisation_names.csv', 'r' );
 
 	if ($fh) {

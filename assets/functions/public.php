@@ -49,12 +49,16 @@ function exchange_get_contrast_YIQ( $hex ) {
 /**
  * Create link (or simply an opening tag)
  *
- * @param object Exchange object to link to.
+ * @param object Exchange object to link to OR WP_Term
  * @param bool @with_text Optional. Add object title as link text, or simply open tag.
 
  * @return string Anchor tag with appropriate attributes and / or title.
  */
 function exchange_create_link( $obj, $with_text = true, $class = '' ) {
+	// Turn post_id into object
+	if ( is_numeric( $obj ) && exchange_post_exists( $obj ) ) {
+		$obj = BaseController::exchange_factory( $obj );
+	} 
 	if ( $obj instanceof Exchange ) {
 		$url = $obj->link;
 		$title = $obj->title;

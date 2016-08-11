@@ -39,6 +39,7 @@ class SimpleGrid extends BaseGrid {
 		$this->set_grid_items();
 		 // Create grid with posts embedded.
 		if ( $this->has_grid_items ) {
+			$this->set_attribute('data','children', count( $this->grid_items ) );
 			$this->output_tag_open( $el );
 			$sum = 0;
 			foreach ( $this->grid_items as $item ) {

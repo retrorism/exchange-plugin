@@ -55,6 +55,7 @@ abstract class BaseGrid extends BasePattern {
 
 		 // Create grid with posts embedded.
 		if ( $this->has_grid_items ) {
+			$this->set_attribute('data','children', count( $this->grid_items ) );
 			$this->output_tag_open( $el );
 			foreach ( $this->grid_items as $item ) {
 				$this->output .= $item->embed();
@@ -177,13 +178,15 @@ abstract class BaseGrid extends BasePattern {
 				$item_mods = self::add_grid_modifiers( $object );
 				break;
 			case 'grid_paragraph' :
-				$object = BasePattern::pattern_factory( $item, 'paragraph', 'griditem__pattern', true );
-				break;
 			case 'grid_pull_quote' :
-				$object = BasePattern::pattern_factory( $item, 'pull_quote', 'griditem__pattern', true );
-				break;
 			case 'grid_image' :
-				$object = BasePattern::pattern_factory( $item, 'image', 'griditem__pattern', true );
+				$pattern_type = str_replace( 'grid_','', $item['acf_fc_layout'] );
+				$object = BasePattern::pattern_factory( $item, $pattern_type, 'griditem__pattern', true );
+				if ( $object->output === '' ) {
+					return;
+				}
+				$item_mods['type'] = 'pattern';
+				$item_mods['pattern_type'] = $pattern_type;
 				break;
 			default:
 				return;
@@ -196,6 +199,7 @@ abstract class BaseGrid extends BasePattern {
 				$item_mods['grid_width_num'] = $num;
 			}
 		}
+
 		$grid_item = new GridItem( $object, $this->element, $item_mods );
 		return $grid_item;
 	}
