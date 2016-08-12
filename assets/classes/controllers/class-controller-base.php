@@ -172,8 +172,9 @@ class BaseController {
 	protected function set_sections( $acf_sections ) {
 		// Loop through sections.
 		foreach( $acf_sections as $s ) {
-			if ( ! empty( $s['section_contents'] ) ) {
-				$section_mods['type'] = $s['section_contents'];
+			$section_mods = array();
+			if ( ! empty( $s['contents'] ) && isset( $s['contents']['acf_fc_layout'] ) ) {
+				$section_mods['type'] = $s['contents']['acf_fc_layout'];
 			}
 			$section = new Section( $s, strtolower( get_class( $this->container ) ), $section_mods );
 			if ( is_object( $section ) && is_a( $section, 'Section' ) ) {

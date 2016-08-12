@@ -188,6 +188,9 @@ function exchange_add_update_form_link( $post_ID, $post_obj ) {
 		$field = 'field_57a0a397c1cd6';
 		$coll = BaseController::exchange_factory( $post_ID );
 	}
+	if ( ! isset( $coll ) ) {
+		return;
+	}
 	if ( is_object( $coll ) && is_a( $coll->programme_round, 'Programme_Round' ) ) {
 		$pr_token = $coll->programme_round->controller->get_programme_round_token();
 	}
@@ -216,3 +219,27 @@ function exchange_add_update_form_link( $post_ID, $post_obj ) {
 		update_field( $field, $link, $post_ID );
 	}
 }
+
+function exchange_iterate_filter( $input ) {
+    foreach ( $input as $key => $val ) {
+        if ( is_array( $val ) ) {
+            $input[ $key ] = exchange_iterate_filter( $input[ $key ] );
+        }
+		if ( '' === $input[ $key ] ) {
+			unset( $input[ $key ] );
+		}
+    }
+	return $input;
+}
+
+function exchange_remove_empty_acf_meta_at_save( $post_id ) {
+	// bail early if no ACF data
+    if( empty($_POST['acf']) ) {
+        return;
+    }
+
+	// array of field values
+	$_POST['acf'] = exchange_iterate_filter( $_POST['acf'] );
+}
+
+add_action('acf/save_post', 'exchange_remove_empty_acf_meta_at_save', 1);

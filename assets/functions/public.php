@@ -30,6 +30,16 @@ function exchange_hex_to_slug( $hex ) {
 	return 'custom-colour';
 }
 
+function exchange_slug_to_hex( $slug ) {
+	$color_array = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS'];
+	if ( is_array( $color_array ) && array_key_exists( $slug, $color_array ) ) {
+		$retval = $color_array[ $slug ];
+		if ( ! empty( $retval ) ) {
+		  return '#' . $retval;
+		}
+	}
+}
+
 
 /**
  * Pick black or white to contrast with chosen hexcolor
@@ -58,7 +68,7 @@ function exchange_create_link( $obj, $with_text = true, $class = '' ) {
 	// Turn post_id into object
 	if ( is_numeric( $obj ) && exchange_post_exists( $obj ) ) {
 		$obj = BaseController::exchange_factory( $obj );
-	} 
+	}
 	if ( $obj instanceof Exchange ) {
 		$url = $obj->link;
 		$title = $obj->title;

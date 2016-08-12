@@ -54,6 +54,52 @@ class Section extends BasePattern {
 
 
 
+	// public function create_output() {
+	//
+	// 	// Check for background colour modifier and add to classes.
+	// 	if ( ! empty( $this->input['background_colour'] ) ) {
+	// 		$colour = $this->input['background_colour'];
+	// 		$this->set_modifier_class( 'colour', $colour );
+	// 		$this->set_attribute( 'data', 'background-colour', $colour );
+	// 	}
+	//
+	// 	$this->output_tag_open( 'section' );
+	// 	if ( isset( $colour ) ) {
+	// 		$this->output .= BasePattern::build_edge_svg( 'top', $colour );
+	// 	}
+	// 	$this->output .= '<div class="section-inner">';
+	//
+	// 	$this->build_section_header();
+	//
+	// 	if ( ! empty( $this->input['story_elements'] ) && count( $this->input['story_elements'] ) ) {
+	// 		$this->story_elements = $this->input['story_elements'];
+	// 		$this->build_story_elements();
+	// 	}
+	//
+	// 	if ( ! empty( $this->input['gravity_forms'] ) ) {
+	// 		$this->build_form();
+	// 	}
+	//
+	// 	if ( 'has_map' === $this->input['section_contents'] ) {
+	// 		$this->set_map_data()->build_map();
+	// 	}
+	//
+	// 	if ( 'has_grid' === $this->input['section_contents'] ) {
+	// 		$this->build_simple_grid();
+	// 	}
+	//
+	// 	if ( ! empty( $this->input['contact_details'] ) ) {
+	// 		$this->build_contact_block();
+	// 	}
+	//
+	// 	$this->output .= '</div>';
+	// 	if ( isset( $colour ) ) {
+	// 		$this->output .= BasePattern::build_edge_svg( 'bottom', $colour );
+	// 	}
+	// 	$this->output_tag_close( 'section' );
+	// }
+
+
 	public function create_output() {
 
 		// Check for background colour modifier and add to classes.
@@ -63,36 +109,43 @@ class Section extends BasePattern {
 			$this->set_attribute( 'data', 'background-colour', $colour );
 		}
 
+		// Open section with edge.
 		$this->output_tag_open( 'section' );
 		if ( isset( $colour ) ) {
 			$this->output .= BasePattern::build_edge_svg( 'top', $colour );
 		}
+
 		$this->output .= '<div class="section-inner">';
 
 		$this->build_section_header();
 
-		if ( ! empty( $this->input['story_elements'] ) && count( $this->input['story_elements'] ) ) {
-			$this->story_elements = $this->input['story_elements'];
-			$this->build_story_elements();
-		}
+		if ( ! empty( $this->input['contents'] ) ) {
 
-		if ( ! empty( $this->input['gravity_forms'] ) ) {
-			$this->build_form();
-		}
+			foreach ( $this->input['contents'] as $section_contents ) {
 
-		if ( 'has_map' === $this->input['section_contents'] ) {
-			$this->set_map_data()->build_map();
-		}
-
-		if ( 'has_grid' === $this->input['section_contents'] ) {
-			$this->build_simple_grid();
-		}
-
-		if ( ! empty( $this->input['contact_details'] ) ) {
-			$this->build_contact_block();
+				switch ( $section_contents[ 'acf_fc_layout' ] ) {
+					case 'has_map' :
+						$this->set_map_data( $section_contents )->build_map();
+						break;
+					case 'has_form' :
+						$this->build_form( $section_contents );
+						break;
+					case 'has_grid' :
+						$this->build_simple_grid( $section_contents );
+						break;
+					case 'has_story_elements' :
+						$this->build_story_elements( $section_contents );
+						break;
+					case 'has_contact_details' :
+						$this->build_contact_block( $section_contents );
+						break;
+				}
+			}
 		}
 
 		$this->output .= '</div>';
+
+		// Close section with edge.
 		if ( isset( $colour ) ) {
 			$this->output .= BasePattern::build_edge_svg( 'bottom', $colour );
 		}
@@ -122,11 +175,12 @@ class Section extends BasePattern {
 	 *
 	 * @TODO proper Error notifications.
 	 **/
-	protected function build_story_elements() {
+	protected function build_story_elements( $section_contents ) {
 		// Check for story elements, return when none present.
-		if ( empty( $this->story_elements ) ) {
+		if ( empty( $section_contents['story_elements'] ) ) {
 			return;
 		}
+		$this->story_elements = $section_contents['story_elements'];
 		foreach ( $this->story_elements as $input ) {
 			// Loop through elements.
 			$type = $input['acf_fc_layout'];
@@ -138,8 +192,8 @@ class Section extends BasePattern {
 	 * Build contact block from user object input.
 	 *
 	 */
-	 protected function build_contact_block() {
-		$team_members = $this->input['contact_details'];
+	 protected function build_contact_block( $section_contents ) {
+		$team_members = $section_contents['contact_details'];
 		if ( count( $team_members ) < 1 ) {
 			return;
 		}
@@ -162,9 +216,10 @@ class Section extends BasePattern {
 	 * Set up section map data from ACF input.
 	 *
 	 * @return the section object.
+	 * @TODO don't count settings. account for new leaflet plugin settings.
 	 */
-	protected function set_map_data() {
-		$map_data = array_filter( $this->input, array( $this, 'map_key_filter_cb'), ARRAY_FILTER_USE_KEY );
+	protected function set_map_data( $section_contents ) {
+		$map_data = array_filter( $section_contents, array( $this, 'map_key_filter_cb'), ARRAY_FILTER_USE_KEY );
 		// At least four map settings must be provided: style, size, map_center, map_zoom, map_markers / map_collabs.
 		if ( count( $map_data ) > 4 ) {
 			$this->map_data = $map_data;
@@ -281,8 +336,8 @@ class Section extends BasePattern {
 	 * Build contact block from Gravity Forms input.
 	 *
 	 */
-	protected function build_form() {
-		$form = $this->input['gravity_forms'];
+	protected function build_form( $section_contents ) {
+		$form = $section_contents['gravity_forms'];
 		$update_string = '';
 		if ( ! empty( $_SERVER[ 'QUERY_STRING' ] ) ) {
 			$processed = $this->process_token( $form['id'] );
@@ -296,8 +351,8 @@ class Section extends BasePattern {
 	 * Build grid from ACF layouts
 	 *
 	 */
-	protected function build_simple_grid() {
-		$grid = new SimpleGrid( $this->input['select_grid_items'], $this->element );
+	protected function build_simple_grid( $section_contents ) {
+		$grid = new SimpleGrid( $section_contents['select_grid_items'], $this->element );
 		$this->output .= $grid->embed();
 	}
 }

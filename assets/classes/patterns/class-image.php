@@ -542,6 +542,10 @@ class Image extends BasePattern {
 		}
 	}
 
+	public function get_raw_image_data() {
+		return $this->input;
+	}
+
 	/**
 	 * Determine image quality by comparing it to standard.
 	 *

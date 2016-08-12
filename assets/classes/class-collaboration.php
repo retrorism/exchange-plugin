@@ -195,4 +195,26 @@ class Collaboration extends Exchange {
 			$map->publish();
 		}
 	}
+
+	public function publish_collab_media_gallery( $context = '' ) {
+		$gallery_grid_items = array();
+		if ( ! $this->has_gallery ) {
+			return;
+		}
+		foreach ( $this->gallery as $item ) {
+			$pattern = array();
+
+			if ( $item instanceof Image ) {
+				$image_data = $item->get_raw_image_data();
+				$pattern['acf_fc_layout'] = 'grid_image';
+				$pattern['image'] = $image_data;
+				$pattern['image_orientation'] = 'landscape';
+				$pattern['grid_width'] = 'grid_sixth';
+				$gallery_grid_items[] = $pattern;
+			}
+
+		}
+		$grid = new SimpleGrid( $gallery_grid_items, 'collaboration' );
+		$grid->publish('collaboration__gallery');
+	}
 }

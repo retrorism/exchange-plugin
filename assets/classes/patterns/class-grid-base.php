@@ -143,9 +143,10 @@ abstract class BaseGrid extends BasePattern {
 
 	private function get_grid_width_num( $grid_width ) {
 		$num = array(
-			'grid_full' => 12,
-			'grid_half' => 6,
-			'grid_third' => 4,
+			'grid_full'      => 12,
+			'grid_sixth'     => 2,
+			'grid_third'     => 4,
+			'grid_half'      => 6,
 			'grid_two_third' => 8,
 		);
 		if ( empty( $grid_width ) || ! array_key_exists( $grid_width, $num ) ) {
@@ -178,13 +179,19 @@ abstract class BaseGrid extends BasePattern {
 				$item_mods = self::add_grid_modifiers( $object );
 				break;
 			case 'grid_paragraph' :
+				if ( empty( $item['text'] ) ) {
+					return;
+				};
 			case 'grid_pull_quote' :
+				if ( empty( $item['pquote_text'] ) ) {
+					return;
+				};
 			case 'grid_image' :
+				if ( empty( $item['image'] ) ) {
+					return;
+				};
 				$pattern_type = str_replace( 'grid_','', $item['acf_fc_layout'] );
 				$object = BasePattern::pattern_factory( $item, $pattern_type, 'griditem__pattern', true );
-				if ( $object->output === '' ) {
-					return;
-				}
 				$item_mods['type'] = 'pattern';
 				$item_mods['pattern_type'] = $pattern_type;
 				break;

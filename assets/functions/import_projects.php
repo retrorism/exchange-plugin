@@ -19,7 +19,7 @@ function exchange_importer() {
   $args = array(
     'post_type' => 'participant',
     'posts_per_page' => -1,
-    'post_status' => 'draft'
+    'post_status' => 'publish'
 
   );
   $collab_args = array(
@@ -257,35 +257,35 @@ function add_term_to_cid( $cid, $arr ) {
 			foreach ( $arr as $tax => $terms ) {
 				$ints = array();
 				foreach ( $terms as $term ) {
-					echo $term;
-					echo htmlspecialchars( $term );
+					add_taxo( $tax, $term );
 					$obj = get_term_by( 'name', htmlspecialchars( $term ), $tax, 'slug');
+					var_dump( $obj );
 					if ( is_object( $obj ) && get_class( $obj ) === 'WP_Term' ) {
 						if ( ! empty( $obj->term_id ) ) {
-							$ints[] = $obj->term_id;
+							$ints[] = intval( $obj->term_id );
 						}
 					}
 				}
-				$ints = array_map( 'intval', $ints );
 				$ints = array_unique( $ints );
-				var_dump( $ints );
-				var_dump( $tax );
-				echo $collab->post_title;
-				$result = wp_set_object_terms( $collab->ID, $ints, $tax );
+				echo $collab->post_title . '<br />';
+				$result = wp_set_object_terms( $collab->ID, $ints, $tax, true );
 				print_r($result);
+				echo '<hr />';
 			}
 		}
 	}
 }
 
 function exchange_tag_importer() {
-	$fh = fopen( EXCHANGE_PLUGIN_PATH . 'taxonomies.csv', 'r' );
+	$fh = fopen( EXCHANGE_PLUGIN_PATH . 'assets/taxonomies.csv', 'r' );
 
 	if ($fh) {
 		$line = 0; // 1
+		$headers = array();
 		while ( ( $row = fgetcsv( $fh ) ) !== false ) {
 			// csv headings, so continue/ignore this iteration:
 			if ($line == 0) { // 2
+				$headers = $row;
 				$line++; // 3
 				continue; // 4
 			}
@@ -294,9 +294,8 @@ function exchange_tag_importer() {
 			$arr = array();
 			foreach ( $row as $term ) {
 				if ( ! empty( $term ) && $col > 0 ) {
-					if ( $col < 3 )	{
-						$tax = 'location';
-					}
+					$tax = explode( '_', $headers[$col] )[0];
+					echo $cid . ': ' . $tax . ': ' . $term . '<br />';
 					$arr[$tax][] = $term;
 					echo add_taxo( $tax, $term );
 					add_term_to_cid( $cid, $arr );
@@ -310,54 +309,83 @@ function exchange_tag_importer() {
 	fclose($fh);
 }
 
-function match_organisation_by_pid( $orgs, $pid ) {
-	$participant_args = array(
-	  'post_type' => 'participant',
-	  'posts_per_page' => 1,
-	  'post_status' => 'draft',
-	  'meta_key' => 'participant_id',
-	  'meta_value' => $pid,
+function exchange_location_tags_by_participants() {
+	$result = array();
+	$collab_args = array(
+		'post_type' => 'collaboration',
+		'posts_per_page' => -1,
+		'post_status' => 'draft',
 	);
-	$participant_query = new WP_Query($participant_args);
-	if ( empty( $participant_query->posts ) ) {
-		return;
-	}
-	$participant = $participant_query->posts[0];
-
-	if ( $participant->post_type !== 'participant' ) {
-		return;
-	}
-
-	if ( empty( $orgs[ $pid ] ) ) {
-		return;
-	}
-	$org = $orgs[$pid];
-	echo htmlspecialchars( $org ) .'<br />';
-	update_field( 'organisation_name', $org, $participant->ID );
-}
-
-function exchange_organisation_name_matcher() {
-	$fh = fopen( EXCHANGE_PLUGIN_PATH . 'organisation_names.csv', 'r' );
-
-	if ($fh) {
-		echo "yup";
-		$orgs = array();
-		while ( ( $row = fgetcsv( $fh ) ) !== false ) {
-			print_r( $row);
-			// csv headings, so continue/ignore this iteration:
-			if ($line == 0) { // 2
-				$line++; // 3
-				continue; // 4
+	$query = new WP_Query($collab_args);
+	$collabs = $query->posts;
+	if(!empty($collabs)) {
+		foreach($collabs as $collab) {
+			$cid = get_field( 'collaboration_id', $collab->ID );
+			$locations = array();
+			$arr = array();
+			$exchange = BaseController::exchange_factory( $collab );
+			foreach( $exchange->participants as $p ) {
+				if ( ! empty( $p->org_city ) ) {
+					$locations[] = $p->org_city;
+					var_dump( $p->org_city );
+				}
 			}
-			$col = 0;
-			$pid = $row[0];
-			$org = $row[1];
-			$orgs[$pid] = $org;
-			match_organisation_by_pid($orgs, $pid);
-			// Keep logic here to add to database, line 1 onwards
-			$line++;
+			if ( ! empty( $locations ) ) {
+				$arr['location'] = $locations;
+				add_term_to_cid($cid, $arr);
+			}
 		}
 	}
-
-	fclose($fh);
 }
+
+// function match_organisation_by_pid( $orgs, $pid ) {
+// 	$participant_args = array(
+// 	  'post_type' => 'participant',
+// 	  'posts_per_page' => 1,
+// 	  'post_status' => 'draft',
+// 	  'meta_key' => 'participant_id',
+// 	  'meta_value' => $pid,
+// 	);
+// 	$participant_query = new WP_Query($participant_args);
+// 	if ( empty( $participant_query->posts ) ) {
+// 		return;
+// 	}
+// 	$participant = $participant_query->posts[0];
+//
+// 	if ( $participant->post_type !== 'participant' ) {
+// 		return;
+// 	}
+//
+// 	if ( empty( $orgs[ $pid ] ) ) {
+// 		return;
+// 	}
+// 	$org = $orgs[$pid];
+// 	echo htmlspecialchars( $org ) .'<br />';
+// 	update_field( 'organisation_name', $org, $participant->ID );
+// }
+
+// function exchange_organisation_name_matcher() {
+// 	$fh = fopen( EXCHANGE_PLUGIN_PATH . 'organisation_names.csv', 'r' );
+//
+// 	if ($fh) {
+// 		echo "yup";
+// 		$orgs = array();
+// 		while ( ( $row = fgetcsv( $fh ) ) !== false ) {
+// 			print_r( $row);
+// 			// csv headings, so continue/ignore this iteration:
+// 			if ($line == 0) { // 2
+// 				$line++; // 3
+// 				continue; // 4
+// 			}
+// 			$col = 0;
+// 			$pid = $row[0];
+// 			$org = $row[1];
+// 			$orgs[$pid] = $org;
+// 			match_organisation_by_pid($orgs, $pid);
+// 			// Keep logic here to add to database, line 1 onwards
+// 			$line++;
+// 		}
+// 	}
+//
+// 	fclose($fh);
+// }
