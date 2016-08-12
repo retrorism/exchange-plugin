@@ -220,13 +220,77 @@ function exchange_add_update_form_link( $post_ID, $post_obj ) {
 	}
 }
 
-function exchange_iterate_filter( $input ) {
+function exchange_iterate_filter( $input, $post_id, $indices, $last_iter = '' ) {
+
     foreach ( $input as $key => $val ) {
-        if ( is_array( $val ) ) {
-            $input[ $key ] = exchange_iterate_filter( $input[ $key ] );
-        }
-		if ( '' === $input[ $key ] ) {
-			unset( $input[ $key ] );
+		if ( is_array( $val ) ) {
+			// Let's find out in what kind of array we are currently.
+			if ( 'field_56cf1e8d69ac5' === $key ) {
+				// Depth 1: field_56cf1e8d69ac5 = sections
+				// $indices['section_index'] = $indices['section_index'] + 1;
+				// $indices['content_index'] = -1;
+				// $indices['element_index'] = -1;
+				// $indices['subelement_index'] = -1;
+				$last_iter = 'section_index';
+			} elseif ( 'field_57ad96b367287' === $key ) {
+				// Depth 2: field_57ad96b367287 = content
+				// $indices['content_index'] = $indices['content_index'] + 1;
+				// $indices['element_index'] = -1;
+				// $indices['subelement_index'] = -1;
+				$last_iter = 'content_index';
+			} elseif ( 'field_57ad96b367288' === $key ) {
+				// Depth 3: field_57ad96b367288 = story_elements
+				// $indices['element_index'] = $indices['element_index'] + 1;
+				// $indices['subelement_index'] = -1;
+				// $el_type_index = '_story_elements_' . $indices['element_index'];
+				$last_iter = 'element_index';
+			} elseif ( 'field_574c142388c64' === $key ) {
+				// Depth 3: field_57ad98f1884a4 = grid_elements
+				// $indices['element_index'] = $indices['element_index'] + 1;
+				// $indices['subelement_index'] = -1;
+				// $el_type = '_select_grid_items_' . $indices['element_index'];
+				$last_iter = 'element_index';
+			} elseif ( is_int( $key ) ) {
+				//var_dump( 'resetting indices for ' . $last_iter );
+				$indices[$last_iter] = $key;
+			}
+			//var_dump( $indices );
+			// Depth 4 = interviews
+			// Skipping these for now.
+			$input[ $key ] = exchange_iterate_filter( $val, $post_id, $indices, $last_iter );
+		}
+		// Only iterate into previous version to see if there's an old value that needs to be overwritten.
+		if ( '' === $val ) {
+			$field = get_field_object( $key, $post_id, false, false );
+			if ( ! empty( $field ) && isset( $field['name'] ) ) {
+				if ( array_key_exists( $key, $_POST['acf'] ) ) {
+					$meta_name = $field['name'];
+				} elseif ( $indices['element_index'] > -1 ) {
+					//var_dump( $indices['element_index'] );
+					$meta_name = 'sections_' . $indices['section_index'] . '_contents_' . $indices['content_index'] . $el_type . $field['name'];
+				} elseif ( $indices['content_index'] > -1 ) {
+					$meta_name = 'sections_' . $indices['section_index'] . '_contents_' . $indices['content_index'] . '_' . $field['name'];
+				} elseif ( $indices['section_index'] > -1 ) {
+					$meta_name = 'sections_' . $indices['section_index'] . '_' . $field['name'];
+				}
+				// echo '<hr />';
+				// 	var_dump( 'this is now empty: ' . $meta_name );
+				// echo '<hr />';
+				$previous_value = get_post_meta( $post_id, $meta_name, true );
+				// Only unset the key's value if the previous value was also empty or not set.
+				// This should skip the deepest arrays.
+				if ( empty( $previous_value ) ) {
+					// echo '<hr />';
+					// 	var_dump( 'resetting: ' . $meta_name );
+					// echo '<hr />';
+					unset( $input[ $key ] );
+				} else {
+					// echo '<hr />';
+					// 	echo 'keeping';
+					// 	var_dump( $previous_value );
+					// echo '<hr />';
+				}
+			}
 		}
     }
 	return $input;
@@ -234,12 +298,32 @@ function exchange_iterate_filter( $input ) {
 
 function exchange_remove_empty_acf_meta_at_save( $post_id ) {
 	// bail early if no ACF data
-    if( empty($_POST['acf']) ) {
+    if( empty( $_POST['acf'] ) ) {
         return;
     }
 
+	if ( ! in_array( get_post_type( $post_id ), array( 'story','page' ) ) ) {
+		return;
+	}
+
+	$fields = $_POST['acf'];
+
+	// /var_dump( $fields['field_56cf1e8d69ac5'] );
+
+	$indices = array(
+		'section_index'    => -1,
+		'content_index'    => -1,
+		'element_index'    => -1,
+		'subelement_index' => -1,
+	);
 	// array of field values
-	$_POST['acf'] = exchange_iterate_filter( $_POST['acf'] );
+
+		$_POST['acf'] = exchange_iterate_filter( $fields, $post_id, $indices );
+
+	// print_r( $fields );
+	//
+	// throw new Exception();
+
 }
 
 add_action('acf/save_post', 'exchange_remove_empty_acf_meta_at_save', 1);
