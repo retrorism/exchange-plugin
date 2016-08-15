@@ -153,7 +153,7 @@ class StoryController extends BaseController {
 		 $this->container->has_editorial_intro = true;
 		 // Allow for translations and buttons
 		 $acf_intro_add_translation = get_post_meta( $this->container->post_id, 'add_intro_translation');
-		 if ( ! empty( $acf_intro_add_translation && function_exists( 'get_field' ) ) ) {
+		 if ( $acf_intro_add_translation && function_exists( 'get_field' ) ) ) {
 			 $acf_intro_translations = get_field( 'intro_translations', $this->container->post_id );
 			 $intro_input['add_translation'] = $acf_intro_add_translation;
 			 $intro_input['translations'] = $acf_intro_translations;
