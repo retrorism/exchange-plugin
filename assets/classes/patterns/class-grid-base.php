@@ -78,8 +78,8 @@ abstract class BaseGrid extends BasePattern {
 			foreach ( $this->input as $item ) {
 				if ( is_array( $item ) ) {
 					$this->add_grid_item( $this->create_grid_item_from_layout( $item ) );
-				} elseif ( is_object( $item ) ) {
-					$this->add_grid_item( $this::create_grid_item_from_post( $item, $this->element ) );
+				} elseif ( is_object( $item ) || is_numeric( $item ) ) {
+					$this->add_grid_item( self::create_grid_item_from_post( $item, $this->element ) );
 				}
 			}
 			if ( count( $this->grid_items ) > 0 ) {

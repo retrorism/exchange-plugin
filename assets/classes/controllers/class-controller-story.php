@@ -99,17 +99,16 @@ class StoryController extends BaseController {
 		// }
 
 		// Get related
-		if ( get_post_meta( $post_id, 'related_content_auto_select', true ) ) {
+		$curation = get_post_meta( $post_id, 'related_content_auto_select', true );
+		if ( ! $curation ) {
 			$related_content = $this->get_related_grid_content_by_tags();
 		} else {
 			$related_content = get_post_meta( $post_id, 'related_content', true );
 		}
 
 		if ( is_array( $related_content ) && count( $related_content ) > 0 ) {
-			$this->container->has_related_content = true;
 			$this->set_related_grid_content( $related_content );
 		}
-		$acf_has_custom_byline = get_post_meta( $post_id, 'has_custom_byline', true );
 
 		//Set sections.
 		if ( function_exists( 'get_field' ) ) {
@@ -152,8 +151,8 @@ class StoryController extends BaseController {
 		 );
 		 $this->container->has_editorial_intro = true;
 		 // Allow for translations and buttons
-		 $acf_intro_add_translation = get_post_meta( $this->container->post_id, 'add_intro_translation');
-		 if ( 1 == intval( $acf_intro_add_translation ) && function_exists( 'get_field' ) ) {
+		 $acf_intro_add_translation = get_post_meta( $this->container->post_id, 'add_intro_translation', true );
+		 if ( $acf_intro_add_translation && function_exists( 'get_field' ) ) {
 			 $acf_intro_translations = get_field( 'intro_translations', $this->container->post_id );
 			 $intro_input['add_translation'] = $acf_intro_add_translation;
 			 $intro_input['translations'] = $acf_intro_translations;

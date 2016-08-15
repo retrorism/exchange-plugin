@@ -531,7 +531,7 @@ abstract class BasePattern {
 
 			case 'paragraph':
 				$p_mods = array();
-				if ( ! empty( $input['add_translation'] ) && 1 == intval( $input['add_translation'] ) ) {
+				if ( isset( $input['add_translation'] ) && ! empty( $input['add_translation'] ) ) {
 					$translations = $input['translations'];
 					$p_mods['type'] = 'has_translations';
 					$languages = array();

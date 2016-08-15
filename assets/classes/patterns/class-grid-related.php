@@ -32,8 +32,10 @@ class RelatedGrid extends BaseGrid {
 	 protected function create_output() {
 
 		// If a grid is created inside a story, make this into an aside class.
-		if ( is_single() ) {
+		if ( is_single() || is_page() ) {
 			$el = 'aside';
+		} else {
+			$el = 'section';
 		}
 		$colour = '#' . $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['salmon-1-web'];
 		$this->set_grid_items();
