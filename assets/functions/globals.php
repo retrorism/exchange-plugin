@@ -51,25 +51,35 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 			// Parent programmes (not taxonomized for overall ease ).
 
 			'programmes' => array(
-				'C_P'     => 'Tandem Community & Participation',
+				'C_P'     => 'Tandem C & P',
 				'Europe'  => 'Tandem Europe',
 				'Shaml'   => 'Tandem Shaml',
 				'Turkey'  => 'Tandem Turkey',
 				'Ukraine' => 'Tandem Ukraine',
 			),
+
 			// Priority in taxonomy types, listed by ACF Field label.
-			'display_priority_story' => array(
-				1 => 'tandem',
-				2 => 'topic',
-				3 => 'location',
-			),
-			'display_priority_collaboration' => array(
-				1 => 'topic',
-				2 => 'location',
-				3 => 'discipline',
-				4 => 'methodology',
-				5 => 'output',
-			),
+			// 'display_priority_story' => array(
+			// 'display_priority_collaboration' => array(
+			// 	0 => 'tandem',
+			// 	1 => 'post_tag'
+			// 	2 => 'topic',
+			// 	3 => 'location',
+			// 	4 => 'discipline',
+			// 	5 => 'methodology',
+			// 	6 => 'output',
+			//  7 => 'language',
+			// ),
+			'display_priority_story' => array( 'tandem','topic','location','discipline','methodology','project_output' ),
+			// 'display_priority_collaboration' => array(
+			// 	0 => 'post_tag',
+			// 	1 => 'topic',
+			// 	2 => 'location',
+			// 	3 => 'discipline',
+			// 	4 => 'methodology',
+			// 	5 => 'output',
+			// ),
+			'display_priority_collaboration' => array( 'topic','location','discipline','methodology','project_output' ),
 			// Maximum number of tags on grid items
 			'grid_tax_max' => 3,
 		)

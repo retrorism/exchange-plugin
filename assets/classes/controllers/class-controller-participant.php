@@ -43,14 +43,14 @@ class ParticipantController extends BaseController {
 
 	public function set_organisation_data() {
 		$post_id = $this->container->post_id;
-		$org_name = get_field( 'organisation_name', $post_id );
-		$org_short_name = get_field( 'organisation_short_name', $post_id );
-		$org_coords = get_field( 'organisation_location', $post_id );
-		$org_city = get_field( 'organisation_city', $post_id );
-		$org_country = get_field( 'organisation_country', $post_id );
-		$org_description = get_field( 'organisation_description', $post_id );
-		$org_website = get_field( 'organisation_website', $post_id );
-		$p_contactme = get_field( 'participant_email', $post_id );
+		$org_name = get_post_meta( $post_id, 'organisation_name', true );
+		$org_short_name = get_post_meta( $post_id, 'organisation_short_name', true );
+		$org_coords = get_post_meta( $post_id, 'organisation_location', true );
+		$org_city = get_post_meta( $post_id, 'organisation_city', true );
+		$org_country = get_post_meta( $post_id, 'organisation_country', true );
+		$org_description = get_post_meta( $post_id, 'organisation_description', true );
+		$org_website = get_post_meta( $post_id, 'organisation_website', true );
+		$p_contactme = get_post_meta( $post_id, 'participant_email', true );
 
 		if ( !empty( $org_name ) ) {
 			$this->container->org_name = $org_name;

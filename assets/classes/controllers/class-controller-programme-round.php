@@ -30,20 +30,20 @@ class Programme_RoundController extends BaseController {
 
 		$post_id = $this->container->post_id;
 
-		$acf_has_cta = get_field( 'has_cta', $post_id );
+		$acf_has_cta_story = get_post_meta( $post_id, 'has_cta_story', true );
 		// Set CTA check
-		if ( ! empty( $acf_has_cta ) ) {
-			$this->container->has_cta = $acf_has_cta;
+		if ( ! empty( $acf_has_cta_story ) ) {
+			$this->container->has_cta_story = $acf_has_cta_story;
 		}
 
-		$acf_is_active = get_field( 'is_active', $post_id );
+		$acf_is_active = get_post_meta( $post_id, 'is_active', true );
 		// Set active check
 		if ( $acf_is_active ) {
 			$this->container->is_active = true;
 		}
 
 		// Set editorial introduction.
-		$acf_editorial_intro = get_field( 'editorial_intro', $post_id );
+		$acf_editorial_intro = get_post_meta( $post_id, 'editorial_intro', true );
 		if ( ! empty( $acf_editorial_intro ) ) {
 			$this->container->has_editorial_intro = true;
 			$this->container->editorial_intro = new EditorialIntro( $acf_editorial_intro, 'programme_round' );
@@ -61,7 +61,7 @@ class Programme_RoundController extends BaseController {
 
 	private function retrieve_or_set_programme_round_token() {
 		$post_id = $this->container->post_id;
-		$acf_update_token = get_field( 'update_token', $post_id );
+		$acf_update_token = get_post_meta( $post_id, 'update_token', true );
 		if ( empty( $acf_update_token ) ) {
 			$acf_update_token = $this->set_programme_round_token();
 		}

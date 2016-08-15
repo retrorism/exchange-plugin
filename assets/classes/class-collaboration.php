@@ -145,9 +145,9 @@ class Collaboration extends Exchange {
 	 * @param object $controller Optional. Add existing controller if you want.
 	 **/
 	public function __construct( $post, $context = '', $controller = null ) {
-		Parent::__construct( $post, $context, $controller );
+		Parent::__construct( $post, $controller );
 		// Add standard WordPress data
-		$this->controller->map_collaboration_basics( $post );
+		$this->controller->map_collaboration_basics();
 		// Add featured image.
 
 		if ( ! in_array( $context, array( 'griditem', 'simplemap' ) ) ) {

@@ -102,10 +102,27 @@ class Section extends BasePattern {
 
 	public function create_output() {
 
+		if ( ! is_array( $this->input['contents'] ) ) {
+			return;
+		}
+
+		$length = count( $this->input['contents'] );
+
+		if ( 0 === $length ) {
+			return;
+		}
+
+		for ( $i = 0 ; $i < $length ; $i++ ) {
+			if ( ! empty( $this->input['contents'][ $i ]['acf_fc_layout'] ) ) {
+				$this->set_modifier_class( 'contents_' . $i, $this->input['contents'][ $i ]['acf_fc_layout'] );
+			}
+		}
+
 		// Check for background colour modifier and add to classes.
 		if ( ! empty( $this->input['background_colour'] ) ) {
 			$colour = $this->input['background_colour'];
 			$this->set_modifier_class( 'colour', $colour );
+			$this->set_modifier_class( 'style', 'coloured' );
 			$this->set_attribute( 'data', 'background-colour', $colour );
 		}
 
@@ -119,28 +136,26 @@ class Section extends BasePattern {
 
 		$this->build_section_header();
 
-		if ( ! empty( $this->input['contents'] ) ) {
+		foreach ( $this->input['contents'] as $section_contents ) {
 
-			foreach ( $this->input['contents'] as $section_contents ) {
-
-				switch ( $section_contents[ 'acf_fc_layout' ] ) {
-					case 'has_map' :
-						$this->set_map_data( $section_contents )->build_map();
-						break;
-					case 'has_form' :
-						$this->build_form( $section_contents );
-						break;
-					case 'has_grid' :
-						$this->build_simple_grid( $section_contents );
-						break;
-					case 'has_story_elements' :
-						$this->build_story_elements( $section_contents );
-						break;
-					case 'has_contact_details' :
-						$this->build_contact_block( $section_contents );
-						break;
-				}
+			switch ( $section_contents['acf_fc_layout'] ) {
+				case 'has_map' :
+					$this->set_map_data( $section_contents )->build_map();
+					break;
+				case 'has_form' :
+					$this->build_form( $section_contents );
+					break;
+				case 'has_grid' :
+					$this->build_simple_grid( $section_contents );
+					break;
+				case 'has_story_elements' :
+					$this->build_story_elements( $section_contents );
+					break;
+				case 'has_contact_details' :
+					$this->build_contact_block( $section_contents );
+					break;
 			}
+
 		}
 
 		$this->output .= '</div>';
@@ -269,7 +284,7 @@ class Section extends BasePattern {
 
 	private function update_form_ids() {
 		$ids = array();
-		$updateable = array( 'collaboration', 'participant' );
+		$updateable = array( 'collaboration', 'participant', 'story' );
 		foreach( $updateable as $type ) {
 			$update_form = get_option( 'options_' . $type . '_update_form');
 			if ( ! empty( $update_form ) ) {

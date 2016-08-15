@@ -45,7 +45,7 @@ class ContactBlock extends BasePattern {
 	protected function create_output() {
 
 		if ( is_array( $this->input ) && ! empty( $this->input['ID'] ) ) {
-			$this->set_user_acf();
+			$this->set_user_meta();
 			$this->set_user_image();
 			$this->output_tag_open();
 
@@ -68,8 +68,8 @@ class ContactBlock extends BasePattern {
 	/**
 	 * Set extra user fields
 	 */
-	private function set_user_acf() {
-		$user_acf = get_fields( 'user_' . $this->input['ID'] );
+	private function set_user_meta() {
+		$user_meta = get_user_meta( 'user_' . $this->input['ID'] );
 		if ( count( $user_acf ) ) {
 			$this->user_acf = $user_acf;
 		}

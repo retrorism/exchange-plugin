@@ -36,6 +36,9 @@ class EmphasisBlock extends BasePattern {
 			}
 			$this->output_tag_open();
 			$this->output .= '<div class="emphasisblock-inner" ' . $equalizer . '>';
+			if ( isset( $this->modifiers['type'] ) && 'post-it' === $this->modifiers['type'] ) {
+				$this->output .= '<div class="post-it-bg"></div>';
+			}
 			$this->output .= $this->build_block_elements();
 			$this->output .= '</div>';
 			$this->output_tag_close();

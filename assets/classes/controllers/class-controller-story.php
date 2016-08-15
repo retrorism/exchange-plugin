@@ -41,29 +41,24 @@ class StoryController extends BaseController {
 		$post_id = $this->container->post_id;
 
 		// Map ACF variables.
-		$acf_editorial_intro = get_field( 'editorial_intro', $post_id );
-		$acf_language = get_field( 'language', $post_id );
-		$acf_category = get_field( 'category', $post_id );
-		$acf_has_cta = get_field( 'has_cta', $post_id );
+		$acf_intro = get_post_meta( $post_id, 'editorial_intro', true );
+		$acf_language = wp_get_post_terms( $post_id, 'language', true );
+		$acf_category = wp_get_post_terms( $post_id, 'category', true );
+		$acf_has_cta = get_post_meta( $post_id, 'has_cta', true );
 
 		// Set editorial introduction.
-		if ( ! empty( $acf_editorial_intro ) ) {
-			$this->container->has_editorial_intro = true;
-			$this->container->editorial_intro = new EditorialIntro( $acf_editorial_intro, 'story' );
+		if ( ! empty( $acf_intro ) ) {
+			$this->set_editorial_intro( $acf_intro );
 		}
 
 		// Set language.
-		if ( is_object( $acf_language ) ) {
-			if ( 'WP_Term' === get_class( $acf_language ) ) {
-				$this->container->language = $acf_language;
-			}
+		if ( ! empty( $acf_language ) && 'WP_Term' === get_class( $acf_language[0] ) ) {
+			$this->container->language = $acf_language[0];
 		}
 
 		// Set category.
-		if ( is_object( $acf_category ) ) {
-			if ( 'WP_Term' === get_class( $acf_category ) ) {
-				$this->container->category = $acf_category->name;
-			}
+		if ( ! empty( $acf_category ) && 'WP_Term' === get_class( $acf_category[0] ) ) {
+			$this->container->category = $acf_category[0];
 		}
 
 		// Set CTA check
@@ -92,44 +87,44 @@ class StoryController extends BaseController {
 		// Retrieve post_id variable from basic mapping.
 		$post_id = $this->container->post_id;
 
-
 		// Set language global to language category
 		if ( isset( $this->container->language ) ) {
 			$GLOBALS['story_language'] = $this->container->language->name;
 		}
 
-		// Throw Exception when the input is not a valid story post type object.
-		if ( ! ( $post_id >= 1 ) ) {
-			unset( $this->container );
-			throw new Exception( 'This is not a valid post' );
-		}
-
-		$acf_sections = get_field( 'sections', $post_id );
+		// // Throw Exception when the input is not a valid story post type object.
+		// if ( ! ( $post_id >= 1 ) ) {
+		// 	unset( $this->container );
+		// 	throw new Exception( 'This is not a valid post' );
+		// }
 
 		// Get related
-		if ( get_field( 'related_content_auto_select', $post_id ) ) {
+		if ( get_post_meta( $post_id, 'related_content_auto_select', true ) ) {
 			$related_content = $this->get_related_grid_content_by_tags();
 		} else {
-			$related_content = get_field( 'related_content', $post_id );
+			$related_content = get_post_meta( $post_id, 'related_content', true );
 		}
 
 		if ( is_array( $related_content ) && count( $related_content ) > 0 ) {
 			$this->container->has_related_content = true;
 			$this->set_related_grid_content( $related_content );
 		}
-		$acf_has_custom_byline = get_field( 'has_custom_byline', $post_id );
+		$acf_has_custom_byline = get_post_meta( $post_id, 'has_custom_byline', true );
 
-		// Set sections.
-		if ( ! empty( $acf_sections ) ) {
-			$this->set_sections( $acf_sections );
+		//Set sections.
+		if ( function_exists( 'get_field' ) ) {
+			$acf_sections = get_field( 'sections', $post_id );
+			if ( ! empty( $acf_sections ) ) {
+				$this->set_sections( $acf_sections );
+			}
 		}
 
 		// Set header image.
-		$this->set_header_image( $post_id, 'story__header' );
+		$this->set_header_image( 'story__header' );
 
 
 		// Set participant as storyteller
-		$acf_storyteller = get_field( 'storyteller', $post_id );
+		$acf_storyteller = get_post_meta( $post_id, 'storyteller', true );
 		if ( is_numeric( $acf_storyteller ) ) {
 			$storyteller = BaseController::exchange_factory( $acf_storyteller );
 			if ( is_a( $storyteller, 'Participant' ) ) {
@@ -145,6 +140,26 @@ class StoryController extends BaseController {
 
 		$this->set_gallery();
 	}
+
+	/**
+	 * Set editorial intro.
+	 *
+	 * @param string $acf_intro Editorial Intro.
+	 */
+	 protected function set_editorial_intro( $acf_intro ) {
+		 $intro_input = array(
+			 'text' => '<p>' . $acf_intro . '</p>',
+		 );
+		 $this->container->has_editorial_intro = true;
+		 // Allow for translations and buttons
+		 $acf_intro_add_translation = get_post_meta( $this->container->post_id, 'add_intro_translation');
+		 if ( ! empty( $acf_intro_add_translation && function_exists( 'get_field' ) ) ) {
+			 $acf_intro_translations = get_field( 'intro_translations', $this->container->post_id );
+			 $intro_input['add_translation'] = $acf_intro_add_translation;
+			 $intro_input['translations'] = $acf_intro_translations;
+		 }
+		 $this->container->editorial_intro = new EditorialIntro( $intro_input, 'story' );
+	 }
 
 	/**
 	 * Retrieve story byline template from options page.
@@ -194,11 +209,15 @@ class StoryController extends BaseController {
 			$byline_template = $templates['past'];
 		}
 		$collab_term = $this->container->storyteller->collaboration->programme_round->term;
-		$term = term_exists( $collab_term, 'post_tag' );
-		$term_link = ! empty( $term['term_id'] ) ? exchange_create_link( get_term( $term['term_id'] ) ) : $this->container->storyteller->collaboration->programme_round->title;
+		if ( ! empty( $collab_term ) ) {
+			$term = get_term_by( 'slug', $collab_term, 'post_tag' );
+		}
+		$term_link = $term instanceof WP_Term
+			? exchange_create_link( $term )
+			: $this->container->storyteller->collaboration->programme_round->title;
 		$byline_template = str_replace( '[[storyteller]]', $this->container->storyteller->name, $byline_template );
 		$byline_template = str_replace( '[[programme_round]]', $term_link, $byline_template );
-		$byline = '<p>' . str_replace( '[[collaboration]]', exchange_create_link( $this->container->storyteller->collaboration ), $byline_template ) . '</p';
+		$byline = '<p>' . str_replace( '[[collaboration]]', exchange_create_link( $this->container->storyteller->collaboration ), $byline_template ) . '</p>';
 		$this->container->byline = new Byline( $byline, 'footer' );
 	}
 
@@ -209,7 +228,7 @@ class StoryController extends BaseController {
 	 * @access protected
 	 **/
 	protected function set_custom_byline() {
-		$acf_custom_byline = get_field( 'custom_byline', $this->container->post_id );
+		$acf_custom_byline = get_post_meta( $this->container->post_id, 'custom_byline', true );
 		if ( ! empty( $acf_custom_byline ) ) {
 			$this->container->has_custom_byline = true;
 			$this->container->byline = new Byline( $acf_custom_byline, 'footer' );

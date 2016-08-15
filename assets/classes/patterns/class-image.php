@@ -135,7 +135,7 @@ class Image extends BasePattern {
 		// Close anchor.
 		$this->anchor( 'open' );
 
-		// Add placeholder for images that need lazy-loading.
+		// Add placeholder for images that don't need lazy-loading.
 		if ( in_array( $this->context, array( 'collaboration__header', 'griditem','contactblock','griditem__pattern' ), true ) ) {
 			$this->lazy = false;
 			$caption = false;

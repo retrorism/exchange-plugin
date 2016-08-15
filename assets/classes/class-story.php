@@ -70,7 +70,7 @@ class Story extends Exchange {
 	 * @param string $context Context, to allow for partial mapping.
 	 **/
 	public function __construct( $post, $context = '', $controller = null ) {
-		Parent::__construct( $post );
+		Parent::__construct( $post, $controller );
 		$this->controller->map_story_basics();
 
 		if ( 'griditem' === $context ) {

@@ -40,7 +40,6 @@ function exchange_slug_to_hex( $slug ) {
 	}
 }
 
-
 /**
  * Pick black or white to contrast with chosen hexcolor
  *
@@ -59,7 +58,7 @@ function exchange_get_contrast_YIQ( $hex ) {
 /**
  * Create link (or simply an opening tag)
  *
- * @param object Exchange object to link to OR WP_Term
+ * @param $object mixed Exchange object, term or ID
  * @param bool @with_text Optional. Add object title as link text, or simply open tag.
 
  * @return string Anchor tag with appropriate attributes and / or title.
@@ -74,12 +73,15 @@ function exchange_create_link( $obj, $with_text = true, $class = '' ) {
 		$title = $obj->title;
 		$cat = 'story';
 	} elseif ( $obj instanceof WP_Term ) {
-			$url = get_term_link( $obj, 'post_tag' );
-			$title = $obj->name;
+		$url = get_term_link( $obj );
+		$title = $obj->name;
 	}
-	if ( 'griditem__button button--small' === $class ) {
-		if  ( 'story' === $obj->type && isset( $obj->category ) ) {
-			$cat = $obj->category;
+	$button_classes = array(
+		'griditem__button button--small'
+	);
+	if ( in_array( $class, $button_classes, true ) ) {
+		if  ( isset( $obj->category ) ) {
+			$cat = $obj->category->slug;
 			$labels = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['CATEGORIES']['button_labels'];
 			if ( array_key_exists( $cat, $labels ) ) {
 				$title = strtoupper( $labels[ $cat ] );
@@ -143,15 +145,6 @@ function exchange_get_focus_points( $thumb ) {
 function exchange_post_exists( $id ) {
   return is_string( get_post_status( $id ) );
 }
-
-
-add_filter( 'get_the_archive_title', function ( $title ) {
-
-	$title = str_replace('Archives:','', $title);
-
-    return $title;
-
-});
 
 function exchange_build_svg( $svg_src, $fallback = false) {
 	if ( ! is_string( $svg_src ) || '' === $svg_src ) {

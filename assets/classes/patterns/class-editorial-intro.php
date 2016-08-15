@@ -31,11 +31,9 @@ class EditorialIntro extends BasePattern {
 	 * @access protected
 	 **/
 	 protected function create_output() {
-		if ( is_string( $this->input ) && ! empty( $this->input ) ) {
-			$this->output_tag_open();
-			$content = new Paragraph( $this->input, $this->element );
-			$this->output .= $content->embed();
-			$this->output_tag_close();
-		}
+		$this->output_tag_open();
+		$content = BasePattern::pattern_factory( $this->input, 'paragraph', $this->element, true );
+		$this->output .= $content->embed();
+		$this->output_tag_close();
 	}
 }

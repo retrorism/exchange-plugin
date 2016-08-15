@@ -182,3 +182,11 @@ function mmp_rewrite_rules($rules) {
 }
 
 add_filter('rewrite_rules_array', 'mmp_rewrite_rules');
+
+add_filter( 'get_the_archive_title', function ( $title ) {
+
+	$title = str_replace('Archives:','', $title);
+
+    return $title;
+
+});

@@ -35,7 +35,6 @@ add_action( 'save_post_collaboration', 'exchange_set_attachments_post_tag', 10, 
 add_action( 'save_post_programme_round', 'exchange_set_attachments_post_tag', 10, 4 );
 add_action( 'attachment_updated', 'exchange_set_attachment_media_tags', 10, 3 );
 
-
 // add_filter( 'pre_option_tag_base', 'exchange_change_tag_base' );
 // function exchange_change_tag_base( $value ) {
 //
@@ -61,7 +60,8 @@ function exchange_modify_post_tag() {
     // again, note that it's an object
 	$programme_round_args->query_var = 'programme-round';
     $programme_round_args->rewrite['slug'] = 'programme-round';
-    $programme_round_args->rewrite['with_front'] = true;
+    $programme_round_args->rewrite['with_front'] = 1;
+	$programme_round_args->rewrite['show_ui'] = 0;
 
     // re-register the taxonomy
     register_taxonomy( 'post_tag', array('story','collaboration','programme_round'), (array) $programme_round_args);
@@ -108,7 +108,7 @@ add_action( 'template_redirect', 'exchange_url_rewrite_templates' );
 function exchange_create_tax_tandem() {
 	register_taxonomy(
 		'tandem',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
-		'story',	// Post type name.
+		array( 'story', 'page' ), // Post type name.
 		array(
 			'hierarchical' => false,
 			'sort'         => true,
@@ -134,7 +134,7 @@ function exchange_create_tax_tandem() {
 function exchange_create_tax_language() {
 	register_taxonomy(
 		'language',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
-		'story',	// Post type name.
+		array( 'story', 'page' ), // Post type name.
 		array(
 			'hierarchical' => false,
 			'sort'         => true,
@@ -160,7 +160,7 @@ function exchange_create_tax_language() {
 function exchange_create_tax_topic() {
 	register_taxonomy(
 		'topic',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
-		array( 'collaboration','story' ), // Post type name.
+		array( 'story', 'collaboration', 'page' ), // Post type name.
 		array(
 			'hierarchical' => false,
 			'sort'         => true,
@@ -185,7 +185,7 @@ function exchange_create_tax_topic() {
 function exchange_create_tax_location() {
 	register_taxonomy(
 		'location',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
-		array( 'story', 'collaboration' ), // Post type name.
+		array( 'story', 'collaboration', 'page' ), // Post type name.
 		array(
 			'hierarchical' => false,
 			'sort'         => true,
@@ -208,7 +208,7 @@ function exchange_create_tax_location() {
 function exchange_create_tax_methodology() {
 	register_taxonomy(
 		'methodology',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
-		array( 'collaboration' ), // Post type name.
+		array( 'story', 'collaboration', 'page' ), // Post type name.
 		array(
 			'hierarchical' => false,
 			'sort'         => true,
@@ -231,7 +231,7 @@ function exchange_create_tax_methodology() {
 function exchange_create_tax_discipline() {
 	register_taxonomy(
 		'discipline',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
-		array( 'collaboration' ),	// Post type name.
+		array( 'story', 'collaboration', 'page' ), // Post type name.
 		array(
 			'hierarchical' => false,
 			'sort'         => true,
@@ -257,7 +257,7 @@ function exchange_create_tax_discipline() {
 function exchange_create_tax_project_output() {
 	register_taxonomy(
 		'project_output', // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
-		'collaboration', // Post type name.
+		array( 'story', 'collaboration', 'page' ), // Post type name.
 		array(
 			'hierarchical' => false,
 			'sort'         => true,

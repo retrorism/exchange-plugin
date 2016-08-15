@@ -72,22 +72,22 @@ class CollaborationController extends BaseController {
 		$post_id = $this->container->post_id;
 
 		// Set project website.
-		$acf_website = get_field( 'collaboration_website', $post_id );
+		$acf_website = get_post_meta( $post_id, 'collaboration_website', true );
 		if ( ! empty( $acf_website ) ) {
 			$this->container->website = $acf_website;
 		}
 
 		// Set sections.
-		$acf_sections = get_field( 'sections', $post_id );
-		if ( ! empty( $acf_sections ) ) {
-			$this->set_sections( $acf_sections );
-		}
+		//$acf_sections = get_post_meta( $post_id, 'sections', true );
+		// if ( ! empty( $acf_sections ) ) {
+		// 	$this->set_sections( $acf_sections );
+		// }
 
 		// Add description.
 		$this->set_description();
 
 		// Add header image.
-		$this->set_header_image( $post_id, 'collaboration__header' );
+		$this->set_header_image( 'collaboration__header' );
 
 		// Set video and gallery.
 		$this->set_media();
@@ -169,8 +169,8 @@ class CollaborationController extends BaseController {
 	 * @return void.
 	 */
 	protected function set_participants() {
-		$acf_participants = get_field( 'participants', $this->container->post_id );
-		if ( empty( $acf_participants ) || ! is_array( $acf_participants ) ) {
+		$acf_participants = get_post_meta($this->container->post_id, 'participants', true );
+		if ( empty( $acf_participants ) ) {
 			return;
 		}
 		foreach( $acf_participants as $participant ) {
@@ -191,14 +191,14 @@ class CollaborationController extends BaseController {
 	 */
 	protected function set_description() {
 		$post_id = $this->container->post_id;
-		$description = get_field( 'description', $post_id  );
+		$description = get_post_meta(  $post_id, 'description', true );
 		if ( empty( $description ) || ! is_string( $description ) ) {
 			return;
 		}
 		$length = str_word_count( $description );
-		$add_translation = get_field( 'add_translation', $post_id );
+		$add_translation = get_post_meta(  $post_id, 'add_translation', true );
 		if ( $add_translation ) {
-			$translations = get_field( 'translations' );
+			$translations = get_post_meta( $post_id, 'translations', true );
 		}
 		if ( ! isset( $translations ) || empty( $translations ) ) {
 			$this->container->description = new Paragraph( $description );
@@ -255,10 +255,10 @@ class CollaborationController extends BaseController {
 
 	protected function set_related_content() {
 		$post_id = $this->container->post_id;
-		if ( get_field( 'related_content_auto_select', $post_id ) ) {
+		if ( get_post_meta(  $post_id, 'related_content_auto_select', $post_id, true ) ) {
 			$related_content = $this->get_related_grid_content_by_tags();
 		} else {
-			$related_content = get_field( 'related_content', $post_id );
+			$related_content = get_post_meta( 'related_content', $post_id, true );
 		}
 		if ( is_array( $related_content ) && count( $related_content ) > 0 ) {
 			$this->container->has_related_content = true;
@@ -266,5 +266,16 @@ class CollaborationController extends BaseController {
 		}
 	}
 
+
+	protected function set_tag_from_programme_round() {
+		$slug = $this->container->programme_round->term;
+		if ( empty( $slug ) ) {
+			return;
+		}
+		$term_id = wp_set_object_terms( $this->container->post_id, $slug, 'post_tag' );
+		if ( ! empty( $term_id ) ) {
+			return $term_id;
+		}
+	}
 
 }

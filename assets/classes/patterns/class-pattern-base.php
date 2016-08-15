@@ -531,13 +531,17 @@ abstract class BasePattern {
 
 			case 'paragraph':
 				$p_mods = array();
-				$translations = $input['translations'];
-				if ( $input['add_translation'] && ! empty( $translations ) ) {
+				if ( ! empty( $input['add_translation'] ) ) {
+					$translations = $input['translations'];
 					$p_mods['type'] = 'has_translations';
 					$languages = array();
 					foreach( $translations as $t ) {
 						if ( ! empty ( $t['translation_text'] ) ) {
-							$languages[] = $t['translation_language'];
+							if ( $t['translation_language'] instanceof WP_Term ) {
+								$languages[] = $t['translation_language']->name;
+							} elseif ( is_string( $t['translation_language'] ) ) {
+								$languages[] = $t['translation_language'];
+							}
 						}
 					}
 					$p_mods['data']['languages'] = implode(',', $languages );

@@ -33,7 +33,7 @@ class GridItem extends BasePattern {
 	 protected function create_output() {
 
 		if ( ! is_object( $this->input ) ) {
-			throw new Exception("Testing {1:What are we testing?}");
+			return;
 		}
 		$this->output_tag_open();
 		if ( $this->input instanceof Exchange ) {

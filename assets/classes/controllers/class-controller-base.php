@@ -70,7 +70,6 @@ class BaseController {
 			'story'           => 'story',
 			'page'            => 'story',
 			'programme_round' => 'programme_round',
-			'grid_breaker'    => 'grid_breaker',
 			'collaboration'   => 'collaboration',
 			'participant'     => 'participant',
 		);
@@ -92,11 +91,11 @@ class BaseController {
 	 *
 	 * @throws Exception when wrong post type is supplied.
 	 **/
-	public static function exchange_factory( $post_id_or_object, $context = '' ) {
+	public static function exchange_factory( $post_id_or_object, $context = '', $check_for_type = null ) {
 		if ( is_numeric( $post_id_or_object ) && $post_id_or_object > 0 ) {
 			$post_id_or_object = get_post( $post_id_or_object );
 		}
-		$type = self::is_correct_content_type( $post_id_or_object );
+		$type = self::is_correct_content_type( $post_id_or_object, $check_for_type );
 		if ( empty( $type ) ) {
 			throw new Exception( __( 'The factory disagrees: type = ' ) . $type );
 		}
@@ -108,12 +107,6 @@ class BaseController {
 				return new Programme_Round( ...$args );
 			case 'participant':
 				return new Participant( ...$args );
-			case 'grid_breaker':
-				// Context grid is required for now.
-				if ( 'griditem' === $context ) {
-					return new Grid_Breaker( ...$args );
-				}
-				break;
 			case 'story':
 			case 'page':
 			default:
@@ -154,13 +147,14 @@ class BaseController {
 		// Set post_type.
 		$exchange->type = $post->post_type;
 
-		if ( $post->post_parent >= 1 ) {
+		if ( 'collaboration' === $exchange->type && $post->post_parent >= 1 ) {
 			$exchange->controller->set_programme_round( $post->post_parent );
 		}
 
 		if ( 'programme_round' === $exchange->type ) {
 			 $slug = sanitize_title( $exchange->title );
-			 $exchange->term = term_exists( $slug, 'post_tag' ) ? $slug : null;
+			 //$exchange->term = get_term_by( 'slug', $slug, 'post_tag' ) ? $slug : null;
+			 $exchange->term = $slug;
 		}
 
 		// Set permalink.
@@ -183,23 +177,44 @@ class BaseController {
 		}
 	}
 
+	// // Store sections in Exchange object
+	// protected function set_sections( $acf_sections ) {
+	// 	// Loop through sections.
+	// 	if ( empty( $acf_sections ) ) {
+	// 		return;
+	// 	}
+	// 	for ( $i = 0; $i < $acf_sections; $i++ ) {
+	// 		$section_mods = array();
+	// 		$contents = get_post_meta( $this->container->post_id, 'sections_' . $i . '_contents', true );
+	// 		var_dump( $contents );
+	// 		throw new Exception("Testing {1:What are we testing?}");
+	// 		if ( ! empty( $contents ) && isset( $contents['acf_fc_layout'] ) ) {
+	// 			$section_mods['type'] = $contents['acf_fc_layout'];
+	// 		}
+	// 		$section = new Section( $contents, strtolower( get_class( $this->container ) ), $section_mods );
+	// 		if ( is_object( $section ) && is_a( $section, 'Section' ) ) {
+	// 			$this->container->sections[] = $section;
+	// 		}
+	// 	}
+	// }
 
-	protected function get_header_image_source( $post_id ) {
-		return get_field( 'header_image' );
+
+	protected function get_header_image_source() {
+		return get_post_meta( 'header_image', $this->container->post_id, true );
 	}
 
-	protected function get_header_image( $post_id, $context ) {
-		switch ( $this->get_header_image_source( $post_id ) ) {
+	protected function get_header_image( $context ) {
+		switch ( $this->get_header_image_source( $context ) ) {
 			case 'upload_new_image':
-				$thumb = get_field( 'upload_header_image', $post_id );
+				$thumb = get_post_meta( 'upload_header_image', $this->container->post_id, true );
 				break;
 			case 'none':
 				break;
 			case 'use_featured_image':
 			default:
-				$thumb_id = get_post_thumbnail_id( $post_id );
+				$thumb_id = get_post_thumbnail_id( $this->container->post_id );
 				// Use ACF function to create array for Image object constructor.
-				if ( ! empty( $thumb_id ) ) {
+				if ( ! empty( $thumb_id ) && function_exists( 'acf_get_attachment' ) ) {
 					$thumb = acf_get_attachment( $thumb_id );
 				}
 				break;
@@ -227,8 +242,8 @@ class BaseController {
 	 * @param integer $post_id.
 	 * @return HeaderImage object or null
 	 */
-	protected function set_header_image( $post_id, $context = '' ) {
-		$image = $this->get_header_image( $post_id, $context );
+	protected function set_header_image( $context = '' ) {
+		$image = $this->get_header_image( $context );
 		if ( is_object( $image ) && is_a($image, 'Image') ) {
 			$this->container->header_image = $image;
 			$this->container->has_header_image = true;
@@ -242,8 +257,8 @@ class BaseController {
 	 * @param integer $post_id.
 	 * @return null or Image object;
 	 **/
-	protected function get_featured_image( $post_id, $context ) {
-		$thumb_props = $this->get_featured_image_props( $post_id );
+	protected function get_featured_image( $context ) {
+		$thumb_props = $this->get_featured_image_props();
 		$focus_points = exchange_get_focus_points( $thumb_props );
 		$image_mods = array();
 		if ( ! empty( $focus_points ) ) {
@@ -255,12 +270,13 @@ class BaseController {
 		}
 	}
 
-	protected function get_featured_image_props( $post_id ) {
+	protected function get_featured_image_props() {
+		$post_id = $this->container->post_id;
 		$thumb_id = get_post_thumbnail_id( $post_id );
-		if ( empty( $thumb_id ) ) {
+		if ( empty( $thumb_id ) && function_exists( 'acf_get_attachment' ) ) {
 			$thumb_props = acf_get_attachment( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['IMAGES']['fallback_image_att_id'] );
 		} else {
-			if ( 'attachment' === get_post( $thumb_id )->post_type ) {
+			if ( 'attachment' === get_post( $thumb_id )->post_type && function_exists( 'acf_get_attachment' ) ) {
 				$thumb_props = acf_get_attachment( $thumb_id );
 			}
 		}
@@ -276,7 +292,7 @@ class BaseController {
 	 * @return void.
 	 **/
 	public function set_featured_image( $context = '' ) {
-		$image = $this->get_featured_image( $this->container->post_id, $context );
+		$image = $this->get_featured_image( $context );
 		if ( is_a( $image, 'Image' ) ) {
 			$this->container->has_featured_image = true;
 			$this->container->featured_image = $image;
@@ -307,15 +323,15 @@ class BaseController {
 	}
 
 	protected function get_gallery_from_acf() {
-		$gallery = get_field( $this->container->type . '_gallery', $this->container->post_id );
+		$gallery = get_post_meta( $this->container->type . '_gallery', $this->container->post_id, true );
 		return $gallery;
 	}
 
 	protected function get_video_from_acf() {
 		// Set empty array for video properties
 		$input = array();
-		$video = get_field( $this->container->type . '_video_embed_code', $this->container->post_id );
-		$video_caption = get_field( $this->container->type . '_video_caption', $this->container->post_id );
+		$video = get_post_meta( $this->container->type . '_video_embed_code', $this->container->post_id, true );
+		$video_caption = get_post_meta( $this->container->type . '_video_caption', $this->container->post_id, true );
 		if ( empty( $video ) ) {
 			return;
 		}
@@ -459,7 +475,20 @@ class BaseController {
 	 * @return void.
 	 **/
 	protected function get_ordered_tag_list() {
-		$results = wp_get_post_terms( $this->container->post_id );
+		// Returns empty array if nothing found (and the post tag taxonomy exists ).
+		$post_tags = get_object_term_cache( $this->container->post_id, 'post_tag' );
+		if ( ! $post_tags || empty( $post_tags ) ) {
+			$ordered_tag_list = wp_get_object_terms( $this->container->post_id, 'post_tag' );
+		} else {
+			$ordered_tag_list = $post_tags;
+		}
+		if ( empty( $ordered_tag_list ) && 'collaboration' === $this->container->type ) {
+			$term_id = $this->set_tag_from_programme_round();
+			if ( is_numeric( $term_id ) ) {
+				$ordered_tag_list[] = get_term( intval( $term_id[0] ), 'post_tag');
+			}
+		}
+		// Empty tax array.
 		switch ( $this->container->type ) {
 			case 'story':
 				$tax_list = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['display_priority_story'];
@@ -470,21 +499,37 @@ class BaseController {
 			default:
 				return;
 		}
-		foreach( $tax_list as $taxonomy ) {
-			$tax_results = get_field( $taxonomy, $this->container->post_id );
-			if ( empty( $tax_results ) ) {
-				continue;
+		foreach ( $tax_list as $tax ) {
+			// Try and retrieve terms from object from cache in the order of the tax list.
+			$terms = get_object_term_cache( $this->container->post_id, $tax );
+			if ( ! $post_tags || empty( $post_tags ) ) {
+				if ( function_exists( 'get_field' ) ) {
+					$tax_results = get_field( $tax, $this->container->post_id );
+				}
+			} else {
+				$tax_results = $terms;
 			}
-			if ( is_object( $tax_results ) ) {
-				$tax_results = array( $tax_results );
+			// Attempt to retrieve the pr_tag from the collaborations parent.
+			if ( ! empty( $tax_results ) ) {
+				if ( is_numeric( $tax_results ) ) {
+					$term_obj = get_term( $tax_results );
+					if ( $term_obj instanceof WP_Term ) {
+						$tax_results = array( $term_obj );
+					}
+				}
+				if ( $tax_results instanceof WP_Term ) {
+					$tax_results = array( $tax_results );
+				}
+				if ( is_array( $tax_results ) ) {
+					$ordered_tag_list = array_merge( $ordered_tag_list, $tax_results );
+				}
 			}
-			$results = array_merge( $results, $tax_results );
 		}
 		if ( isset( $this->container->language ) ) {
-			$results[] = $this->container->language;
+			$ordered_tag_list[] = $this->container->language;
 		}
-		if ( ! empty( $results ) ) {
-			return $results;
+		if ( ! empty( $ordered_tag_list ) ) {
+			return $ordered_tag_list;
 		}
 	}
 
@@ -523,7 +568,7 @@ class BaseController {
 		$i = 0;
 		while ( $i < $tag_number && count( $shortlist ) < $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['grid_tax_max'] ) {
 			$term = $tag_list[$i];
-			if ( is_a( $term, 'WP_Term' ) ) {
+			if ( $term instanceof WP_Term ) {
 				$shortlist[] = $term;
 			}
 			$i++;
@@ -549,7 +594,7 @@ class BaseController {
 			// Tests for WP_Post content types.
 			if ( BaseController::is_correct_content_type( $item ) ) {
 				// Tests if the items are unique and don't refer to the post itself.
-				if ( ! in_array( $item->ID, $unique_ids, true ) ) {
+				if ( ! in_array( $item, $unique_ids, true ) ) {
 					$grid_content[] = $item;
 				}
 			}
@@ -588,7 +633,7 @@ class BaseController {
 	 * @TODO POST_TAGS FOR COLLABORATIONS!!!
 	 */
 	protected function get_related_grid_content_by_tags() {
-		if( ! $this->container->has_tags ) {
+		if( ! $this->container->has_tags && 'story' === $this->container->type ) {
 			$related_posts = $this->get_related_grid_content_by_cat();
 			return $related_posts;
 		} else {
@@ -616,7 +661,7 @@ class BaseController {
 		} else {
 			$args = array(
 				'post_type' => array('story'),
-				'cat' => $cat,
+				'cat' => $cat->slug,
 				'numberposts' => 3, /* you can change this to show more */
 				'post__not_in' => array( $this->container->post_id ),
 			);
@@ -648,12 +693,6 @@ class BaseController {
 	}
 
 	protected function set_programme_round( $parent_id ) {
-		$parent = get_post( $parent_id );
-		if ( ! 'programme_round' === $parent->post_type ) {
-			return;
-		}
-		$this->container->programme_round = $this::exchange_factory( $parent );
+		$this->container->programme_round = self::exchange_factory( $parent_id, '', 'programme_round' );
 	}
-
-
 }

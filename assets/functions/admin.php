@@ -70,6 +70,7 @@ function exchange_add_and_remove_menu_options() {
 	remove_meta_box( 'tagsdiv-post_tag', 'collaboration', 'side');
 	remove_meta_box( 'tagsdiv-post_tag', 'story', 'side');
 	remove_meta_box( 'tagsdiv-post_tag', 'attachment', 'side');
+	remove_meta_box( 'tagsdiv-post_tag', 'programme_round', 'side' );
 	remove_submenu_page( 'edit.php?post_type=collaboration', 'edit-tags.php?taxonomy=post_tag&amp;post_type=collaboration' );
 	remove_submenu_page( 'edit.php?post_type=story', 'edit-tags.php?taxonomy=post_tag&amp;post_type=story' );
 

@@ -83,15 +83,26 @@ class TranslatedParagraph extends BasePattern {
 		$this->output .= $p->embed();
 	}
 
+	protected function get_translation_language( $translation ) {
+		$lang_id = $translation['translation_language'];
+		$lang_term = get_term( $lang_id, 'language');
+		if ( $lang_term instanceof WP_Term ) {
+			return $lang_term;
+		}
+	}
+
 	protected function build_translation( $translation ) {
-		$lang = $translation['translation_language'];
+		$lang_term = $this->get_translation_language( $translation );
+		if ( empty( $lang_term ) ) {
+			return;
+		}
 		$p_mods = array(
-			'lang' => $lang,
+			'lang' => $lang_term->slug,
 			'misc' => array(
-				'id' => $lang,
+				'id' => $lang_term->slug,
 			),
 	 	);
-		if ( $lang === 'arabic' ) {
+		if ( $lang_term->description === 'rtl' ) {
 			$p_mods['misc']['dir'] = 'rtl' ;
 		}
 		$p = new Paragraph( $translation['translation_text'], $this->element, $p_mods );
@@ -100,15 +111,19 @@ class TranslatedParagraph extends BasePattern {
 
 	protected function build_translation_dropdown( ) {
 		$original = isset( $GLOBALS['story_language'] ) ? $GLOBALS['story_language'] : 'English';
-		$dropdown = '<label class="show-for-sr">' . __( "Available translations",EXCHANGE_PLUGIN ) . '</label>';
+		$dropdown = '<fieldset class="translatedparagraph__translation-select-wrapper"><label class="show-for-sr">' . __( 'Available translations',EXCHANGE_PLUGIN ) . '</label>';
 		$dropdown .= '<select class="translation-select">' . PHP_EOL;
-		$dropdown .= '<option value="" disabled selected>' . __( "Read this in ...",EXCHANGE_PLUGIN ) . '</option>';
+		$dropdown .= '<option value="" disabled selected>' . __( 'Available translations',EXCHANGE_PLUGIN ) . '</option>';
 		$dropdown .= '<option value="original">' . $original . '</option>';
 		foreach ( $this->translations as $translation ) {
-			$lang = $translation['translation_language'];
-			$dropdown .= '<option value ="' . $lang . '">' . $lang . '</option>';
+			$lang_term = $this->get_translation_language( $translation );
+			if ( empty( $lang_term ) ) {
+				continue;
+			}
+			$lang_name = $lang_term->name;
+			$dropdown .= '<option value="' . $lang_term->slug . '">' . $lang_term->name . '</option>';
 		}
-		$dropdown .= '</select>';
+		$dropdown .= '</select></fieldset>';
 		$this->output .= $dropdown;
 	}
 
