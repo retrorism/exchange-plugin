@@ -76,4 +76,22 @@ class Programme_RoundController extends BaseController {
 			return false;
 		}
 	}
+
+	public function set_block_paragraph_text() {
+		$acf_paragraph = get_post_meta( $this->container->post_id, 'block_paragraph_text', true );
+		if ( ! empty( $acf_paragraph ) ) {
+			$input = array(
+				'text' => $acf_paragraph,
+			);
+			$this->container->block_paragraph_text = BasePattern::pattern_factory( $input, 'paragraph', '', 'emphasisblock', false );
+		}
+
+	}
+
+	public function set_cta_colour() {
+		$acf_cta_colour = get_post_meta( $this->container->post_id, 'cta_colour', true );
+		if ( ! empty( $acf_cta_colour ) ) {
+			$this->container->cta_colour = $acf_cta_colour;
+		}
+	}
 }

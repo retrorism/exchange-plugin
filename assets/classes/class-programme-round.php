@@ -40,6 +40,20 @@ class Programme_Round extends Exchange {
 	public $is_active = false;
 
 	/**
+	 *
+	 *
+	 * @var string $block_paragraph_text Short intro for Programme Round Card.
+	 */
+	 public $block_paragraph_text;
+
+	 /**
+	  *
+	  *
+	  * @var string $cta_colour Colour for Programme Round Card.
+	  */
+	  public $cta_colour;
+
+	/**
 	 * Constructor for Programme Round objects. If available, the constructor can use
 	 * a controller that's already there.
 	 *
@@ -51,20 +65,31 @@ class Programme_Round extends Exchange {
 	public function __construct( $post, $context = '', $controller = null ) {
 		Parent::__construct( $post );
 		$this->controller->map_programme_round_basics();
+		if ( 'griditem' === $context ) {
+			$this->controller->set_block_paragraph_text();
+			$this->controller->set_cta_colour();
+		}
 	}
 
 	public function publish_grid_programme_round( $modifier = '' ) {
 		$prog_name = explode( ' ', $this->title )[1];
 		$link = get_post_permalink( $this->post_id );
-		$paragraph = ! empty( $this->editorial_intro )
-			? $this->editorial_intro->embed_stripped('emphasisblock', 30)
+		// Fall back to default colour when no colour is set.
+		$cta_colour = ! empty ( $this->cta_colour )
+			? $this->cta_colour
+			: exchange_slug_to_hex('rose-1-web');
+
+		// Fall back to default paragraph when no intro is set.
+		$paragraph = ! empty( $this->block_paragraph_text )
+			? $this->block_paragraph_text->embed_stripped('emphasisblock', 30)
 			: '<p>' . __('Click below for more programme information', EXCHANGE_PLUGIN ) . '</p>';
 		if ( in_array( $prog_name, array( 'C&P', 'Community', 'C' ), true ) ) {
 			$prog_name = 'C_P';
 		}
+
 		$properties = array(
 			'block_type' => 'cta',
-			'cta_colour' => '#' . $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['rose-1-web'],
+			'cta_colour' => $cta_colour,
 			'block_alignment' => false,
 			'cta_block_elements' => array(
 				0 => array(

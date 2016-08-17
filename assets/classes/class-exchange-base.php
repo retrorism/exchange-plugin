@@ -335,9 +335,14 @@ class Exchange {
 		} else {
 			$length = count( $properties['cta_block_elements'] );
 			for( $i = 0; $i < $length; $i++ ) {
-				// Add permalink to button if link left empty.
-				if ( 'block_button' === $properties['cta_block_elements'][$i]['acf_fc_layout'] && empty( $properties['cta_block_elements'][$i]['button_link'] ) ) {
-					$properties['cta_block_elements'][$i]['button_link'] = $this->link;
+				if ( 'block_button' === $properties['cta_block_elements'][$i]['acf_fc_layout'] ) {
+					// Add permalink to button if link left empty.
+					if ( empty( $properties['cta_block_elements'][$i]['button_link'] ) ) {
+						$properties['cta_block_elements'][$i]['button_link'] = $this->link;
+					}
+					if ( empty( $properties['cta_block_elements'][$i]['button_size'] ) ) {
+						$properties['cta_block_elements'][$i]['button_size'] = 'small';
+					}
 				}
 			}
 		}
