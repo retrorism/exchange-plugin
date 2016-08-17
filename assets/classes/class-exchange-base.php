@@ -58,9 +58,9 @@ class Exchange {
 	 *
 	 * @since 0.1.0
 	 * @access public
-	 * @var string $has_cta Set when grid should show a CTA block. Defaults to 'no'.
+	 * @var string $has_cta Set when grid should show a CTA block. Defaults to false.
 	 **/
-	public $has_cta = 'no';
+	public $has_cta = false;
 
 
 	/**

@@ -73,12 +73,8 @@ class Story extends Exchange {
 		Parent::__construct( $post, $controller );
 		$this->controller->map_story_basics();
 
-		if ( 'griditem' === $context ) {
-			if ( empty( $this->has_cta ) || ( $this->has_cta == 'no' ) ) {
-				$this->controller->set_featured_image( 'griditem' );
-				$this->controller->set_ordered_tag_list();
-			}
-		} else {
+		if ( 'griditem' !== $context ) {
+			$this->controller->set_ordered_tag_list();
 			$this->controller->map_full_story();
 		}
 	}

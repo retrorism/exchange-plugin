@@ -51,21 +51,19 @@ class GridItem extends BasePattern {
 	 * @since 0.1.0
 	 * @TODO switch for context, switch for grid width
 	 **/
-	protected function build_grid_item_from_post( $cta = false ) {
-		if (
-			( 'archive__grid' === $this->context && 'everywhere' === $this->input->has_cta ) ||
-			( ( 'simplegrid' === $this->context || 'relatedgrid' === $this->context ) && 'no' !== $this->input->has_cta )
-		) {
-			$cta = true;
+	protected function build_grid_item_from_post() {
+		if ( is_array( $this->input->has_cta ) ) {
+			$cta = in_array( $this->context, $this->input->has_cta );
+		} else {
+			$cta = false;
 		}
-		if ( 'featuredgrid' === $this->context && locate_template( 'parts/grid-featured.php') !== '' ) {
+		if ( $cta && locate_template( 'parts/grid-cta.php') !== '' ) {
+			$template = 'cta';
+		} elseif ( 'featuredgrid' === $this->context && locate_template( 'parts/grid-featured.php') !== '' ) {
+			$template = 'default';
 			if ( isset( $this->modifiers['grid_width_num'] ) && 12 === $this->modifiers['grid_width_num'] ) {
 				$template = 'featured';
-			} else {
-				$template = 'default';
 			}
-		} elseif ( $cta && locate_template( 'parts/grid-cta.php') !== '' ) {
-			$template = 'cta';
 		} elseif ( locate_template( 'parts/grid-' . $this->input->type . '.php' ) !== '') {
 			$template = $this->input->type;
 		} elseif ( locate_template( 'parts/grid-default.php' ) !== '') {
@@ -73,19 +71,25 @@ class GridItem extends BasePattern {
 		} else {
 			$template = false;
 		}
-		if ( $template ) {
-			$exchange = $this->input;
-			$modifier = false;
-			if ( isset( $this->modifiers['grid_width'] ) ) {
-				$modifier = $this->modifiers['grid_width'];
-			}
-			ob_start();
-			include( locate_template( 'parts/grid-' . $template .'.php' ) );
-			$grid_item = ob_get_contents();
-			ob_end_clean();
-		} else {
-			$grid_item = "I couldn't find the right template";
+		if ( ! $template ) {
+			return "I couldn't find the right template";
 		}
+		$exchange = $this->input;
+		if ( ! $cta ) {
+			$exchange->controller->set_featured_image();
+		}
+		if ( $cta && 'archive_grid' === $this->context ) {
+			// Only set tags for archive grid.
+			$exchange->controller->set_ordered_tag_list();
+		}
+		$modifier = false;
+		if ( isset( $this->modifiers['grid_width'] ) ) {
+			$modifier = $this->modifiers['grid_width'];
+		}
+		ob_start();
+		include( locate_template( 'parts/grid-' . $template .'.php' ) );
+		$grid_item = ob_get_contents();
+		ob_end_clean();
 		return $grid_item;
 	}
 

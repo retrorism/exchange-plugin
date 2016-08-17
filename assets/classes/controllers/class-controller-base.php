@@ -533,8 +533,6 @@ class BaseController {
 		}
 	}
 
-
-
 	/**
 	 * Sets ordered tag list
 	 *

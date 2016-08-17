@@ -1,6 +1,6 @@
 <?php
 /**
- * Controller Class
+ * Story Controller Class
  * Author: Willem Prins | SOMTIJDS
  * Project: Tandem
  * Date created: 11/2/2016
@@ -65,14 +65,8 @@ class StoryController extends BaseController {
 		if ( ! empty( $acf_has_cta ) ) {
 			$this->container->has_cta = $acf_has_cta;
 		}
-
-		// Add featured image
-		$this->set_featured_image();
-
-		// Add tags
-		$this->set_ordered_tag_list();
-
 	}
+
 	/**
 	 * Return story object with properties taken from ACF Fields.
 	 *
