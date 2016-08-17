@@ -151,24 +151,15 @@ function exchange_change_acf_color_picker() {
 	</script>";
 }
 
-if( function_exists('acf_add_options_page') ) {
+if ( function_exists('acf_add_options_page' ) ) {
 
-	$forms_page = acf_add_options_sub_page(array(
+	$page_settings = acf_add_options_sub_page(array(
 		'page_title' 	=> 'Page Settings',
 		'menu_title' 	=> 'Pages',
 		'parent_slug' 	=> EXCHANGE_PLUGIN,
 		'capability' 	=> 'edit_posts',
-		'redirect' 	=> false
+		'redirect' 	    => false,
 	));
-
-	$stories_page = acf_add_options_sub_page(array(
-		'page_title' 	=> 'Story Overview Settings',
-		'menu_title' 	=> 'Stories Settings',
-		'parent_slug' 	=> EXCHANGE_PLUGIN,
-		'capability' 	=> 'edit_posts',
-		'redirect' 	=> false
-	));
-
 }
 
 

@@ -52,7 +52,9 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 			'button_labels' => array(
 				'story' => 'Read the full story',
 				'video' => 'Watch the video',
-				'default' => 'Read the full %s'
+				'default' => 'Read the full %s',
+				'partner' => 'Find the full %s story',
+				'team-member' => 'Find out more about this %s',
 			),
 		),
 		'TAXONOMIES' => array(
