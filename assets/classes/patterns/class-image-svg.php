@@ -60,7 +60,7 @@ class ImageSVG extends BasePattern {
 		if ( ! is_string( $this->input ) ) {
 			return false;
 		}
-		if ( array_key_exists( $this->input, $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['programmes'] ) ) {
+		if ( array_key_exists( $this->input, $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['IMAGES']['programme-logos'] ) ) {
 			return true;
 		} else {
 			return false;

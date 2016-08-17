@@ -39,6 +39,14 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 			'hq-norm'       => 345600, /* 720 * 480 */
 			'size-in-story' => 'medium-large',
 			'fallback_image_att_id' => 970,
+			'programme-logos' => array(
+				'C_P'     => 'Tandem C & P',
+				'Europe'  => 'Tandem Europe',
+				'Shaml'   => 'Tandem Shaml',
+				'Turkey'  => 'Tandem Turkey',
+				'Ukraine' => 'Tandem Ukraine',
+				'Solo'    => 'Tandem',
+			),
 		),
 		'CATEGORIES' => array (
 			'button_labels' => array(
