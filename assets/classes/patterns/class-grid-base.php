@@ -172,6 +172,8 @@ abstract class BaseGrid extends BasePattern {
 		switch ( $layout ) {
 			case 'grid_exchange_story':
 			case 'grid_exchange_collaboration':
+			case 'grid_exchange_programme_round':
+			// Doesn't exist anymore, will remain here for legacy purposes.
 			case 'grid_exchange_page':
 				if ( ! is_int( $item['grid_exchange_object'] ) ) {
 					return;
