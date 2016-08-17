@@ -162,43 +162,6 @@ class BaseController {
 
 	}
 
-	// Store sections in Exchange object
-	protected function set_sections( $acf_sections ) {
-		// Loop through sections.
-		foreach( $acf_sections as $s ) {
-			$section_mods = array();
-			if ( ! empty( $s['contents'] ) && isset( $s['contents']['acf_fc_layout'] ) ) {
-				$section_mods['type'] = $s['contents']['acf_fc_layout'];
-			}
-			$section = new Section( $s, strtolower( get_class( $this->container ) ), $section_mods );
-			if ( is_object( $section ) && is_a( $section, 'Section' ) ) {
-				$this->container->sections[] = $section;
-			}
-		}
-	}
-
-	// // Store sections in Exchange object
-	// protected function set_sections( $acf_sections ) {
-	// 	// Loop through sections.
-	// 	if ( empty( $acf_sections ) ) {
-	// 		return;
-	// 	}
-	// 	for ( $i = 0; $i < $acf_sections; $i++ ) {
-	// 		$section_mods = array();
-	// 		$contents = get_post_meta( $this->container->post_id, 'sections_' . $i . '_contents', true );
-	// 		var_dump( $contents );
-	// 		throw new Exception("Testing {1:What are we testing?}");
-	// 		if ( ! empty( $contents ) && isset( $contents['acf_fc_layout'] ) ) {
-	// 			$section_mods['type'] = $contents['acf_fc_layout'];
-	// 		}
-	// 		$section = new Section( $contents, strtolower( get_class( $this->container ) ), $section_mods );
-	// 		if ( is_object( $section ) && is_a( $section, 'Section' ) ) {
-	// 			$this->container->sections[] = $section;
-	// 		}
-	// 	}
-	// }
-
-
 	protected function get_header_image_source() {
 		return get_post_meta( 'header_image', $this->container->post_id, true );
 	}

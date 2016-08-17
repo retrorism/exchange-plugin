@@ -81,7 +81,7 @@ class Programme_RoundController extends BaseController {
 		$acf_paragraph = get_post_meta( $this->container->post_id, 'block_paragraph_text', true );
 		if ( ! empty( $acf_paragraph ) ) {
 			$input = array(
-				'text' => $acf_paragraph,
+				'text' => '<p>' . $acf_paragraph . '</p>',
 			);
 			$this->container->block_paragraph_text = BasePattern::pattern_factory( $input, 'paragraph', '', 'emphasisblock', false );
 		}

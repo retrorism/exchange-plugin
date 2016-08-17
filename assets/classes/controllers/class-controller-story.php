@@ -112,6 +112,36 @@ class StoryController extends BaseController {
 			}
 		}
 
+		// $acf_section_count = get_post_meta( $post_id, 'sections', true );
+		// var_dump( $acf_section_count );
+		// if ( ! empty( $acf_section_count ) ) {
+		// 	$post_custom = get_post_custom( $post_id );
+		// 	var_dump( $post_custom );
+		// }
+		// for ( $i = 0; $i < $acf_section_count; $i++ ) {
+		// 	$acf_section_contents = get_post_meta( $post_id, 'sections_' . $i . '_contents', true );
+		// 	var_dump( $acf_section_contents );
+		// 	if ( empty( $acf_section_contents ) || ! is_array( $acf_section_contents ) ) {
+		// 		continue;
+		// 	}
+		// 	$contents_length = count( $acf_section_contents );
+		// 	for( $j = 0; $j < $contents_length; $j++ ) {
+		// 		switch( $acf_section_contents[ $j ] ) {
+		// 			case 'has_story_elements' :
+		// 				$meta_name = 'sections_' . $i . '_contents_' . $j . '_story_elements';
+		// 				$acf_story_elements = get_post_meta( $post_id, $meta_name, true );
+		// 				var_dump( $meta_name );
+		// 				var_dump( $acf_story_elements );
+		// 				break;
+		// 			default :
+		// 				var_dump( $acf_sections_items[ $j ] );
+		// 				break;
+		// 		}
+		// 	}
+		// }
+		// throw new Exception("Testing {1:What are we testing?}");
+
+
 		// Set header image.
 		$this->set_header_image( 'story__header' );
 
@@ -153,6 +183,49 @@ class StoryController extends BaseController {
 		 }
 		 $this->container->editorial_intro = new EditorialIntro( $intro_input, 'story' );
 	 }
+
+	 // Store sections in Exchange object
+ 	protected function set_sections( $acf_sections ) {
+ 		// Loop through sections.
+ 		foreach( $acf_sections as $s ) {
+			//var_dump( $s );
+ 			$section_mods = array();
+ 			if ( ! empty( $s['contents'] ) && isset( $s['contents']['acf_fc_layout'] ) ) {
+ 				$section_mods['type'] = $s['contents']['acf_fc_layout'];
+ 			}
+ 			$section = new Section( $s, strtolower( get_class( $this->container ) ), $section_mods );
+ 			if ( is_object( $section ) && is_a( $section, 'Section' ) ) {
+ 				$this->container->sections[] = $section;
+ 			}
+ 		}
+		//throw new Exception("Testing {1:What are we testing?}");
+ 	}
+
+	// protected function get_sections() {
+	// 	$
+	// }
+
+ 	// // Store sections in Exchange object
+ 	// protected function set_sections( $acf_sections ) {
+ 	// 	// Loop through sections.
+ 	// 	if ( empty( $acf_sections ) ) {
+ 	// 		return;
+ 	// 	}
+ 	// 	for ( $i = 0; $i < $acf_sections; $i++ ) {
+ 	// 		$section_mods = array();
+ 	// 		$contents = get_post_meta( $this->container->post_id, 'sections_' . $i . '_contents', true );
+ 	// 		var_dump( $contents );
+ 	// 		throw new Exception("Testing {1:What are we testing?}");
+ 	// 		if ( ! empty( $contents ) && isset( $contents['acf_fc_layout'] ) ) {
+ 	// 			$section_mods['type'] = $contents['acf_fc_layout'];
+ 	// 		}
+ 	// 		$section = new Section( $contents, strtolower( get_class( $this->container ) ), $section_mods );
+ 	// 		if ( is_object( $section ) && is_a( $section, 'Section' ) ) {
+ 	// 			$this->container->sections[] = $section;
+ 	// 		}
+ 	// 	}
+ 	// }
+
 
 	/**
 	 * Retrieve story byline template from options page.
@@ -230,4 +303,6 @@ class StoryController extends BaseController {
 			$this->set_byline();
 		}
 	}
+
+
 }
