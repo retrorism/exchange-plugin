@@ -77,9 +77,10 @@ class GridItem extends BasePattern {
 		$exchange = $this->input;
 		if ( ! $cta ) {
 			$exchange->controller->set_featured_image();
+			$exchange->controller->set_ordered_tag_list();
 		}
 		if ( $cta && 'archive_grid' === $this->context ) {
-			// Only set tags for archive grid.
+			// Only set tags on CTA for archive grid.
 			$exchange->controller->set_ordered_tag_list();
 		}
 		$modifier = false;
