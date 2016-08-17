@@ -50,11 +50,12 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 		),
 		'CATEGORIES' => array (
 			'button_labels' => array(
-				'story' => 'Read the full story',
-				'video' => 'Watch the video',
-				'default' => 'Read the full %s',
-				'partner' => 'Find the full %s story',
-				'team-member' => 'Find out more about this %s',
+				'story' => __( 'Read the full story', EXCHANGE_PLUGIN ),
+				'video' => __( 'Watch the video', EXCHANGE_PLUGIN ),
+				'default' => __( 'Read the full %s', EXCHANGE_PLUGIN ),
+				'partner' => __( 'Read the full %s story', EXCHANGE_PLUGIN ),
+				'team-member' => __( 'Find out more about this %s', EXCHANGE_PLUGIN ),
+				'photo-story' => __( 'See the full %s', EXCHANGE_PLUGIN ),
 			),
 		),
 		'TAXONOMIES' => array(
