@@ -173,10 +173,19 @@ abstract class BaseGrid extends BasePattern {
 			case 'grid_exchange_story':
 			case 'grid_exchange_collaboration':
 			case 'grid_exchange_programme_round':
-				if ( ! is_int( $item['grid_exchange_object'] ) ) {
+				if ( ! is_numeric( $item['grid_exchange_object'] ) ) {
+					if ( is_array( $item['grid_exchange_object'] ) && is_int( $item['grid_exchange_object'][0] ) ) {
+						$object_id = $item['grid_exchange_object'][0];
+					} else {
+						return;
+					}
+				} else {
+					$object_id = intval( $item['grid_exchange_object'] );
+				}
+				if ( empty( $object_id ) ) {
 					return;
 				}
-				$object = BaseController::exchange_factory( $item['grid_exchange_object'], 'griditem' );
+				$object = BaseController::exchange_factory( $object_id, 'griditem' );
 				$item_mods = self::add_grid_modifiers( $object );
 				break;
 			case 'grid_paragraph' :
