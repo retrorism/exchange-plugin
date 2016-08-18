@@ -290,16 +290,16 @@ function exchange_remove_empty_acf_meta_at_save( $post_id ) {
 		'subelement_index' => -1,
 	);
 	$clean_fields = exchange_iterate_filter( $fields, $post_id, $indices );
-	// $max_sections = count( $clean_fields['field_56cf1e8d69ac5'] );
-	// $all_meta_keys = array_keys( get_post_custom( $post_id ) );
-	// foreach ( $all_meta_keys as $k ) {
-	// 	if ( preg_match( '/(_*sections_)([0-9]+)(\w+)/', $k, $m ) ) {
-	// 		// Remove irrelevant sections from database for this revision.
-	// 		if ( ! $m[2] < $max_sections ) {
-	// 			delete_post_meta( $post_id, $m[0] );
-	// 		}
-	// 	}
-	// }
+	$max_sections = count( $clean_fields['field_56cf1e8d69ac5'] );
+	$all_meta_keys = array_keys( get_post_custom( $post_id ) );
+	foreach ( $all_meta_keys as $k ) {
+		if ( preg_match( '/(_*sections_)([0-9]+)(\w+)/', $k, $m ) ) {
+			// Remove irrelevant sections from database for this revision.
+			if ( ! $m[2] < $max_sections ) {
+				delete_post_meta( $post_id, $m[0] );
+			}
+		}
+	}
 
 	$_POST['acf'] = $clean_fields;
 }
