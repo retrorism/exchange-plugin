@@ -78,7 +78,6 @@ function exchange_create_link( $obj, $with_text = true, $class = '' ) {
 	}
 	$button_classes = array(
 		'griditem__button button--small',
-		'button--small',
 	);
 	if ( in_array( $class, $button_classes, true ) ) {
 		if ( isset( $obj->category ) ) {
