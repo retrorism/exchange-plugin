@@ -39,6 +39,15 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 			'hq-norm'       => 345600, /* 720 * 480 */
 			'size-in-story' => 'medium-large',
 			'fallback_image_att_id' => 970,
+			'no-lazy-loading' => array(
+				'contactblock',
+			),
+			'no-caption' => array(
+				'contactblock',
+				'griditem',
+				'collaboration__header',
+				'griditem__pattern'
+			),
 			'programme-logos' => array(
 				'C_P'       => 'Tandem C & P',
 				'Europe'    => 'Tandem Europe',
@@ -69,28 +78,7 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 				'Turkey'  => 'Tandem Turkey',
 				'Ukraine' => 'Tandem Ukraine',
 			),
-
-			// Priority in taxonomy types, listed by ACF Field label.
-			// 'display_priority_story' => array(
-			// 'display_priority_collaboration' => array(
-			// 	0 => 'tandem',
-			// 	1 => 'post_tag'
-			// 	2 => 'topic',
-			// 	3 => 'location',
-			// 	4 => 'discipline',
-			// 	5 => 'methodology',
-			// 	6 => 'output',
-			//  7 => 'language',
-			// ),
 			'display_priority_story' => array( 'tandem','topic','location','discipline','methodology','project_output' ),
-			// 'display_priority_collaboration' => array(
-			// 	0 => 'post_tag',
-			// 	1 => 'topic',
-			// 	2 => 'location',
-			// 	3 => 'discipline',
-			// 	4 => 'methodology',
-			// 	5 => 'output',
-			// ),
 			'display_priority_collaboration' => array( 'topic','location','discipline','methodology','project_output' ),
 			// Maximum number of tags on grid items
 			'grid_tax_max' => 3,

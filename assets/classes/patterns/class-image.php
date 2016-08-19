@@ -106,11 +106,11 @@ class Image extends BasePattern {
 	public $lazy = true;
 
 	/**
-	 * Float
+	 * Ratio
 	 *
 	 * @since 0.1.0
 	 * @access public
-	 * @var bool $lazy Whether to load this image lazily. Default is true.
+	 * @var float $ratio Proportions h / w.
 	 **/
 	public $ratio;
 
@@ -136,19 +136,19 @@ class Image extends BasePattern {
 		$this->anchor( 'open' );
 
 		// Add placeholder for images that don't need lazy-loading.
-		if ( in_array( $this->context, array( 'collaboration__header', 'griditem','contactblock','griditem__pattern' ), true ) ) {
+		if ( in_array( $this->context, $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['IMAGES']['no-lazy-loading'], true ) ) {
 			$this->lazy = false;
-			$caption = false;
 		}
 
 		$this->output .= $this->build_image_placeholder();
 
-		if ( $caption ) {
-			// Add caption if available.
-			if ( ! empty( $this->input['caption'] ) || ! empty( $this->title ) ) {
-				$this->set_image_caption();
-			}
 
+		if ( in_array( $this->context, $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['IMAGES']['no-caption'], true ) ) {
+			$caption = false;
+		}
+
+		if ( $caption && ( ! empty( $this->input['caption'] ) || ! empty( $this->title ) ) ) {
+			$this->set_image_caption();
 			if ( is_object( $this->caption ) ) {
 				$this->output .= $this->build_image_caption();
 			}
@@ -159,6 +159,13 @@ class Image extends BasePattern {
 
 		// Close element.
 		$this->output_tag_close( 'figure' );
+
+		if ( ! empty( $this->input['description'] ) ) {
+			$this->set_image_description();
+			if ( is_object( $this->description ) ) {
+				$this->output .= $this->build_image_description();
+			}
+		}
 
 		// Close wrapper.
 		$this->wrapper( 'close' );
@@ -402,12 +409,11 @@ class Image extends BasePattern {
 		// Set src_set and RWD sizes based on context.
 		$this->set_src_set_and_sizes();
 
-		// Set src just in case, defaulting to medium when not availabe
-		$this->src = $this->input['sizes']['medium'];
-
-		// Set description to be used as alt and alternative for title.
-		if ( ! empty( $this->input['description'] ) ) {
-			$this->description = $this->input['description'];
+		// Set src just in case, defaulting to medium when not available.
+		if ( 'contactblock' === $this->context ) {
+			$this->src = $this->input['sizes']['thumbnail'];
+		} else {
+			$this->src = $this->input['sizes']['medium'];
 		}
 
 		// Add description to be used as title.
@@ -426,15 +432,20 @@ class Image extends BasePattern {
 	 **/
 	protected function build_image_placeholder() {
 		$lazy_style = '';
+		$placeholder = '';
 		$ratio_perc = round( ( $this->ratio * 100 ), 3 );
 
 		if ( ! empty( $ratio_perc ) ) {
-			$lazy_style = ' style="position: relative;height:0;padding-bottom:' . $ratio_perc . '%;"';
+			$lazy_style = ' style="position:relative;height:0;padding-bottom:' . $ratio_perc . '%;"';
 		}
-		$placeholder = '<div class="image__placeholder"' . $lazy_style . '>';
+		if ( $this->lazy ) {
+			$placeholder .= '<div class="image__placeholder"' . $lazy_style . '>';
+		}
 		$placeholder .= $this->build_image_element();
-		$placeholder .= '<img class="image__placeholder__thumb" src=' . $this->input['sizes']['placeholder'] . ' />';
-		$placeholder .= '</div>';
+		if ( $this->lazy ) {
+			$placeholder .= '<img class="image__placeholder__thumb" src=' . $this->input['sizes']['placeholder'] . ' />';
+			$placeholder .= '</div>';
+		}
 
 		return $placeholder;
 	}
@@ -448,34 +459,42 @@ class Image extends BasePattern {
 	 * @return string $img HTML image element.
 	 **/
 	protected function build_image_element() {
-		$lazy_class = ' lazyload lazypreload';
+		$lazy_class = '';
 		if ( $this->lazy ) {
-			$lazy_class = ' lazyload';
+			$lazy_class = ' lazyload lazypreload';
 		}
-		$img = '<img class="image--main' . $lazy_class . '"';
+		$img = '<img class="image--main' . $lazy_class . $contact_class . '"';
 
 		// Add src to output.
-		$img .= ' data-src="' . $this->src . '"';
-
-		// Add ratio.
-		if ( $this->ratio ) {
-			$img .= ' data-ratio="' . esc_attr( $this->ratio ) . '"';
-		}
-
-		// Add srcset to image element.
-		if ( $this->src_set ) {
-			if ( $this->rwd_sizes ) {
-				$img .= ' data-sizes="' . esc_attr( $this->rwd_sizes ) . '"';
+		if ( $this->lazy ) {
+			$img .= ' data-src="' . $this->src . '"';
+			// Add ratio.
+			if ( $this->ratio ) {
+				$img .= ' data-ratio="' . esc_attr( $this->ratio ) . '"';
 			}
-			$img .= ' data-srcset="' . esc_attr( $this->src_set ) . '"';
+
+			// Add srcset to image element.
+			if ( $this->src_set ) {
+				if ( $this->rwd_sizes ) {
+					$img .= ' data-sizes="' . esc_attr( $this->rwd_sizes ) . '"';
+				}
+				$img .= ' data-srcset="' . esc_attr( $this->src_set ) . '"';
+			}
+		} else {
+			$img .= ' src="' . $this->src . '"';
 		}
+
 
 		// if ( $this->lazy ) {
 		// 	$img .= ' srcset="data:image/gif;base64,R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="';
 		// }
 		// Add RWD_sizes to image element.
 
-
+		if ( ! empty( $this->input['caption'] ) ) {
+			$img .= ' title="' . esc_attr( $this->input['caption'] ) . '"';
+		} else {
+			$img .= ' title="' . esc_attr( $this->title ) . '"';
+		}
 		// Add title to image element.
 		if ( $this->title ) {
 			$img .= ' title="' . esc_attr( $this->title ) . '"';
@@ -483,6 +502,8 @@ class Image extends BasePattern {
 		// Add alt to image element.
 		if ( $this->description ) {
 			$img .= ' alt="' . esc_attr( $this->description ) . '"';
+		} elseif ( $this->caption ) {
+			$img .= ' alt="' . esc_attr( $this->caption ) . '"';
 		} elseif ( $this->title ) {
 			$img .= ' alt="' . esc_attr( $this->title ) . '"';
 		}
@@ -522,6 +543,36 @@ class Image extends BasePattern {
 	 **/
 	protected function build_image_caption() {
 		$embed = $this->caption->embed();
+		if ( ! empty( $embed ) ) {
+			return $embed;
+		}
+	}
+
+
+	/**
+	 * Set image description object from input and modifiers.
+	 *
+	 * @since 0.1.0
+	 **/
+	protected function set_image_description() {
+
+		// Set description to be used in photo-stories
+		if ( ! empty( $this->input['description'] ) ) {
+			$description = $this->input['description'];
+		}
+
+		$this->description = new Paragraph( $description, 'photostory-image' );
+	}
+
+	/**
+	 * Set image properties by using input and modifiers.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return string $embed HTML string of caption to be added.
+	 **/
+	protected function build_image_description() {
+		$embed = $this->description->embed();
 		if ( ! empty( $embed ) ) {
 			return $embed;
 		}

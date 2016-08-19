@@ -25,9 +25,9 @@ class ContactBlock extends BasePattern {
 	/**
 	 * User Image
 	 *
-	 * @var array $user_acf Array with all ACF fields
+	 * @var array $user_meta Array with all team member details.
 	 */
-	protected $user_acf;
+	protected $user_meta;
 
 	/**
 	 * User Image
@@ -69,9 +69,9 @@ class ContactBlock extends BasePattern {
 	 * Set extra user fields
 	 */
 	private function set_user_meta() {
-		$user_meta = get_user_meta( 'user_' . $this->input['ID'] );
-		if ( count( $user_acf ) ) {
-			$this->user_acf = $user_acf;
+		$user_meta = get_user_meta( $this->input['ID'] );
+		if ( ! empty( $user_meta ) ) {
+			$this->user_meta = $user_meta;
 		}
 	}
 
@@ -81,12 +81,24 @@ class ContactBlock extends BasePattern {
 	 * @return object $image Image Pattern object.
 	 */
 	private function get_user_image() {
-		$acf_image = $this->user_acf['user_image'];
-		$image_mods = array(
-			'style' => 'rounded',
-		);
-		$image = new Image( $acf_image, $this->element, $image_mods );
-		return $image;
+		$image = $this->user_meta['user_image'][0];
+		if ( empty( $image ) ) {
+			return;
+		}
+		if ( function_exists( 'acf_get_attachment' ) ) {
+			$input = acf_get_attachment( $image );
+			if ( empty( $input ) ) {
+				return;
+			}
+			$image_mods = array(
+				'style' => 'rounded',
+			);
+			$image_obj = new Image( $input, $this->element, $image_mods );
+			if ( ! $image_obj instanceof Image ) {
+				return;
+			}
+		}
+		return $image_obj;
 	}
 
 	/**
@@ -102,8 +114,8 @@ class ContactBlock extends BasePattern {
 			if ( ! empty( $this->user_image ) ) {
 				$user_image = $this->user_image;
 			}
-			if ( ! empty( $this->user_acf ) ) {
-				$user_acf = $this->user_acf;
+			if ( ! empty( $this->user_meta ) ) {
+				$user_meta = $this->user_meta;
 			}
 			$user_info = $this->input;
 			include( locate_template( 'parts/contact-block.php' ) );
