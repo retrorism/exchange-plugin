@@ -211,11 +211,11 @@ function exchange_add_update_form_link( $post_ID, $post_obj ) {
 	}
 }
 
-function exchange_iterate_filter( $input, $post_id, $indices, $last_iter = '' ) {
+function exchange_iterate_filter( $input, $post_id, $indices, $last_iter = '', $last_iter_type = 'story_elements' ) {
 
     foreach ( $input as $key => $val ) {
 		if ( is_array( $val ) ) {
-
+			$el_type = '_';
 			// Let's find out in what kind of array we are currently.
 			if ( 'field_56cf1e8d69ac5' === $key ) {
 				$last_iter = 'section_index';
@@ -226,18 +226,22 @@ function exchange_iterate_filter( $input, $post_id, $indices, $last_iter = '' ) 
 			} elseif ( 'field_57ad96b367288' === $key ) {
 				// Depth 3: field_57ad96b367288 = story_elements
 				$last_iter = 'element_index';
+				$last_iter_type = 'story_elements';
 			} elseif ( 'field_574c142388c64' === $key ) {
 				// Depth 3: field_57ad98f1884a4 = grid_elements
 				// Depth 4 = interviews, emphasisblocks, etc.
 				$last_iter = 'element_index';
+				$last_iter_type = 'select_grid_items';
 			} elseif ( is_int( $key ) ) {
 				$indices[ $last_iter ] = $key;
 			}
 
-			$input[ $key ] = exchange_iterate_filter( $val, $post_id, $indices, $last_iter );
+			$input[ $key ] = exchange_iterate_filter( $val, $post_id, $indices, $last_iter, $last_iter_type );
 		}
 
 		if ( empty( $val ) ) {
+			// var_dump( $key );
+			// var_dump( $val );
 			// Only iterate into previous version when the new value is empty,
 			// in order to see if there's an old value that needs to be overwritten.
 			$field = get_field_object( $key, $post_id, false, false );
@@ -246,8 +250,12 @@ function exchange_iterate_filter( $input, $post_id, $indices, $last_iter = '' ) 
 					// Non-prefixed ACF post_meta, like taxonomies, editorial info, cta info.
 					$meta_name = $field['name'];
 				} elseif ( $indices['element_index'] > -1 ) {
+					// echo 'this is a deep lookup';
+					// var_dump( $indices );
+					// var_dump( $el_type );
 					// ACF post_meta with a 'sections_n_contents_n_[type]_elements_' prefix (story-elements and grid-elements)
-					$meta_name = 'sections_' . $indices['section_index'] . '_contents_' . $indices['content_index'] . $el_type . $field['name'];
+					$meta_name = 'sections_' . $indices['section_index'] . '_contents_' . $indices['content_index']
+						. '_' . $last_iter_type . '_' . $indices['element_index'] . '_' . $field['name'];
 				} elseif ( $indices['content_index'] > -1 ) {
 					// ACF post_meta with a 'sections_n_contents_n_ prefix (like map, form, contact, gridinfo or storyelementinfo )
 					$meta_name = 'sections_' . $indices['section_index'] . '_contents_' . $indices['content_index'] . '_' . $field['name'];
@@ -256,10 +264,12 @@ function exchange_iterate_filter( $input, $post_id, $indices, $last_iter = '' ) 
 					// ACF post_meta with a 'sections_n_ prefix (like bg colours, headerinfo and contents).
 					$meta_name = 'sections_' . $indices['section_index'] . '_' . $field['name'];
 				}
-
+				// var_dump( $meta_name );
 				$previous_value = get_post_meta( $post_id, $meta_name, true );
+				// var_dump( $previous_value );
 				// Only unset the key's value if the previous value was also empty or not set.
-				if ( empty( $previous_value ) ) {
+				if ( isset( $meta_name) && empty( $previous_value ) ) {
+					// echo "yup";
 					unset( $input[ $key ] );
 					delete_post_meta( $post_id, $meta_name );
 				}
