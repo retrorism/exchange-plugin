@@ -148,12 +148,35 @@ abstract class BaseMap extends BasePattern {
 	 * Sets input array to map_markers property.
 	 */
 	protected function set_map_collaborations() {
-		$collaborations = $this->input['map_collaborations'];
+		$objects = $this->input['map_collaborations'];
 		if ( ! is_array( $collaborations ) && count( $collaborations ) > 0 )  {
 			return;
 		} else {
-			foreach( $collaborations as $collaboration ) {
-				$this->set_collaboration_data( $collaboration );
+			$collaborations = array();
+			foreach ( $objects as $object ) {
+				switch ( $object->post_type ) {
+					case 'programme_round':
+						$programme_round = new Programme_round( $object );
+						if ( ! $programme_round instanceof Programme_Round ) {
+							continue;
+						}
+						$programme_round_collabs = $programme_round->controller->get_collaborations();
+						if ( count( $programme_round_collabs ) ) {
+							$collaborations = array_merge( $collaborations, $programme_round_collabs );
+						}
+						break;
+					case 'collaboration' :
+						$collaborations[] = $object;
+						break;
+					default:
+						break;
+				}
+			}
+			$collaborations = array_unique( $collaborations, SORT_REGULAR );
+
+			for ( $i = 0; $i < $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['PATTERNS']['map_max-collaboration-count']; $i++ ) {
+				// Limit to 20 collaborations.
+				$this->set_collaboration_data( $collaborations[$i] );
 			}
 			if ( ! empty( $this->collaboration_data ) ) {
 				$this->has_network = true;

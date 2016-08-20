@@ -63,7 +63,7 @@ class BaseController {
 		if ( ! is_object( $post_id_or_object ) ) {
 			return;
 		}
-		if ( 'WP_Post' != get_class( $post_id_or_object ) ) {
+		if ( 'WP_Post' !== get_class( $post_id_or_object ) ) {
 			return;
 		}
 		$allowed_types = array(
@@ -77,8 +77,10 @@ class BaseController {
 			return;
 		}
 		$content_type = $post_id_or_object->post_type;
-		if ( $allowed_types[ $content_type ] === $type || null === $type ) {
+		if ( null === $type || $allowed_types[ $content_type ] === $type ) {
 			return $content_type;
+		} else {
+			throw new Exception("Testing {1:What are we testing?}");
 		}
 	}
 
@@ -92,6 +94,9 @@ class BaseController {
 	 * @throws Exception when wrong post type is supplied.
 	 **/
 	public static function exchange_factory( $post_id_or_object, $context = '', $check_for_type = null ) {
+		if ( empty( $post_id_or_object ) ) {
+			return;
+		}
 		if ( is_numeric( $post_id_or_object ) && $post_id_or_object > 0 ) {
 			$post_id_or_object = get_post( $post_id_or_object );
 		}

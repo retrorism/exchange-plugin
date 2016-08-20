@@ -94,4 +94,14 @@ class Programme_RoundController extends BaseController {
 			$this->container->cta_colour = $acf_cta_colour;
 		}
 	}
+
+	public function get_collaborations() {
+		$args = array(
+			'post_parent' => $this->container->post_id,
+			'post_type' => 'collaboration',
+			'numberposts' => 25,
+			'post_status' => 'publish',
+		);
+		return get_children( $args );
+	}
 }
