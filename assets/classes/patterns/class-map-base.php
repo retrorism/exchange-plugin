@@ -154,6 +154,9 @@ abstract class BaseMap extends BasePattern {
 		} else {
 			$collaborations = array();
 			foreach ( $objects as $object ) {
+				if ( is_numeric( $object ) && $object > 0 ) {
+					$object = get_post( $object );
+				}
 				switch ( $object->post_type ) {
 					case 'programme_round':
 						$programme_round = new Programme_round( $object );
@@ -168,7 +171,7 @@ abstract class BaseMap extends BasePattern {
 					case 'collaboration' :
 						$collaborations[] = $object;
 						break;
-					default:
+					default :
 						break;
 				}
 			}
