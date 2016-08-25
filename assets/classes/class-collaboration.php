@@ -168,12 +168,10 @@ class Collaboration extends Exchange {
 	}
 
 	/**
-	 * undocumented function summary
+	 * Publish collaboration map.
 	 *
-	 * Undocumented function long description
-	 *
-	 * @param type var Description
-	 * @return {11:return type}
+	 * @param string context Context
+	 * @return void if no participants are found
 	 */
 	public function publish_collab_map( $context = '' ) {
 		$collab_map_caption = $this->controller->create_map_caption();

@@ -76,7 +76,7 @@ abstract class BaseMap extends BasePattern {
 	 protected function create_output() {
 
 		// If a grid is created inside a story, make this into an figure class.
-		if ( is_single() ) {
+		if ( is_single() || is_page() ) {
 			$el = 'figure';
 		}
 
