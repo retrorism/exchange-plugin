@@ -561,6 +561,7 @@ abstract class BasePattern {
 				}
 				$pattern = new PullQuote( $input, $context, $pquote_mods );
 				break;
+
 			case 'embedded_video':
 				$pattern = new Video( $input, $context );
 				break;
@@ -608,6 +609,13 @@ abstract class BasePattern {
 				$block_mods['data'] = array( 'element_count' => count( $block_elements ) );
 				$pattern = new EmphasisBlock( $block_elements, $context, $block_mods );
 				break;
+		case 'uploaded_files':
+			$document_mods = array(
+				'type' => 'post-it',
+				'colour' => exchange_slug_to_hex('blue-1-web'),
+			);
+			$pattern = new DocumentBlock( $input, $context, $document_mods );
+			break;
 			default:
 				$output = '<div data-alert class="alert-box alert">';
 				$output .= '<strong>' . __( 'Error: This layout has not yet been defined', EXCHANGE_PLUGIN ) . '</strong>';

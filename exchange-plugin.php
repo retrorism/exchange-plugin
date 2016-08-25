@@ -152,6 +152,7 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 					'imageduo' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-image-duo.php',
 					'caption' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-caption.php',
 					'emphasisblock' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-emphasis-block.php',
+					'documentblock' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-document-block.php',
 					'button' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-button.php',
 					'blocklist' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-block-list.php',
 					'imagesvg' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-image-svg.php',
