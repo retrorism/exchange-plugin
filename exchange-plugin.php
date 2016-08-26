@@ -67,6 +67,7 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 				'globals.php',
 				'admin.php',
 				'admin-acf.php',
+				'acf-google-api-key.php',
 				'admin-options.php',
 				'admin-roles.php',
 				'taxonomies.php',
