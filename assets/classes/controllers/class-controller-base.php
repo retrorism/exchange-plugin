@@ -79,8 +79,6 @@ class BaseController {
 		$content_type = $post_id_or_object->post_type;
 		if ( null === $type || $allowed_types[ $content_type ] === $type ) {
 			return $content_type;
-		} else {
-			throw new Exception("Testing {1:What are we testing?}");
 		}
 	}
 
@@ -369,7 +367,7 @@ class BaseController {
 			return;
 		}
 		$unique_arrs = $this->get_gallery_from_acf();
-		if ( empty( $unique_arrs ) && 'story' === $this->container->type ) {
+		if ( empty( $unique_arrs ) && $this->container->type instanceof Story ) {
 		// Start over with a new gallery array to be filled with a query.
 			$unique_arrs = array();
 			$unique_ids = $this->get_gallery_from_query();
@@ -458,6 +456,7 @@ class BaseController {
 		}
 		// Empty tax array.
 		switch ( $this->container->type ) {
+			case 'page':
 			case 'story':
 				$tax_list = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['display_priority_story'];
 				break;
@@ -610,7 +609,7 @@ class BaseController {
 			}
 
 			$args = array(
-				'post_type' => array('story','collaboration','programme_round','page'),
+				'post_type' => array('story','collaboration','page'),
 				'tag__in' => $tag_arr,
 				'numberposts' => 3, /* you can change this to show more */
 				'post__not_in' => array( $this->container->post_id ),

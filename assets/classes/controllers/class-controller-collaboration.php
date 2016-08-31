@@ -107,14 +107,33 @@ class CollaborationController extends BaseController {
 		$this->set_gallery();
 	}
 
+	public function google_geocode ( $address ) {
+		/* Google */
+
+		$geocode_url = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
+		$geocode_url .= $address;
+		$json = file_get_contents($geocode_url);
+		$json = json_decode($json);
+
+		/* found location */
+		if ($json->{'status'} == 'OK') {
+			$results = $json->{'results'};
+			$location = $results[0]->{'geometry'}->{'location'};
+			$location->address = $results[0]->formatted_address;
+			return $location;
+		}
+
+		/* else */
+		return array('lat' => 0, 'lng' => 0);
+	}
+
 	protected function set_collaboration_locations() {
 		$locations = array();
 		foreach( $this->container->participants as $p_obj ) {
 			$p_id = $p_obj->post_id;
-			if ( ! is_a( $p_obj, 'Participant' ) ) {
+			if ( ! $p_obj instanceof Participant ) {
 				continue;
 			}
-
 			if ( !empty( $p_obj->org_name ) ) {
 				$locations[$p_id]['org_name'] = $p_obj->org_name;
 			}
@@ -122,9 +141,27 @@ class CollaborationController extends BaseController {
 				$locations[$p_id]['org_lat'] = $p_obj->org_coords['lat'];
 				$locations[$p_id]['org_lng'] = $p_obj->org_coords['lng'];
 				$locations[$p_id]['org_address'] = $p_obj->org_coords['address'];
+			} else {
+				$geocode = true;
 			}
 			if ( ! empty( $p_obj->org_city ) ) {
 				$locations[$p_id]['org_city'] = $p_obj->org_city;
+			}
+			if ( isset( $geocode ) && ! empty( $p_obj->org_city ) ) {
+				$geocoded_coords = $this->google_geocode( urlencode( $p_obj->org_city ) );
+				if ( ! empty( $geocoded_coords->lat )
+					&& ! empty( $geocoded_coords->lng )
+					&& ! empty( $geocoded_coords->address ) ) {
+					$locations[$p_id]['org_lat'] = $geocoded_coords->lat;
+					$locations[$p_id]['org_lng'] = $geocoded_coords->lng;
+					$locations[$p_id]['org_address'] = $geocoded_coords->address;
+					$geocoded = array(
+						'address' => $geocoded_coords->address,
+						'lat' => $geocoded_coords->lat,
+						'lng' => $geocoded_coords->lng,
+					);
+					add_post_meta( $p_id, 'organisation_location', $geocoded, false );
+				}
 			}
 		}
 		if ( count( $locations ) > 1 ) {

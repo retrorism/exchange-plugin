@@ -51,7 +51,7 @@ class GridItem extends BasePattern {
 	 * @since 0.1.0
 	 * @TODO switch for context, switch for grid width
 	 **/
-	protected function build_grid_item_from_post() {
+	public function build_grid_item_from_post() {
 		if ( is_array( $this->input->has_cta ) ) {
 			$cta = in_array( $this->context, $this->input->has_cta );
 		} else {

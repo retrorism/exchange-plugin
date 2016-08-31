@@ -463,7 +463,7 @@ class Image extends BasePattern {
 		if ( $this->lazy ) {
 			$lazy_class = ' lazyload lazypreload';
 		}
-		$img = '<img class="image--main' . $lazy_class . $contact_class . '"';
+		$img = '<img class="image--main' . $lazy_class . '"';
 
 		// Add src to output.
 		if ( $this->lazy ) {
