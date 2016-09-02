@@ -186,16 +186,11 @@ function exchange_create_tax_dropdown( $tax, $context = '' ) {
 	$terms = get_terms( $args );
 	if ( ! empty( $terms ) ) {
 		$id = $tax . '-select';
-		if ( 'post__tag' === $tax ) {
-			$rest_slug = 'tag';
-		} else {
-			$rest_slug = $tax;
-		}
 		if ( ! empty( $context ) ) {
 			$context = $context . '__';
 		}
 		$output = '<fieldset>';
-		$output .= '<datalist data-tax="' . $rest_slug . '" id="' . $id . '" class="' . $context . 'tax-datalist tax-datalist">' . PHP_EOL;
+		$output .= '<datalist data-tax="' . $tax . '" id="' . $id . '" class="' . $context . 'tax-datalist tax-datalist">' . PHP_EOL;
 		foreach ( $terms as $term ) {
 			if ( ! $term instanceof WP_Term ) {
 				continue;

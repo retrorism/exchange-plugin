@@ -18,6 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_action( 'rest_api_init', 'exchange_register_api_hooks' );
 
 function exchange_register_api_hooks() {
+
+    // Add the plaintext content to GET requests for individual posts
     register_api_field(
         array('story','collaboration'),
         'exchange_basics',
@@ -25,6 +27,7 @@ function exchange_register_api_hooks() {
             'get_callback'    => 'exchange_return_basics',
         )
     );
+	// Add the plaintext content to GET requests for individual posts
 }
 
 // Return plaintext content for posts
