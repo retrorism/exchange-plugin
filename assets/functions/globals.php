@@ -51,6 +51,7 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 			),
 			'programme-logos' => array(
 				'C_P'       => 'Tandem C & P',
+				'C_P'       => 'Tandem C&P',
 				'Europe'    => 'Tandem Europe',
 				'Shaml'     => 'Tandem Shaml',
 				'Turkey'    => 'Tandem Turkey',
