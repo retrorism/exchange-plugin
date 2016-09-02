@@ -22,8 +22,21 @@ add_action('admin_init','add_grav_forms');
  * @since 0.1.0
  **/
 
-add_action('exchange_plugin_deactivate','exchange_remove_user_and_theme_management_for_editors');
-add_action('exchange_plugin_activate','exchange_add_user_and_theme_management_for_editors');
+add_action('exchange_plugin_deactivate','exchange_remove_user_management_for_editors');
+
+
+/**
+* Adds user management for editor role.
+*
+* @return void
+*/
+function exchange_add_user_management_for_editors() {
+	$role = get_role( 'editor' );
+	$caps = exchange_get_user_caps();
+	foreach ( $caps as $cap ) {
+		$role->add_cap( $cap );
+	}
+}
 
 /**
 * Returns array with user-editing capacities.
@@ -38,21 +51,7 @@ function exchange_get_user_caps() {
 		'add_users',
 		'remove_users',
 		'promote_users',
-		'edit_theme_options',
 	);
-}
-
-/**
-* Adds user management for editor role.
-*
-* @return void
-*/
-function exchange_add_user_and_theme_management_for_editors() {
-	$role = get_role( 'editor' );
-	$caps = exchange_get_user_caps();
-	foreach ( $caps as $cap ) {
-		$role->add_cap( $cap );
-	}
 }
 
 /**
@@ -60,7 +59,7 @@ function exchange_add_user_and_theme_management_for_editors() {
 *
 * @return void
 */
-function exchange_remove_user_and_theme_management_for_editors() {
+function exchange_remove_user_management_for_editors() {
 	$role = get_role( 'editor' );
 	$caps = exchange_get_user_caps();
 	foreach ( $caps as $cap ) {

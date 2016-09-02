@@ -75,6 +75,11 @@ abstract class BaseMap extends BasePattern {
 	 **/
 	 protected function create_output() {
 
+		// If a grid is created inside a story, make this into an figure class.
+		if ( is_single() || is_page() ) {
+			$el = 'figure';
+		}
+
 		if ( class_exists( 'Exchange_Leaflet_Map' ) ) {
 			$map_shortcode = $this->prepare_map_attributes();
 
@@ -85,7 +90,7 @@ abstract class BaseMap extends BasePattern {
 			}
 			$this->set_caption();
 
-			$this->output_tag_open( 'figure' );
+			$this->output_tag_open( $el );
 
 			$this->output .= apply_filters('the_content', $map_shortcode);
 
@@ -108,7 +113,7 @@ abstract class BaseMap extends BasePattern {
 			}
 
 			// Close map element.
-			$this->output_tag_close( 'figure' );
+			$this->output_tag_close( $el );
 
 
 		} else {

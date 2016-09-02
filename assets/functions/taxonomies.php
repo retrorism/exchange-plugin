@@ -123,9 +123,6 @@ function exchange_create_tax_tandem() {
 				'slug'       => 'tandem', // This controls the base slug that will display before each term.
 				'with_front' => false, // Don't display the category base before.
 			),
-			'show_in_rest'       => true,
-			'rest_base'          => 'tandem',
-			'rest_controller_class' => 'WP_REST_Terms_Controller',
 			'labels'       => array(
 				'add_new_item' => 'Add new Tandem Tag',
 			),
@@ -152,9 +149,6 @@ function exchange_create_tax_language() {
 				'slug'       => 'language', // This controls the base slug that will display before each term.
 				'with_front' => false, // Don't display the category base before.
 			),
-			'show_in_rest'       => true,
-  			'rest_base'          => 'language',
-  			'rest_controller_class' => 'WP_REST_Terms_Controller',
 			'labels'       => array(
 				'add_new_item' => 'Add new language tag',
 			),
@@ -182,9 +176,6 @@ function exchange_create_tax_topic() {
 				'slug'       => 'topic', // This controls the base slug that will display before each term.
 				'with_front' => false, // Don't display the category base before.
 			),
-			'show_in_rest'       => true,
-			'rest_base'          => 'topic',
-			'rest_controller_class' => 'WP_REST_Terms_Controller',
 		)
 	);
 }
@@ -209,9 +200,6 @@ function exchange_create_tax_location() {
 				'slug'       => 'location', // This controls the base slug that will display before each term.
 				'with_front' => true, // Don't display the category base before.
 			),
-			'show_in_rest'       => true,
-			'rest_base'          => 'location',
-			'rest_controller_class' => 'WP_REST_Terms_Controller',
 		)
 	);
 }
@@ -235,9 +223,6 @@ function exchange_create_tax_methodology() {
 				'slug'       => 'methodology', // This controls the base slug that will display before each term
 				'with_front' => false, // Don't display the category base before.
 			),
-			'show_in_rest'       => true,
-			'rest_base'          => 'methodology',
-			'rest_controller_class' => 'WP_REST_Terms_Controller',
 		)
 	);
 }
@@ -262,9 +247,6 @@ function exchange_create_tax_discipline() {
 				'slug'       => 'discipline', // This controls the base slug that will display before each term.
 				'with_front' => false, // Don't display the category base before.
 			),
-			'show_in_rest'       => true,
-			'rest_base'          => 'discipline',
-			'rest_controller_class' => 'WP_REST_Terms_Controller',
 		)
 	);
 	register_taxonomy_for_object_type( 'discipline', 'collaboration' );
@@ -290,9 +272,6 @@ function exchange_create_tax_project_output() {
 				'slug'       => 'output', // This controls the base slug that will display before each term.
 				'with_front' => false, // Don't display the category base before.
 			),
-			'show_in_rest'       => true,
-			'rest_base'          => 'project_output',
-			'rest_controller_class' => 'WP_REST_Terms_Controller',
 		)
 	);
 }

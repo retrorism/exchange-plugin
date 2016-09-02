@@ -330,13 +330,13 @@ abstract class BasePattern {
 	 * @param string $key Data-attribute identifier.
 	 * @param string $val Contains the value for this data-attribute.
 	 **/
-	public function set_attribute( $type, $key, $val ) {
+	protected function set_attribute( $type, $key, $val ) {
 		$allowed_types = array( 'data','aria','link','misc' );
 		if ( ! in_array( $type, $allowed_types, true ) ) {
 			return;
 		}
 		$prop = $type . '_attributes';
-		if ( null !== $val && '' !== $val && is_array( $this->$prop ) ) {
+		if (  ! empty( $val ) && is_array( $this->$prop ) ) {
 			// Apparently, it's not possible to set keys directly to an array that is an object property.
 			$arr = $this->$prop;
 			$arr[$key] = $val;

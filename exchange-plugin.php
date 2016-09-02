@@ -74,7 +74,6 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 				'post-types.php',
 				'public.php',
 				'import_projects.php',
-				'rest-api.php',
 			);
 			foreach ( $files as $file ) {
 				require_once( EXCHANGE_PLUGIN_PATH . 'assets/functions/' . $file );
@@ -126,8 +125,6 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 					'participantcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-participant.php',
 					'collaborationcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-collaboration.php',
 					'programme_roundcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-programme-round.php',
-
-					'exchange_taxonomy_route'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-exchange-taxonomy-route.php',
 
 					'basepattern' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-pattern-base.php',
 					'basegrid' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-grid-base.php',
