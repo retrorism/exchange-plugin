@@ -49,7 +49,7 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 				'griditem__pattern'
 			),
 			'programme-logos' => array(
-				'C_P'       => 'Tandem C & P',
+				'C_P'       => 'Tandem C&P',
 				'Europe'    => 'Tandem Europe',
 				'Shaml'     => 'Tandem Shaml',
 				'Turkey'    => 'Tandem Turkey',
@@ -72,7 +72,7 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 			// Parent programmes (not taxonomized for overall ease ).
 
 			'programmes' => array(
-				'C_P'     => 'Tandem C & P',
+				'C_P'     => 'Tandem C&P',
 				'Europe'  => 'Tandem Europe',
 				'Shaml'   => 'Tandem Shaml',
 				'Turkey'  => 'Tandem Turkey',

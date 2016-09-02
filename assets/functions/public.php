@@ -186,7 +186,7 @@ function exchange_create_tax_dropdown( $tax, $context = '' ) {
 	$terms = get_terms( $args );
 	if ( ! empty( $terms ) ) {
 		$id = $tax . '-select';
-		if ( 'post__tag' === $tax ) {
+		if ( 'post_tag' === $tax ) {
 			$rest_slug = 'tag';
 		} else {
 			$rest_slug = $tax;
@@ -208,8 +208,8 @@ function exchange_create_tax_dropdown( $tax, $context = '' ) {
 		}
 		$output .= '</datalist>' . PHP_EOL;
 		if ( ! empty( $tax_obj ) ) {
-			$output .= '<input data-tax="' . $tax . '" type="text" class="' . $context . 'datalist ' . $tax . '-input" type="text" placeholder="' . $tax_obj->label . '" list="' . $id . '"></input>' . PHP_EOL;
-			$output .= '<a data-tax="' . $tax . '" class="' . $context . 'button ' . $tax . '-button button--input" data-input="' . $id . '">' . __('Add filter',EXCHANGE_PLUGIN ) . '</a>' . PHP_EOL;
+			$output .= '<input data-tax="' . $rest_slug . '" type="text" class="' . $context . 'datalist ' . $rest_slug . '-input" type="text" placeholder="' . $tax_obj->label . '" list="' . $id . '"></input>' . PHP_EOL;
+			$output .= '<a data-tax="' . $rest_slug . '" class="' . $context . 'button ' . $rest_slug . '-button button--input" data-input="' . $id . '">' . __('Add filter',EXCHANGE_PLUGIN ) . '</a>' . PHP_EOL;
 		}
 		$output .= '</fieldset>';
 		echo $output;
