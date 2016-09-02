@@ -62,10 +62,10 @@ class EmphasisBlock extends BasePattern {
 
 				case 'block_graphic':
 					$image_arr = $e['block_graphic_select'];
-					$image_mods = array();
 					if ( empty( $image_arr ) || empty( $image_arr['mime_type'] ) ) {
-						continue;
+						break;
 					}
+					$image_mods = array();
 					if ( 'image/svg+xml' === $image_arr['mime_type'] ) {
 						$image = new ImageSVG( $image_arr, $this->element, $image_mods );
 					} else {
@@ -75,22 +75,28 @@ class EmphasisBlock extends BasePattern {
 					break;
 
 				case 'block_logo':
-					$colour = isset( $this->modifiers['colour'] ) ? $this->modifiers['colour'] : 'default';
-					$image_mods = array(
-						'background-colour' => $colour,
-					);
-					$image = new ImageSVG( $e['block_programme' ],$this->element, $image_mods );
-					$this->output .= $image->embed();
+					if ( ! empty( $e['block_programme'] ) ) {
+						$colour = isset( $this->modifiers['colour'] ) ? $this->modifiers['colour'] : 'default';
+						$image_mods = array(
+							'background-colour' => $colour,
+						);
+						$image = new ImageSVG( $e['block_programme'],$this->element, $image_mods );
+						$this->output .= $image->embed();
+					}
 					break;
 
 				case 'block_paragraph':
-					$paragraph = new Paragraph( $e['block_paragraph_text'], $this->element );
-					$this->output .= $paragraph->embed();
+					if ( ! empty( $e['block_paragraph_text'] ) ) {
+						$paragraph = new Paragraph( $e['block_paragraph_text'], $this->element );
+						$this->output .= $paragraph->embed();
+					}
 					break;
 
 				case 'block_header':
-					$subheader = new SubHeader( $e['block_header_text'], $this->element );
-					$this->output .= $subheader->embed();
+					if ( ! empty( $e['block_header_text'] ) ) {
+						$subheader = new SubHeader( $e['block_header_text'], $this->element );
+						$this->output .= $subheader->embed();
+					}
 					break;
 
 				case 'block_button':
@@ -115,7 +121,6 @@ class EmphasisBlock extends BasePattern {
 					break;
 
 				default:
-					$this->output .= ( 'Unknown layout' );
 					break;
 			}
 		}

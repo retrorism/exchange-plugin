@@ -45,6 +45,7 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 			'no-caption' => array(
 				'contactblock',
 				'griditem',
+				'emphasisblock',
 				'collaboration__header',
 				'griditem__pattern'
 			),
@@ -81,7 +82,7 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 			'display_priority_story' => array( 'tandem','topic','location','discipline','methodology','project_output' ),
 			'display_priority_collaboration' => array( 'topic','location','discipline','methodology','project_output' ),
 			// Maximum number of tags on grid items
-			'grid_tax_max' => 3,
+			'grid_tax_max' => 2,
 		),
 		'PATTERNS' => array(
 			'map_max-collaboration-count' => 20,
