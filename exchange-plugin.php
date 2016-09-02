@@ -67,7 +67,6 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 				'globals.php',
 				'admin.php',
 				'admin-acf.php',
-				'acf-google-api-key.php',
 				'admin-options.php',
 				'admin-roles.php',
 				'taxonomies.php',
@@ -75,6 +74,10 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 				'public.php',
 				'import_projects.php',
 			);
+			$google_api_filter = ABSPATH . 'acf-google-api-key.php';
+			if ( file_exists( $google_api_filter ) ) {
+				require_once( $google_api_filter );
+			}
 			foreach ( $files as $file ) {
 				require_once( EXCHANGE_PLUGIN_PATH . 'assets/functions/' . $file );
 			}
