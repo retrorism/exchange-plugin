@@ -57,8 +57,8 @@ class BaseController {
 	 * @return content type, if the post is right for content creation.
 	 **/
 	public static function is_correct_content_type( $post_id_or_object, $type = null ) {
-		if ( is_numeric( $post_id_or_object ) && $post_id_or_object > 0 ) {
-			$post_id_or_object = get_post( $post_id_or_object );
+		if ( is_numeric( $post_id_or_object ) && intval( $post_id_or_object ) > 0 ) {
+			$post_id_or_object = get_post( intval ( $post_id_or_object ) );
 		}
 		if ( ! is_object( $post_id_or_object ) ) {
 			return;
@@ -79,8 +79,6 @@ class BaseController {
 		$content_type = $post_id_or_object->post_type;
 		if ( null === $type || $allowed_types[ $content_type ] === $type ) {
 			return $content_type;
-		} else {
-			throw new Exception("Testing {1:What are we testing?}");
 		}
 	}
 
@@ -97,8 +95,8 @@ class BaseController {
 		if ( empty( $post_id_or_object ) ) {
 			return;
 		}
-		if ( is_numeric( $post_id_or_object ) && $post_id_or_object > 0 ) {
-			$post_id_or_object = get_post( $post_id_or_object );
+		if ( is_numeric( $post_id_or_object ) && intval( $post_id_or_object ) > 0 ) {
+			$post_id_or_object = get_post( intval ( $post_id_or_object ) );
 		}
 		$type = self::is_correct_content_type( $post_id_or_object, $check_for_type );
 		if ( empty( $type ) ) {

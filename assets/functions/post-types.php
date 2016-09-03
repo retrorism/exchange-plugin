@@ -53,11 +53,9 @@ function tandem_create_story() {
 		'capability_type'     => 'post',
 		'supports'            => array( 'title','editor','thumbnail','revisions' ),
 		'rewrite'             => array( 'slug' => 'stories' ),
-		'taxonomies'          => array( 'post_tag','category','location','topic'),
+		'taxonomies'          => array( 'post_tag','category','location','tandem_tag','topic','discipline','methodology','project_output'),
 	) );
 }
-
-
 
 // Register Collaboration as Post Type.
 function tandem_create_collaboration() {
@@ -87,7 +85,7 @@ function tandem_create_collaboration() {
 		'public'              => true,
 		'exclude_from_search' => false,
 		// Awkwardly, WordPress routing finds it difficult to deal with parent posts that are of a different post type. So although we can still fill in the parent type.
-		// So although we can still fill in the parent_ID columnt, we cannot create routing (easily).
+		// So although we can still fill in the parent_ID column, we cannot create routing (easily).
 		'hierarchical'        => false,
 		'capability_type'     => 'post',
 		// Other items that are available for this array: 'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'.
@@ -96,7 +94,7 @@ function tandem_create_collaboration() {
 			'slug'       => 'collaborations',
 			'with_front' => true,
 		),
-		'taxonomies'          => array( 'post_tag','location','topic','discipline','methodology','output'),
+		'taxonomies'          => array( 'post_tag','location','tandem_tag','topic','discipline','methodology','project_output'),
 		)
 	);
 
@@ -158,7 +156,7 @@ function tandem_create_programme_round() {
 	// Register post type.
 	register_post_type( 'programme_round', array(
 		'labels'              => $labels,
-		'has_archive'         => true,
+		'has_archive'         => false,
 		'menu_icon'           => 'dashicons-chart-pie',
 		'menu_position'       => 14,
 		'public'              => false,
@@ -173,15 +171,14 @@ function tandem_create_programme_round() {
 	);
 }
 
-function mmp_rewrite_rules($rules) {
-    $newRules  = array();
-    $newRules['basename/(.+)/(.+)/(.+)/(.+)/?$'] = 'index.php?custom_post_type_name=$matches[4]'; // my custom structure will always have the post name as the 5th uri segment
-    $newRules['basename/(.+)/?$']                = 'index.php?taxonomy_name=$matches[1]';
-
-    return array_merge($newRules, $rules);
+// Make sure that the archive links always end up at the archive, not the page, even when the page's permalink is used.
+function exchange_rewrite_rules($rules) {
+	add_rewrite_rule('^stories$', 'index.php?post_type=story', 'top');
+	add_rewrite_rule('^collaborations$', 'index.php?post_type=collaborations', 'top');
 }
 
-add_filter('rewrite_rules_array', 'mmp_rewrite_rules');
+add_action('init', 'exchange_rewrite_rules');
+
 
 add_filter( 'get_the_archive_title', function ( $title ) {
 
