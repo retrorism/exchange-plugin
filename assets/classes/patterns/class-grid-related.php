@@ -35,7 +35,7 @@ class RelatedGrid extends BaseGrid {
 		if ( is_single() || is_page() ) {
 			$el = 'aside';
 		} else {
-			$el = 'section';
+			$el = 'div';
 		}
 		$colour = '#' . $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['salmon-1-web'];
 		$this->set_grid_items();
@@ -45,7 +45,6 @@ class RelatedGrid extends BaseGrid {
 			$this->set_attribute( 'data', 'background-colour', $colour );
 			$this->set_attribute( 'data', 'equalizer', true );
 			$this->set_attribute('data','children', count( $this->grid_items ) );
-			$this->output .= '<div class="section-inner">';
 			$header_text = __( 'Read more','exchange' );
 			if ( 'collaboration' === $this->context && 'has_stories' === $this->modifiers['related'] ) {
 				$header_text = __( 'Shared stories','exchange');
@@ -57,8 +56,6 @@ class RelatedGrid extends BaseGrid {
 				$this->output .= $item->embed();
 			}
 			$this->output_tag_close( $el );
-
-			$this->output .= '</div>';
 		}
 	}
 }

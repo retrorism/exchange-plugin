@@ -190,14 +190,12 @@ abstract class BasePattern {
 			$this->classes['section__default-element'] = 'section__slice';
 		}
 		// Add base class;
+		$this->classes['element'] = $this->element;
 		if ( ! array_key_exists('base__element', $this->classes )
 			|| empty( $this->classes['base__element'] ) ) {
 			if ( ! empty( $this->context ) ) {
 				$this->classes['base__element'] = $this->context . '__' . $this->element;
 			}
-		} else {
-			// Fallback to setting generic class element.
-			$this->classes['element'] = $this->element;
 		}
 	}
 
