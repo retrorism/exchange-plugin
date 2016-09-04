@@ -149,7 +149,7 @@ abstract class BaseMap extends BasePattern {
 	 */
 	protected function set_map_collaborations() {
 		$objects = $this->input['map_collaborations'];
-		if ( ! is_array( $collaborations ) && count( $collaborations ) > 0 )  {
+		if ( ! is_array( $objects ) && count( $objects ) > 0 ) {
 			return;
 		} else {
 			$collaborations = array();
@@ -176,10 +176,11 @@ abstract class BaseMap extends BasePattern {
 				}
 			}
 			$collaborations = array_unique( $collaborations, SORT_REGULAR );
+			$collab_total = count( $collaborations );
 
-			for ( $i = 0; $i < $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['PATTERNS']['map_max-collaboration-count']; $i++ ) {
-				// Limit to 20 collaborations.
-				$this->set_collaboration_data( $collaborations[$i] );
+			// Limit to 20 collaborations.
+			for ( $i = 0; $i < $collab_total && $i < $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['PATTERNS']['map_max-collaboration-count']; $i++ ) {
+				$this->set_collaboration_data( $collaborations[ $i ] );
 			}
 			if ( ! empty( $this->collaboration_data ) ) {
 				$this->has_network = true;
@@ -270,13 +271,14 @@ abstract class BaseMap extends BasePattern {
 		}
 	}
 
-	/** Add map markers.
+	/**
+	 * Add map markers.
 	 *
 	 * If not empty, sets input array to map_markers property.
-
+	 *
+	 * @param array $marker Array with marker data.
 	 */
 	protected function create_map_marker( $marker ) {
-
 		$marker_shortcode = '[leaflet-marker ';
 		// $marker_shortcode .= 'visible="true" ';
 		$marker_shortcode .= 'lat=' . $marker['lat'] . ' ';
@@ -288,9 +290,10 @@ abstract class BaseMap extends BasePattern {
 	}
 
 	/**
-	 * Create map line
+	 * Create map line.
 	 *
 	 * @param array $locations Array with lats, longs and cities for each participant's organisation.
+	 * @param string $line_label defaults to ''.
 	 * @return string $line Map line shortcode with either addresses or coordinates.
 	 */
 	protected function create_map_line( $locations, $line_label = '' ) {
