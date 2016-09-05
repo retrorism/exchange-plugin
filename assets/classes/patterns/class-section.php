@@ -154,6 +154,9 @@ class Section extends BasePattern {
 				case 'has_contact_details' :
 					$this->build_contact_block( $section_contents );
 					break;
+				case 'has_social_icons' :
+					$this->build_social_icons( $section_contents );
+					break;
 			}
 
 		}
@@ -369,5 +372,16 @@ class Section extends BasePattern {
 	protected function build_simple_grid( $section_contents ) {
 		$grid = new SimpleGrid( $section_contents['select_grid_items'], $this->element );
 		$this->output .= $grid->embed();
+	}
+
+	/**
+	 * Build grid from ACF layouts
+	 *
+	 */
+	protected function build_social_icons( $section_contents ) {
+		$platforms = $section_contents['platforms'];
+		if ( is_array( $platforms ) && ! empty( $platforms ) ) {
+			$this->output .= exchange_build_social_icons( $this->element, $platforms );
+		}
 	}
 }
