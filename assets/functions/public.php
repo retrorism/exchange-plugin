@@ -105,6 +105,50 @@ function exchange_create_link( $obj, $with_text = true, $class = '' ) {
 }
 
 /**
+ * undocumented function summary
+ *
+ * Undocumented function long description
+ *
+ * @param type var Description
+ * @return return type
+ */
+function exchange_build_breadcrumb_base( $exchange ) {
+	global $post;
+	$arrow = '<li>' . exchange_build_svg( get_stylesheet_directory() . '/assets/images/svg/T_arrows_Single_WEB.svg' ) . '</li>';
+	$title_string = $exchange->title;
+	$tag = '';
+	switch( $exchange->type ) {
+		case 'story':
+			$type_string = 'Stories';
+			break;
+		case 'collaboration':
+			$type_string = 'Collaborations';
+			if ( ! empty( $exchange->programme_round ) && is_string( $exchange->programme_round->term ) ) {
+				$participant_list = array();
+				$tag = '<li>' . exchange_create_link( $exchange->ordered_tag_list[0] ) . '</li>' . $arrow;
+			}
+			if ( ! empty( $exchange->participants ) ) {
+				foreach( $exchange->participants as $participant ) {
+					$participant_list[] = $participant->title;
+				}
+				if ( count( $participant_list ) > 0 ) {
+					$title_string = wp_trim_words( '<li>' . implode( ' & ', $participant_list ) . '</li>', 7, __( '...',EXCHANGE_PLUGIN ) );
+				}
+			}
+			break;
+		case 'page':
+			$parent = get_post( $post->post_parent );
+			$type_string = $parent->post_title;
+			break;
+		default:
+			return;
+	}
+	$type = '<li><a href="' . get_post_type_archive_link( $exchange->type ) . '">' . $type_string . '</a></li>' . $arrow;
+	$title = '<li><span class="show-for-sr">Current: </span>'. $title_string. '</li>';
+	return '<ol>' . $type . $tag . $title . '</ol>';
+}
+
+/**
  * Get focus points for this image
  *
  * Add modifiers array with data properties if a focus point has been set.
