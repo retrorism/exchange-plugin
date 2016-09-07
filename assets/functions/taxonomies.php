@@ -19,14 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 add_action( 'init', 'exchange_connect_default_taxonomies' );
 add_action( 'init', 'exchange_modify_post_tag', 11 );
 add_action( 'init', 'exchange_fix_tag_labels' );
-add_action( 'init', 'exchange_create_tax_language' );
-add_action( 'init', 'exchange_create_tax_tandem' );
-add_action( 'init', 'exchange_create_tax_location' );
-add_action( 'init', 'exchange_create_tax_topic' );
-add_action( 'init', 'exchange_create_tax_discipline' );
-add_action( 'init', 'exchange_create_tax_methodology' );
-add_action( 'init', 'exchange_create_tax_project_output' );
-
+add_action( 'init', 'exchange_create_taxonomies' );
 
 add_action( 'save_post_programme_round', 'exchange_create_tax_for_programme_round', 10, 3 );
 add_action( 'save_post_collaboration', 'exchange_set_post_tag_from_parent_id', 10, 3 );
@@ -64,12 +57,17 @@ function exchange_modify_post_tag() {
 	$programme_round_args->rewrite['show_ui'] = 0;
 
     // re-register the taxonomy
-    register_taxonomy( 'post_tag', array('story','collaboration','programme_round'), (array) $programme_round_args);
+    register_taxonomy( 'post_tag', array( 'story', 'collaboration', 'programme_round' ), (array) $programme_round_args);
 }
 
-
+/**
+ * Adjust post_tag term query to return all relevant post types.
+ *
+ * @param array $query Global $query object.
+ * @return return void if the query does not contain a post_tag.
+ */
 function exchange_modify_post_tag_query( $query ) {
-	$programme_round = get_query_var('programme-round');
+	$programme_round = get_query_var( 'programme-round' );
 	if ( ! $query->is_main_query() || empty( $programme_round ) ) {
 		return;
 	}
@@ -77,15 +75,15 @@ function exchange_modify_post_tag_query( $query ) {
 	$query->query_vars['tag_slug__in'][] = $programme_round;
 	if ( empty( $post_type ) ) {
 		$query->set( 'post_type', array( 'collaboration','story' ) );
-	//elseif ( is_post_type_archive('collaboration') || is_post_type_archive('story') ) {
+		// elseif ( is_post_type_archive('collaboration') || is_post_type_archive('story') ) {
 	}
 }
 
 add_action( 'pre_get_posts', 'exchange_modify_post_tag_query' );
 
 function exchange_query_vars_filter($vars) {
-  $vars[] = 'programme-round';
-  return $vars;
+	$vars[] = 'programme-round';
+	return $vars;
 }
 add_filter( 'query_vars', 'exchange_query_vars_filter' );
 
@@ -94,18 +92,22 @@ function exchange_url_rewrite_templates() {
 	if ( ! empty( $post_type ) && ! is_array( $post_type ) ) {
 		return;
 	}
-    if ( get_query_var( 'programme-round' ) ) {
-        add_filter( 'template_include', function() {
-            return get_template_directory() . '/archive.php';
-        });
-    }
+	if ( get_query_var( 'programme-round' ) ) {
+		add_filter( 'template_include', function() {
+			$archive_template = locate_template( array( 'archive.php' ) );
+			if ( '' !== $archive_template ) {
+				return $archive_template;
+			}
+			return $archive_template;
+		});
+	}
 }
 
 add_action( 'template_redirect', 'exchange_url_rewrite_templates' );
 
+function exchange_create_taxonomies() {
 
-// Register language as taxonomy.
-function exchange_create_tax_tandem() {
+	// Register language as taxonomy.
 	register_taxonomy(
 		'tandem',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
 		array( 'story', 'page' ), // Post type name.
@@ -128,10 +130,8 @@ function exchange_create_tax_tandem() {
 			),
 		)
 	);
-}
 
-// Register language as taxonomy.
-function exchange_create_tax_language() {
+	// Register language as taxonomy.
 	register_taxonomy(
 		'language',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
 		array( 'story', 'page' ), // Post type name.
@@ -154,10 +154,8 @@ function exchange_create_tax_language() {
 			),
 		)
 	);
-}
 
-// Register theme as taxonomy.
-function exchange_create_tax_topic() {
+	// Register theme as taxonomy.
 	register_taxonomy(
 		'topic',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
 		array( 'story', 'collaboration', 'page' ), // Post type name.
@@ -178,11 +176,8 @@ function exchange_create_tax_topic() {
 			),
 		)
 	);
-}
 
-
-// Register location as taxonomy.
-function exchange_create_tax_location() {
+	// Register location as taxonomy.
 	register_taxonomy(
 		'location',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
 		array( 'story', 'collaboration', 'page' ), // Post type name.
@@ -202,10 +197,8 @@ function exchange_create_tax_location() {
 			),
 		)
 	);
-}
 
-// Register methodologies as taxonomy.
-function exchange_create_tax_methodology() {
+	// Register methodologies as taxonomy.
 	register_taxonomy(
 		'methodology',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
 		array( 'story', 'collaboration', 'page' ), // Post type name.
@@ -225,10 +218,8 @@ function exchange_create_tax_methodology() {
 			),
 		)
 	);
-}
 
-// Register discipline as taxonomy.
-function exchange_create_tax_discipline() {
+	// Register discipline as taxonomy.
 	register_taxonomy(
 		'discipline',  // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
 		array( 'story', 'collaboration', 'page' ), // Post type name.
@@ -251,10 +242,7 @@ function exchange_create_tax_discipline() {
 	);
 	register_taxonomy_for_object_type( 'discipline', 'collaboration' );
 
-}
-
-// Register output as taxonomy.
-function exchange_create_tax_project_output() {
+	// Register output as taxonomy.
 	register_taxonomy(
 		'project_output', // The name of the taxonomy. Name should be in slug form (must not contain capital letters or spaces).
 		array( 'story', 'collaboration', 'page' ), // Post type name.
@@ -276,9 +264,7 @@ function exchange_create_tax_project_output() {
 	);
 }
 
-
-function exchange_fix_tag_labels()
-{
+function exchange_fix_tag_labels() {
     global $wp_taxonomies;
 
     // The list of labels we can modify comes from
