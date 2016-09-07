@@ -85,8 +85,6 @@ abstract class BaseGrid extends BasePattern {
 			if ( count( $this->grid_items ) > 0 ) {
 				$this->has_grid_items = true;
 			}
-		} else {
-			throw new Exception( __( 'This is not valid grid content', EXCHANGE_PLUGIN ) );
 		}
 	}
 
@@ -137,6 +135,10 @@ abstract class BaseGrid extends BasePattern {
 	public static function create_grid_item_from_post( $item, $context ) {
 		$exchange = BaseController::exchange_factory( $item, 'griditem' );
 		$item_mods = self::add_grid_modifiers( $exchange );
+		if ( 'relatedgrid' === $context ) {
+			$item_mods['grid_width_num'] = self::get_grid_width_num('grid_third');
+			$item_mods['grid_width'] = 'grid_third';
+		}
 		$grid_item = new GridItem( $exchange, $context, $item_mods );
 		return $grid_item;
 	}

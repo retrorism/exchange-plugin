@@ -44,7 +44,7 @@ class SimpleGrid extends BaseGrid {
 			$sum = 0;
 			foreach ( $this->grid_items as $item ) {
 				if ( $sum == 0 ) {
-					$this->output .= '<div class="row" data-equalizer>';
+					$this->output .= '<div class="row" data-equalizer data-equalize-on="medium">';
 				}
 				$this->fill_rows( $item, $sum );
 				$width = $item->get_modifier( 'grid_width_num' );

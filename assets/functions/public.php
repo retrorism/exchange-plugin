@@ -109,7 +109,7 @@ function exchange_build_breadcrumb_base( $exchange ) {
 	$arrow = '<li>' . exchange_build_svg( get_stylesheet_directory() . '/assets/images/svg/T_arrows_Single_WEB.svg' ) . '</li>';
 	$title_string = $exchange->title;
 	$tag = '';
-	$maxchars = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['BREADCRUMBS']['default'];
+	$maxchars = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['BREADCRUMBS']['max-chars-default'];
 	switch( $exchange->type ) {
 		case 'story':
 			$type_string = 'Stories';

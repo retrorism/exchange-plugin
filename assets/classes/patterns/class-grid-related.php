@@ -44,6 +44,7 @@ class RelatedGrid extends BaseGrid {
 			$this->set_modifier_class( 'colour', $colour );
 			$this->set_attribute( 'data', 'background-colour', $colour );
 			$this->set_attribute( 'data', 'equalizer', true );
+			$this->set_attribute( 'data', 'equalize-on', 'medium' );
 			$this->set_attribute('data','children', count( $this->grid_items ) );
 			$header_text = __( 'Read more','exchange' );
 			if ( 'collaboration' === $this->context && 'has_stories' === $this->modifiers['related'] ) {

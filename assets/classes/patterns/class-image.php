@@ -142,12 +142,18 @@ class Image extends BasePattern {
 
 		$this->output .= $this->build_image_placeholder();
 
-
 		if ( in_array( $this->context, $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['IMAGES']['no-caption'], true ) ) {
 			$caption = false;
 		}
 
-		if ( $caption && ( ! empty( $this->input['caption'] ) || ! empty( $this->title ) ) ) {
+		if ( ! empty( $this->input['description'] ) ) {
+			$this->set_image_description();
+			if ( is_object( $this->description ) ) {
+				$this->output .= $this->build_image_description();
+			}
+		}
+
+		if ( $caption && ( ! empty( $this->input['caption'] ) || ! empty( $this->title ) || ! empty( $this->description ) ) ) {
 			$this->set_image_caption();
 			if ( is_object( $this->caption ) ) {
 				$this->output .= $this->build_image_caption();
@@ -160,12 +166,7 @@ class Image extends BasePattern {
 		// Close element.
 		$this->output_tag_close( 'figure' );
 
-		if ( ! empty( $this->input['description'] ) ) {
-			$this->set_image_description();
-			if ( is_object( $this->description ) ) {
-				$this->output .= $this->build_image_description();
-			}
-		}
+
 
 		// Close wrapper.
 		$this->wrapper( 'close' );
