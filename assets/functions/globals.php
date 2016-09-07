@@ -88,6 +88,11 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 		'PATTERNS' => array(
 			'map_max-collaboration-count' => 20,
 		),
+		'BREADCRUMBS' => array(
+			'max-chars-story' => 85,
+			'max-chars-collaboration' => 65,
+			'max-chars-default' => 75,
+		),
 	);
 }
 

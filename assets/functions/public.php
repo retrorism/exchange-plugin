@@ -104,25 +104,20 @@ function exchange_create_link( $obj, $with_text = true, $class = '' ) {
 	}
 }
 
-/**
- * undocumented function summary
- *
- * Undocumented function long description
- *
- * @param type var Description
- * @return return type
- */
 function exchange_build_breadcrumb_base( $exchange ) {
 	global $post;
 	$arrow = '<li>' . exchange_build_svg( get_stylesheet_directory() . '/assets/images/svg/T_arrows_Single_WEB.svg' ) . '</li>';
 	$title_string = $exchange->title;
 	$tag = '';
+	$maxchars = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['BREADCRUMBS']['default'];
 	switch( $exchange->type ) {
 		case 'story':
 			$type_string = 'Stories';
+			$maxchars = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['BREADCRUMBS']['max-chars-story'];
 			break;
 		case 'collaboration':
 			$type_string = 'Collaborations';
+			$maxchars = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['BREADCRUMBS']['max-chars-collaboration'];
 			if ( ! empty( $exchange->programme_round ) && is_string( $exchange->programme_round->term ) ) {
 				$participant_list = array();
 				$tag = '<li>' . exchange_create_link( $exchange->ordered_tag_list[0] ) . '</li>' . $arrow;
@@ -132,7 +127,7 @@ function exchange_build_breadcrumb_base( $exchange ) {
 					$participant_list[] = $participant->title;
 				}
 				if ( count( $participant_list ) > 0 ) {
-					$title_string = wp_trim_words( '<li>' . implode( ' & ', $participant_list ) . '</li>', 7, __( '...',EXCHANGE_PLUGIN ) );
+					$title_string = implode( ' & ', $participant_list );
 				}
 			}
 			break;
@@ -144,6 +139,9 @@ function exchange_build_breadcrumb_base( $exchange ) {
 			return;
 	}
 	$type = '<li><a href="' . get_post_type_archive_link( $exchange->type ) . '">' . $type_string . '</a></li>' . $arrow;
+	if ( strlen( $title_string ) > $maxchars ) {
+		$title_string = substr( $title_string, 0, $maxchars ) . __( '...', EXCHANGE_PLUGIN );
+	}
 	$title = '<li><span class="show-for-sr">Current: </span>'. $title_string. '</li>';
 	return '<ol>' . $type . $tag . $title . '</ol>';
 }
