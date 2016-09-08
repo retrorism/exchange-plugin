@@ -32,6 +32,38 @@ function tandem_admin_enqueue_scripts() {
 	wp_enqueue_script( 'tandem-admin-js', plugin_dir_url( EXCHANGE_PLUGIN_FILE )  . '/assets/js/tandem_admin.js', array(), '0.1.0', true );
 }
 
+
+function exchange_add_tokenlist_widget() {
+
+	wp_add_dashboard_widget(
+		'exchange_tokenlist_widget',         // Widget slug.
+		'Update links for each Programme Round:',         // Title.
+		'exchange_tokenlist_widget' // Display function.
+	);
+}
+
+add_action( 'wp_dashboard_setup', 'exchange_add_tokenlist_widget' );
+
+/**
+ * Create the function to output the contents of our Dashboard Widget.
+ */
+function exchange_tokenlist_widget() {
+	$pr_set = BaseController::get_all_from_type( 'programme_round' );
+	if ( empty( $pr_set ) ) {
+		return;
+	}
+	$output = '<table width="100%"><tr><th align="left">' . __( 'Programme Round', EXCHANGE_PLUGIN ) . '</th>';
+	$output .= '<th align="left">' . __( 'Token Link', EXCHANGE_PLUGIN ) . '</th>';
+	$length = count( $pr_set );
+	for ( $i = 0; $i < $length; $i++ ) {
+		$token = get_post_meta( $pr_set[$i]->ID, 'update_token', true );
+		$output .= '<tr><td width="40%">' . $pr_set[$i]->post_title . '</td>';
+		$output .= '<td width="60%"><input size="50" disabled type="text" value="' . get_home_url() . '/?pr=' . urlencode( $token ) . '"></td></tr>';
+	}
+	$output .= '</table>';
+	echo $output;
+}
+
 /* https://github.com/tommcfarlin/WordPress-Custom-Menu-Separator */
 function exchange_set_admin_menu_separator() {
 	global $menu;
