@@ -256,7 +256,7 @@ class Programme_Round extends Exchange {
 			return;
 		}
 		$output = '<form class="token-form"><fieldset>';
-		$output .= '<input type="hidden" class="token-form__nonce" name="token-form-nonce" value="' . wp_create_nonce( 'exchange-token-form-nonce' ) . '" />';
+		$output .= '<input type="hidden" class="token-form__nonce" name="exchange-token-form-nonce" value="' . wp_create_nonce( 'exchange-token-form-nonce' ) . '" />';
 		$output .= '<select name="token-form-collab-select" class="token-form__collab-select">';
 		$output .= '<option value="null">Select your collaboration</option>';
 		foreach ( $collab_set as $collab ) {

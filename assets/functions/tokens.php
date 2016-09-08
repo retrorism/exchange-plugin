@@ -64,6 +64,10 @@ function exchange_retrieve_and_store_pr_tokens() {
 
 function exchange_token_form_callback() {
 	$results = '';
+	if ( empty( check_ajax_referer( 'exchange-token-form-nonce', 'security', false ) ) ) {
+		echo '<div class="loader-pointer section__helper">' . __( 'Whoa... where did YOU come from?', EXCHANGE_PLUGIN ) . '</div>';
+		wp_die();
+	}
 	if ( ! empty( $_POST['prid'] ) && ! empty( $_POST['cid'] ) ) {
 		$pr_obj = BaseController::exchange_factory( $_POST['prid'], 'token-form' );
 		$c_obj = BaseController::exchange_factory( $_POST['cid'], 'token-form' );
