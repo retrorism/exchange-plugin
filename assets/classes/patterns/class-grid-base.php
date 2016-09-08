@@ -82,9 +82,9 @@ abstract class BaseGrid extends BasePattern {
 					$this->add_grid_item( self::create_grid_item_from_post( $item, $this->element ) );
 				}
 			}
-			if ( count( $this->grid_items ) > 0 ) {
-				$this->has_grid_items = true;
-			}
+		}
+		if ( count( $this->grid_items ) > 0 ) {
+			$this->has_grid_items = true;
 		}
 	}
 
@@ -143,10 +143,11 @@ abstract class BaseGrid extends BasePattern {
 		return $grid_item;
 	}
 
-	private function get_grid_width_num( $grid_width ) {
+	private static function get_grid_width_num( $grid_width ) {
 		$num = array(
 			'grid_full'      => 12,
 			'grid_sixth'     => 2,
+			'grid_fourth'    => 3,
 			'grid_third'     => 4,
 			'grid_half'      => 6,
 			'grid_two_third' => 8,

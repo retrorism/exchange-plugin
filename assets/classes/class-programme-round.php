@@ -131,8 +131,9 @@ class Programme_Round extends Exchange {
 		echo $block;
 	}
 
+
 	public function create_token_form_cta( $obj ) {
-		if ( empty( $obj->type ) ) {
+		if ( empty( $obj->type ) && empty( $obj->post_type ) ) {
 			return;
 		}
 		switch ( $obj->type ) {
@@ -140,14 +141,29 @@ class Programme_Round extends Exchange {
 				$form_paragraph = __( 'Update information about you and your organisation(s)', EXCHANGE_PLUGIN );
 				$cta_colour = exchange_slug_to_hex('rose-1-web');
 				$form_title = ! empty( $obj->name ) ? $obj->name : 'participant';
+				// Set update link.
+				$acf_update_link = $obj->get_update_form_link();
+				$update_link = ! empty( $acf_update_link ) ? $acf_update_link : '#';
 				break;
 			case 'collaboration' :
 				$form_paragraph = __( 'Update information on your project', EXCHANGE_PLUGIN );
 				$cta_colour = exchange_slug_to_hex('blue-2-web');
-				$form_title = ! empty( $obj->title ) ? $obj->title : 'collaboration';
+				$form_title = ! empty( $obj->title ) ? wp_trim_words( $obj->title, 6, __( '...', EXCHANGE_PLUGIN ) ) : 'collaboration';
+				// Set update link.
+				$acf_update_link = $obj->get_update_form_link();
+				$update_link = ! empty( $acf_update_link ) ? $acf_update_link : '#';
 				break;
 			default :
-				return;
+				if ( $obj->post_type == 'page' ) {
+					$form_paragraph = __( 'Share your Tandem experience on your collaboration page', EXCHANGE_PLUGIN );
+					$cta_colour = exchange_slug_to_hex('yellow-tandem');
+					$form_title = ! empty( $obj->post_title ) ? $obj->post_title : 'story';
+					$permalink = get_post_permalink( $obj->ID );
+					$update_link = ! empty( $permalink ) ? $permalink : '#';
+					break;
+				} else {
+					return;
+				}
 		}
 
 		// Set paragraph.
@@ -159,9 +175,6 @@ class Programme_Round extends Exchange {
 			$prog_name = 'C_P';
 		}
 
-		// Set update link.
-		$acf_update_link = $obj->get_update_form_link();
-		$update_link = ! empty( $acf_update_link ) ? $acf_update_link : '#';
 		$properties = array(
 			'block_type' => 'cta',
 			'cta_colour' => $cta_colour,
@@ -183,44 +196,58 @@ class Programme_Round extends Exchange {
 		);
 		if ( 'collaboration' === $obj->type ) {
 
-			$properties['cta_block_elements'][3] = array(
-				'acf_fc_layout' => 'block_button',
-				'button_size' => 'small',
-				'button_text' => __('View my collaboration', EXCHANGE_PLUGIN ),
-				'button_help_text' => __('Navigate to your collaboration page', EXCHANGE_PLUGIN ),
-				'button_link' => $obj->link,
-				'button_target' => '_self',
-			);
-
-			if ( isset( $obj->title ) ) {
+			if ( isset( $obj->link ) ) {
+				$properties['cta_block_elements'][3] = array(
+					'acf_fc_layout' => 'block_button',
+					'button_size' => 'small',
+					'button_text' => __('View my collaboration', EXCHANGE_PLUGIN ),
+					'button_help_text' => __('Navigate to your collaboration page', EXCHANGE_PLUGIN ),
+					'button_link' => $obj->link,
+					'button_target' => '_self',
+				);
+			}
+			if (  isset( $form_title ) && isset( $update_link ) ) {
 				$properties['cta_block_elements'][4] = array(
 					'acf_fc_layout' => 'block_button',
 					'button_size' => 'small',
 					'button_text' => __('Update my collaboration page', EXCHANGE_PLUGIN ),
-					'button_help_text' => sprintf( __('Add or edit information for %s', EXCHANGE_PLUGIN ), $obj->title ),
+					'button_help_text' => sprintf( __('Add or edit information for %s', EXCHANGE_PLUGIN ), $form_title ),
 					'button_link' => $update_link,
 					'button_target' => '_self',
 				);
 			}
-
 		} elseif ( 'participant' === $obj->type ) {
 
-			if ( isset( $obj->name ) ) {
+			if ( isset( $form_title ) && isset( $update_link ) ) {
 				$properties['cta_block_elements'][3] = array(
 					'acf_fc_layout' => 'block_button',
 					'button_size' => 'small',
 					'button_text' => __( 'Update my info', EXCHANGE_PLUGIN ),
-					'button_help_text' => sprintf( __('Edit the information about %s collaboration page', EXCHANGE_PLUGIN ), $obj->name ),
+					'button_help_text' => sprintf( __('Edit the information about %s', EXCHANGE_PLUGIN ), $form_title ),
 					'button_link' => $update_link,
 					'button_target' => '_self',
 				);
 			}
+		} elseif ( 'page' === $obj->post_type ) {
+
+			$properties['cta_block_elements'][3] = array(
+				'acf_fc_layout' => 'block_button',
+				'button_size' => 'small',
+				'button_text' => __( 'Submit a story', EXCHANGE_PLUGIN ),
+				'button_help_text' => __('Navigate to the page for submitting stories', EXCHANGE_PLUGIN ),
+				'button_link' => $update_link,
+				'button_target' => '_self',
+			);
 		}
-		$results .= '<pre>' . print_r( $properties, true ) . '</pre>';
-		//return $results;
+		// $results = '<pre>' . print_r( $properties, true ) . '</pre>';
+		// return $results;
 		$block = BasePattern::pattern_factory( $properties, 'emphasis_block', 'griditem', true );
-		$griditem = new Griditem( $block, 'simplegrid', array('grid_width' => 'grid_third', 'type' => 'pattern') );
-		return $griditem->embed();
+		$griditem_mods = array(
+			'grid_width'     => 'grid_fourth',
+			'type'           => 'cta',
+			'grid_width_num' => 3 );
+		$griditem = new Griditem( $block, 'simplegrid', $griditem_mods  );
+		return $griditem;
 	}
 
 	public function build_pr_dropdown() {
@@ -237,7 +264,6 @@ class Programme_Round extends Exchange {
 		}
 		$output .= '</select>';
 		$output .= '<a class="button--large button--token-form-submit token-form__submit" id="token-form__submit">' . __( 'Go!', EXCHANGE_PLUGIN ) . '</a>';
-		$output .= '<div class="loader--exchange-wrapper"><span class="loader--exchange"></span></div>';
 		$output .= '</fieldset></form>';
 		return $output;
 	}
