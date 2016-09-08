@@ -80,23 +80,23 @@ function exchange_create_link( $obj, $with_text = true, $class = '' ) {
 		'griditem__button button--small',
 	);
 	if ( in_array( $class, $button_classes, true ) ) {
-		if ( isset( $obj->category ) ) {
+		if ( empty( $obj->category ) ) {
+			$label = strtoupper( __( 'Read more', 'exchange' ) );
+		} else {
 			$cat = $obj->category->slug;
 			$labels = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['CATEGORIES']['button_labels'];
 			if ( array_key_exists( $cat, $labels ) ) {
-				$title = strtoupper( sprintf( $labels[ $cat ], $cat ) );
+				$label = strtoupper( sprintf( $labels[ $cat ], $cat ) );
 			} else {
-				$title = strtoupper( sprintf( $labels['default'], $cat ) );
+				$label = strtoupper( sprintf( $labels['default'], $cat ) );
 			}
 			$class .= ' button--' . $cat;
-		} else {
-			$title = strtoupper( __( 'Read more', 'exchange' ) );
 		}
 	}
 	if ( ! empty( $url ) && ! empty( $title ) ) {
 		$output  = '<a class="' . $class . '" href="' . $url . '" title="' .sprintf( esc_html__( 'Navigate to %s', EXCHANGE_PLUGIN ), esc_attr( $title ) ).'">';
 		if ( $with_text ) {
-			$output .= $title . '</a>';
+			$output .= $label . '</a>';
 		}
 		return $output;
 	} else {

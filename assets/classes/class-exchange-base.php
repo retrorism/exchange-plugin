@@ -395,8 +395,10 @@ class Exchange {
 	 * Publish sharing buttons
 	 *
 	 * @param string $context Optional.
+	 * @TODO add print options.
 	 */
 	public function publish_sharing_buttons( $context = '' ) {
-		echo exchange_build_social_icons( $context, array('facebook','twitter','email','print'), $this );
+		//echo exchange_build_social_icons( $context, array('facebook','twitter','email','print'), $this );
+		echo exchange_build_social_icons( $context, array('facebook','twitter','email'), $this );
 	}
 }
