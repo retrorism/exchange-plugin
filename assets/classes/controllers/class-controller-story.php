@@ -32,8 +32,6 @@ class StoryController extends BaseController {
 	 *
 	 * @param object $this->container Newly instantiated Story class object.
 	 * @param object $post Story post object.
-	 *
-	 * @throws Exception When no valid post ID is presented.
 	 **/
 	public function map_story_basics() {
 
@@ -72,8 +70,6 @@ class StoryController extends BaseController {
 	 *
 	 * @since 0.1.0
 	 * @access public
-	 *
-	 * @throws Exception When no valid post ID is presented.
 	 * @return void;
 	 **/
 	public function map_full_story() {

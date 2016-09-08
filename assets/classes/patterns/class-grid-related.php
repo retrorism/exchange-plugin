@@ -26,8 +26,6 @@ class RelatedGrid extends BaseGrid {
 	 *
 	 * @since 0.1.0
 	 * @access protected
-	 *
-	 * @throws Exception when there's no valid input array.
 	 **/
 	 protected function create_output() {
 

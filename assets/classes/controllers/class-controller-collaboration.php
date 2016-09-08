@@ -37,7 +37,8 @@ class CollaborationController extends BaseController {
 			),
 		);
 		if ( ! $participant_id >= 1  ) {
-			throw new Exception( 'This is not a valid participant ID' );
+			//throw new Exception( 'This is not a valid participant ID' );
+			return;
 		} else {
 			$collab_query = new WP_Query( $args );
 

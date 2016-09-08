@@ -92,8 +92,6 @@ class BaseController {
 	 * @access public
 	 * @param WP_Post $post_id_or_object WP_Post types / IDs passed in function.
 	 * @param string $context Optional. Context in which the object will be instantiated.
-	 *
-	 * @throws Exception when wrong post type is supplied.
 	 **/
 	public static function exchange_factory( $post_id_or_object, $context = '', $check_for_type = null ) {
 		if ( empty( $post_id_or_object ) ) {
@@ -104,7 +102,8 @@ class BaseController {
 		}
 		$type = self::is_correct_content_type( $post_id_or_object, $check_for_type );
 		if ( empty( $type ) ) {
-			throw new Exception( __( 'The factory disagrees: type = ' ) . $type );
+			//throw new Exception( __( 'The factory disagrees: type = ' ) . $type );
+			return;
 		}
 		$args = array( $post_id_or_object, $context );
 		switch ( $type ) {
@@ -129,15 +128,14 @@ class BaseController {
 	 * @access protected
 	 * @param object $exchange Exchange content object;
 	 * @param object $post WP_post object to be mapped;
-	 *
-	 * @throws Exception when this is not the right content type.
 	 **/
 	public function map_basics( $exchange, $post ) {
 		// Check if the post and the newly created CPT object are of the same type
 		$class_lower = strtolower( get_class( $exchange ) );
 		if ( empty( self::is_correct_content_type( $post, $class_lower ) ) ) {
 			unset( $exchange );
-			throw new Exception( 'This is not a valid post' );
+			//throw new Exception( 'This is not a valid post' );
+			return;
 		}
 
 		$post_id = $post->ID;
@@ -551,8 +549,6 @@ class BaseController {
 	 *
 	 * @param object $exchange Exchange Content Type
 	 * @param array $related_content
-	 *
-	 * @throws Exception when there are no items to put in the grid.
 	 **/
 	protected function get_grid_content( $grid_items ) {
 		$content = array();
@@ -579,8 +575,6 @@ class BaseController {
 	 *
 	 * @param object $exchange Exchange Content Type
 	 * @param array $related_content
-	 *
-	 * @throws Exception when there are no items to put in the grid.
 	 **/
 	protected function set_related_grid_content( $related_content ) {
 		$grid_content = $this->get_grid_content( $related_content );

@@ -26,8 +26,6 @@ class SimpleGrid extends BaseGrid {
 	 *
 	 * @since 0.1.0
 	 * @access protected
-	 *
-	 * @throws Exception when there's no valid input array.
 	 **/
 	 protected function create_output() {
 		// If a grid is created inside a story, make this into an aside class.

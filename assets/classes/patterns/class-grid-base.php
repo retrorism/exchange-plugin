@@ -42,8 +42,6 @@ abstract class BaseGrid extends BasePattern {
 	 *
 	 * @since 0.1.0
 	 * @access protected
-	 *
-	 * @throws Exception when there's no valid input array.
 	 **/
 	 protected function create_output() {
 
@@ -234,7 +232,8 @@ abstract class BaseGrid extends BasePattern {
 
 	public static function add_grid_modifiers( $exchange, $modifiers = array() ) {
 		if ( ! is_array( $modifiers ) ) {
-			throw Exception( __( 'This is not a valid modifiers array' ) );
+			//throw Exception( __( 'This is not a valid modifiers array' ) );
+			return;
 		}
 		if ( ! empty( $exchange->has_cta ) && $exchange->has_cta !== 'no' ) {
 			$modifiers['type'] = 'cta';

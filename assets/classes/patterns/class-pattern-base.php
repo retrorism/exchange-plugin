@@ -137,8 +137,6 @@ abstract class BasePattern {
 	 * @param mixed  $input Pattern content.
 	 * @param string $context String referring to pattern.
 	 * @param array  $modifiers Additional modifiers that influence look and functionality.
-	 *
-	 * @throws exception when input is empty.
 	 **/
 	public function __construct( $input, $context = '', $modifiers = array() ) {
 

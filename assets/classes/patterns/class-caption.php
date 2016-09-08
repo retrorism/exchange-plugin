@@ -38,8 +38,6 @@ class Caption extends BasePattern {
 			$this->output_tag_close( 'figcaption' );
 		} elseif ( in_array( $this->context, array( 'blockquote', 'pullquote' ), true ) ) {
 			$this->build_quote_caption();
-		} else {
-			throw new Exception( 'No valid parent for this caption.' );
 		}
 	}
 

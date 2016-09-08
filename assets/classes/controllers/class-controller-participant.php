@@ -29,8 +29,6 @@ class ParticipantController extends BaseController {
 	 *
 	 * @param object $participant Newly instantiated participant class object.
 	 * @param object $post Participant post type object.
-	 *
-	 * @throws Exception When no participant has been provided.
 	 **/
 	public function map_participant_basics() {
 
