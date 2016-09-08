@@ -65,6 +65,9 @@ class CollaborationController extends BaseController {
 
 		// Add tags
 		$this->set_ordered_tag_list();
+
+		// Add update token
+		$this->set_collaboration_update_form_link();
 	}
 
 	public function map_full_collaboration() {
@@ -276,6 +279,12 @@ class CollaborationController extends BaseController {
 		if ( ! empty( $term_id ) ) {
 			return $term_id;
 		}
+	}
+
+	protected function set_collaboration_update_form_link() {
+		$post_id = $this->container->post_id;
+		$link = get_post_meta( $post_id, 'collaboration_update_form_link', true );
+		$this->container->set_update_form_link( $link );
 	}
 
 }

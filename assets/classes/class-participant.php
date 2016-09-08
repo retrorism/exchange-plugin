@@ -147,6 +147,15 @@ class Participant extends Exchange {
 	public $org_description;
 
 	/**
+	 * Update form link
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 * @var string $update_form_link
+	 */
+	 private $update_form_link;
+
+	/**
 	 * Constructor for participant objects.
 	 *
 	 * @since 0.1.0
@@ -181,6 +190,17 @@ class Participant extends Exchange {
 		if ( $this->has_contactme ) {
 			return $this->get_contactme;
 		}
+	}
+
+	public function set_update_form_link( $link ) {
+		if ( ! empty( $link ) ) {
+			$this->update_form_link = $link;
+		}
+	}
+
+	public function get_update_form_link() {
+		$link = $this->update_form_link;
+		return $link;
 	}
 
 	public function publish_contactme() {

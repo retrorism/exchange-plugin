@@ -66,13 +66,7 @@ class BaseController {
 		if ( 'WP_Post' !== get_class( $post_id_or_object ) ) {
 			return;
 		}
-		$allowed_types = array(
-			'story'           => 'story',
-			'page'            => 'story',
-			'programme_round' => 'programme_round',
-			'collaboration'   => 'collaboration',
-			'participant'     => 'participant',
-		);
+		$allowed_types = self::exchange_types();
 		if ( ! array_key_exists( $post_id_or_object->post_type, $allowed_types ) ) {
 			return;
 		}
@@ -80,6 +74,16 @@ class BaseController {
 		if ( null === $type || $allowed_types[ $content_type ] === $type ) {
 			return $content_type;
 		}
+	}
+
+	private static function exchange_types() {
+		return array(
+			'story'           => 'story',
+			'page'            => 'story',
+			'programme_round' => 'programme_round',
+			'collaboration'   => 'collaboration',
+			'participant'     => 'participant',
+		);
 	}
 
 	/**
@@ -636,7 +640,7 @@ class BaseController {
 
 	public function prepare_tag_modifiers( $term, $context = '' ) {
 		if ( 'WP_Term' !== get_class( $term ) ) {
-			throw new Exception( __('This is not a valid tag') );
+			return;
 		}
 		$desc = ! empty( $term->description ) ? $tag->description : $term->name;
 		$term_link = get_term_link( $term );
@@ -658,5 +662,28 @@ class BaseController {
 
 	protected function set_programme_round( $parent_id ) {
 		$this->container->programme_round = self::exchange_factory( $parent_id, '', 'programme_round' );
+	}
+
+	public static function get_all_from_type( $type, $fields = '' ) {
+		$types = self::exchange_types();
+		if ( ! array_key_exists( $type, $types ) ) {
+			return;
+		}
+		$args = array(
+			'post_type'   => $type,
+			'orderby'     => 'title',
+			'order'       => 'ASC',
+			'status'	  => 'publish',
+			'posts_per_page' => -1,
+		);
+
+		if ( '' !== $fields && is_string( $fields ) ) {
+			$args['fields'] = $fields;
+		}
+
+		$type_query = new WP_Query( $args );
+		$results = $type_query->posts;
+		wp_reset_postdata();
+		return $results;
 	}
 }

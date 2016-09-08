@@ -130,9 +130,18 @@ class Collaboration extends Exchange {
 	 *
 	 * @since 0.1.0
 	 * @access public
-	 * @var bool $has_description See if description is available.
+	 * @var array $map_data
 	 */
 	public $map_data;
+
+	/**
+	 * Update form link
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 * @var string $update_form_link
+	 */
+	 private $update_form_link;
 
 
 	/**
@@ -149,8 +158,7 @@ class Collaboration extends Exchange {
 		// Add standard WordPress data
 		$this->controller->map_collaboration_basics();
 		// Add featured image.
-
-		if ( ! in_array( $context, array( 'griditem', 'simplemap' ) ) ) {
+		if ( ! in_array( $context, array( 'token-form', 'griditem', 'simplemap' ) ) ) {
 			$this->controller->map_full_collaboration();
 		}
 	}
@@ -214,5 +222,16 @@ class Collaboration extends Exchange {
 		}
 		$grid = new SimpleGrid( $gallery_grid_items, 'collaboration' );
 		$grid->publish('collaboration__gallery');
+	}
+
+	public function set_update_form_link( $link ) {
+		if ( ! empty( $link ) ) {
+			$this->update_form_link = $link;
+		}
+	}
+
+	public function get_update_form_link() {
+		$link = $this->update_form_link;
+		return $link;
 	}
 }

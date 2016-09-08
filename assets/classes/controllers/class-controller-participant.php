@@ -39,6 +39,9 @@ class ParticipantController extends BaseController {
 
 		// Mapping organisation data.
 		$this->set_organisation_data();
+
+		// Add update token
+		$this->set_participant_update_form_link();
 	}
 
 	public function set_organisation_data() {
@@ -84,5 +87,11 @@ class ParticipantController extends BaseController {
 		if ( ! empty( $collaboration ) ) {
 			$this->container->collaboration = $collaboration;
 		}
+	}
+
+	protected function set_participant_update_form_link() {
+		$post_id = $this->container->post_id;
+		$link = get_post_meta( $post_id, 'participant_update_form_link', true );
+		$this->container->set_update_form_link( $link );
 	}
 }

@@ -40,7 +40,6 @@ class GridItem extends BasePattern {
  			$this->output .= $this->build_grid_item_from_post();
 		} elseif ( $this->input instanceof BasePattern ) {
 			$this->output .= $this->build_grid_item_from_pattern();
-		} else {
 		}
 		$this->output_tag_close();
 	}

@@ -87,7 +87,7 @@ function exchange_query_vars_filter($vars) {
 }
 add_filter( 'query_vars', 'exchange_query_vars_filter' );
 
-function exchange_url_rewrite_templates() {
+function exchange_url_rewrite_templates_for_post_type() {
 	$post_type = get_query_var( 'post_type' );
 	if ( ! empty( $post_type ) && ! is_array( $post_type ) ) {
 		return;
@@ -103,7 +103,7 @@ function exchange_url_rewrite_templates() {
 	}
 }
 
-add_action( 'template_redirect', 'exchange_url_rewrite_templates' );
+add_action( 'template_redirect', 'exchange_url_rewrite_templates_for_post_type' );
 
 function exchange_create_taxonomies() {
 

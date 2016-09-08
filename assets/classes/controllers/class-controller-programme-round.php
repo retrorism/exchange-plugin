@@ -50,6 +50,9 @@ class Programme_RoundController extends BaseController {
 		}
 
 		$this->retrieve_or_set_programme_round_token();
+
+		// Set form update link
+		$this->set_participant_update_form_link();
 	}
 
 	private function set_programme_round_token() {
@@ -104,4 +107,13 @@ class Programme_RoundController extends BaseController {
 		);
 		return get_children( $args );
 	}
+
+	protected function set_participant_update_form_link() {
+		$post_id = $this->container->post_id;
+		$link = get_post_meta( $post_id, 'participant_update_form_link', true );
+		if ( ! empty( $link ) ) {
+			$this->container->set_update_form_link( $link );
+		}
+	}
+
 }

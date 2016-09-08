@@ -73,6 +73,7 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 				'post-types.php',
 				'public.php',
 				'import_projects.php',
+				'tokens.php',
 			);
 			$google_api_filter = ABSPATH . 'acf-google-api-key.php';
 			if ( file_exists( $google_api_filter ) ) {
