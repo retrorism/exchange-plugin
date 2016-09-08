@@ -512,7 +512,10 @@ abstract class BasePattern {
 	 * @var string $context The pattern's container.
 	 * @return string $output HTML output consisting of tags and content.
 	 **/
-	public static function pattern_factory( $input, $type, $context = '', $object = false ) {
+	public static function pattern_factory( $input, $type, $context = '', $return_as_object = false ) {
+		if ( empty( $input ) ) {
+			return;
+		}
 		switch ( $type ) {
 			case 'image':
 				$image_mods = array();
@@ -525,7 +528,9 @@ abstract class BasePattern {
 				if ( 'portrait' === $input['image_orientation']  ) {
 					$image_mods['orientation'] = 'portrait';
 				}
-				$pattern = new Image( $input['image'], $context, $image_mods );
+				if ( ! empty( $input['image'] ) ) {
+					$pattern = new Image( $input['image'], $context, $image_mods );
+				}
 				break;
 
 			case 'two_images':
@@ -547,11 +552,15 @@ abstract class BasePattern {
 							}
 						}
 					}
-					$p_mods['data']['languages'] = implode(',', $languages );
-					$pattern = new TranslatedParagraph( $input, $context, $p_mods );
+					if ( ! empty( $languages ) ) {
+						$p_mods['data']['languages'] = implode(',', $languages );
+						$pattern = new TranslatedParagraph( $input, $context, $p_mods );
+					}
 					break;
 				}
-				$pattern = new Paragraph( $input['text'], $context );
+				if ( ! empty( $input['text'] ) ) {
+					$pattern = new Paragraph( $input['text'], $context );
+				}
 				break;
 
 			case 'block_quote':
@@ -569,13 +578,19 @@ abstract class BasePattern {
 				$pattern = new Video( $input, $context );
 				break;
 			case 'interview_conversation':
-				$pattern = new InterviewConversation( $input['interview'], $context );
+				if ( ! empty( $input['interview'] ) ) {
+					$pattern = new InterviewConversation( $input['interview'], $context );
+				}
 				break;
 			case 'interview_q_and_a':
-				$pattern = new InterviewQA( $input['interview'], $context );
+				if ( ! empty( $input['interview'] ) ) {
+					$pattern = new InterviewQA( $input['interview'], $context );
+				}
 				break;
 			case 'subheader':
-				$pattern = new SubHeader( $input['text'], $context );
+				if ( ! empty( $input['text'] ) ) {
+					$pattern = new SubHeader( $input['text'], $context );
+				}
 				break;
 			case 'section_header':
 				$header_mods = array();
@@ -588,7 +603,9 @@ abstract class BasePattern {
 				if ( ! empty( $type ) ) {
 					$header_mods['type'] = $input['type'];
 				}
-				$pattern = new SectionHeader( $input['text'], $context, $header_mods );
+				if ( ! empty( $input['text'] ) ) {
+					$pattern = new SectionHeader( $input['text'], $context, $header_mods );
+				}
 				break;
 			case 'emphasis_block':
 				$block_mods = array();
@@ -619,14 +636,18 @@ abstract class BasePattern {
 			);
 			$pattern = new DocumentBlock( $input, $context, $document_mods );
 			break;
-			default:
-				$output = '<div data-alert class="alert-box alert">';
-				$output .= '<strong>' . __( 'Error: This layout has not yet been defined', EXCHANGE_PLUGIN ) . '</strong>';
-				$output .= '</div>';
-				$pattern = new Paragraph( $output, $context );
-				break;
+		default:
+			// $output = '<div data-alert class="alert-box alert">';
+			// $output .= '<strong>' . __( 'Error: This layout has not yet been defined', EXCHANGE_PLUGIN ) . '</strong>';
+			// $output .= '</div>';
+			// $pattern = new Paragraph( $output, $context );
+			// break;
+			return;
 		}
-		if ( $object ) {
+		if ( ! isset( $pattern ) ) {
+			return;
+		}
+		if ( $return_as_object ) {
 			return $pattern;
 		} else {
 			return $pattern->embed();
