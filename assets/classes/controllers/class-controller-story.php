@@ -146,12 +146,11 @@ class StoryController extends BaseController {
 		$acf_storyteller = get_post_meta( $post_id, 'storyteller', true );
 		if ( is_numeric( $acf_storyteller ) ) {
 			$storyteller = BaseController::exchange_factory( $acf_storyteller );
-			if ( is_a( $storyteller, 'Participant' ) ) {
+			if ( $storyteller instanceof Participant ) {
 				$this->container->storyteller = $storyteller;
 			}
 		}
-
-		if ( is_object( $this->container->storyteller ) ) {
+		if ( ! empty( $this->container->storyteller ) ) {
 			$this->set_byline();
 		} else {
 			$this->set_custom_byline();
@@ -184,7 +183,6 @@ class StoryController extends BaseController {
  	protected function set_sections( $acf_sections ) {
  		// Loop through sections.
  		foreach( $acf_sections as $s ) {
-			//var_dump( $s );
  			$section_mods = array();
  			if ( ! empty( $s['contents'] ) && isset( $s['contents']['acf_fc_layout'] ) ) {
  				$section_mods['type'] = $s['contents']['acf_fc_layout'];
@@ -274,9 +272,11 @@ class StoryController extends BaseController {
 		if ( ! empty( $collab_term ) ) {
 			$term = get_term_by( 'slug', $collab_term, 'post_tag' );
 		}
-		$term_link = $term instanceof WP_Term
-			? exchange_create_link( $term )
-			: $this->container->storyteller->collaboration->programme_round->title;
+		if ( ! empty( $term ) && $term instanceof WP_Term ) {
+			$term_link = exchange_create_link( $term );
+		} else {
+			$term_link = $this->container->storyteller->collaboration->programme_round->title;
+		}
 		$byline_template = str_replace( '[[storyteller]]', $this->container->storyteller->name, $byline_template );
 		$byline_template = str_replace( '[[programme_round]]', $term_link, $byline_template );
 		$byline = '<p>' . str_replace( '[[collaboration]]', exchange_create_link( $this->container->storyteller->collaboration ), $byline_template ) . '</p>';

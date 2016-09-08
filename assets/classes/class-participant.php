@@ -62,15 +62,6 @@ class Participant extends Exchange {
 	public $has_contactme = false;
 
 	/**
-	 * Is this indidual currently active in a programme? Defaults to true
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 * @var bool $is_active If no longer part of a running programme, this is set to false.
-	 */
-	public $is_active = true;
-
-	/**
 	 * The collaboration this person is involved in. Can only be changed from the
 	 * Collaboration admin page.
 	 *

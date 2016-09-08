@@ -71,10 +71,12 @@ function exchange_create_link( $obj, $with_text = true, $class = '' ) {
 	if ( $obj instanceof Exchange ) {
 		$url = $obj->link;
 		$title = $obj->title;
+		$label = $obj->title;
 		$cat = 'story';
 	} elseif ( $obj instanceof WP_Term ) {
 		$url = get_term_link( $obj );
 		$title = $obj->name;
+		$label = $obj->name;
 	}
 	$button_classes = array(
 		'griditem__button button--small',
