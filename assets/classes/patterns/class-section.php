@@ -287,7 +287,6 @@ class Section extends BasePattern {
 
 	private function update_form_ids() {
 		$ids = array();
-		// $updateable = array( 'collaboration', 'participant', 'story' );
 		foreach( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['POST_TYPES']['available-for-form-updates'] as $type ) {
 			$update_form = get_option( 'options_' . $type . '_update_form');
 			if ( ! empty( $update_form ) ) {
@@ -336,7 +335,6 @@ class Section extends BasePattern {
 			default:
 				return;
 		}
-		var_dump( $exchange );
 		if ( ! isset( $programme_round_id ) ) {
 			return;
 		}
@@ -345,6 +343,7 @@ class Section extends BasePattern {
 			return;
 		} else {
 			$pr_update_token = $programme_round->controller->get_programme_round_token();
+			var_dump( $pr_update_token );
 		}
 		if ( $pr_update_token ) {
 			$verifications = array();
