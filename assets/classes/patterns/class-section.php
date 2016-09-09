@@ -364,8 +364,7 @@ class Section extends BasePattern {
 		$form = $section_contents['gravity_forms'];
 		if ( ! empty( $_SERVER['QUERY_STRING'] ) ) {
 			$processed = $this->process_token( $form['id'] );
-			//$update_string = ! empty( $processed ) ? $processed : '';
-			$update_string = '';
+			$update_string = ! empty( $processed ) ? $processed : '';
 		}
 		$this->output .= do_shortcode( '[gravityform id="' . $form['id'] . '"' . $update_string . ' title="true" description="true" ajax="true"]' );
 	}
