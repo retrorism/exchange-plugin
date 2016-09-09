@@ -369,7 +369,6 @@ class Section extends BasePattern {
 		$this->output .= do_shortcode( '[gravityform id="' . $form['id'] . '"' . $update_string . ' title="true" description="true" ajax="true"]' );
 	}
 
-
 	/**
 	 * Build grid from ACF layouts
 	 *

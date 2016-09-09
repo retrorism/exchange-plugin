@@ -13,6 +13,13 @@ function add_grav_forms(){
 add_action('admin_init','add_grav_forms');
 
 /**
+* Enable public editing for Gravity forms
+*
+* @return void
+*/
+add_filter('gform_update_post/public_edit', '__return_true');
+
+/**
  * JPB User Caps Functional class courtesy of John P Bloch (JPB)
  *
  * Extends user management to the editor role, whilst
