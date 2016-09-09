@@ -94,7 +94,11 @@ class CollaborationController extends BaseController {
 		$this->set_header_image( 'collaboration__header' );
 
 		// Set video and gallery.
-		$this->set_media();
+		//$this->set_media();
+
+		$this->set_collaboration_video();
+
+		$this->set_collaboration_documents();
 
 		// Set shared stories.
 		if ( $this->container->has_participants ) {
@@ -106,10 +110,48 @@ class CollaborationController extends BaseController {
 
 	}
 
-	protected function set_media() {
-		$this->set_video();
-		$this->set_gallery();
+	// protected function set_media() {
+	// 	$this->set_video();
+	// 	$this->set_gallery();
+	// }
+
+	protected function set_collaboration_video() {
+		$post_id = $this->container->post_id;
+
+		$video = get_post_meta( $post_id, 'collaboration_video_embed_code', true );
+		if ( ! empty( $video ) ) {
+			$video_obj = BasePattern::pattern_factory( $video, 'embedded_video', 'collaboration', true );
+			if ( $video_obj instanceof Video ) {
+				$this->video = $video_obj;
+				$this->has_video = true;
+			}
+		}
 	}
+
+	protected function set_collaboration_documents() {
+		$doc_block_input = array(
+			'add_file' => array(),
+		);
+		$post_id = $this->container->post_id;
+		$document = get_post_meta( $post_id, 'collaboration_document', true );
+		if ( ! empty( $document ) ) {
+			$url = $this->get_attachment_id_from_url( $document );
+			var_dump( $document );
+			var_dump( $url );
+			$upload_dir = wp_upload_dir();
+			var_dump( $upload_dir );
+			$doc_block_input['add_file'][] = $document;
+		}
+		//
+		// 	$doc_obj = BasePattern::pattern_factory( $document, 'uploaded_files', 'collaboration', true );
+		// 	if ( $doc_obj instanceof Documentblock ) {
+		//
+		// 		) = $doc_obj;
+		// 		$this->has_files = true;
+		// 	}
+		// }
+	}
+
 
 	protected function set_collaboration_locations() {
 		$locations = array();
