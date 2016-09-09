@@ -58,7 +58,7 @@ function exchange_tokenlist_widget() {
 	for ( $i = 0; $i < $length; $i++ ) {
 		$token = get_post_meta( $pr_set[$i]->ID, 'update_token', true );
 		$output .= '<tr><td width="40%">' . $pr_set[$i]->post_title . '</td>';
-		$output .= '<td width="60%"><input size="50" disabled type="text" value="' . get_home_url() . '/?pr=' . urlencode( $token ) . '"></td></tr>';
+		$output .= '<td width="60%"><input size="50" type="text" value="' . get_home_url() . '/?pr=' . urlencode( $token ) . '"></td></tr>';
 	}
 	$output .= '</table>';
 	echo $output;
