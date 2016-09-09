@@ -329,7 +329,7 @@ function exchange_build_social_icons( $context = '', $platforms = array(), $exch
  * @return void.
  */
 function exchange_get_share_description() {
-	if ( is_single() ) {
+	if ( is_single() || is_page() ) {
 		global $post;
 		switch ( $post->post_type ) {
 			case 'page':
@@ -369,7 +369,7 @@ function exchange_get_share_image() {
  * @TODO create a filter instead.
  */
  function exchange_get_share_title() {
- 	if ( is_single() ) {
+ 	if ( is_single() || is_page() ) {
  		global $post;
  		switch ( $post->post_type ) {
  			case 'page':
