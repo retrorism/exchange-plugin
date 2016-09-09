@@ -364,11 +364,11 @@ class Section extends BasePattern {
 	 */
 	protected function build_form( $section_contents ) {
 		$form = $section_contents['gravity_forms'];
-		$update_string = '';
-		if ( ! empty( $_SERVER[ 'QUERY_STRING' ] ) ) {
-			var_dump( $_SERVER[ 'QUERY_STRING' ] );
+		if ( ! empty( $_SERVER['QUERY_STRING'] ) ) {
+			var_dump( $_SERVER['QUERY_STRING'] );
 			$processed = $this->process_token( $form['id'] );
 			$update_string = ! empty( $processed ) ? $processed : '';
+			var_dump( $update_string );
 		}
 		$this->output .= do_shortcode( '[gravityform id="' . $form['id'] . '"' . $update_string . ' title="true" description="true" ajax="true"]' );
 	}
