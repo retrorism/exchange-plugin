@@ -307,7 +307,7 @@ function exchange_build_social_icons( $context = '', $platforms = array(), $exch
 
 	$output = '<ul class="social-icons-list">';
 	foreach ( $platforms as $platform ) {
-		$button_label =  'page__footer' === $context ? '<span>' . $platform . '</span>' : '';
+		$button_label =  'page__footer' === $context ? '<span class="show-for-sr">' . $platform . '</span>' : '';
 
 		$output .= '<li class="social-icons-list__item"><a class="social-icons-list__link link--' . $platform;
 		if ( $share_buttons ) {
