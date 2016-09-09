@@ -343,7 +343,6 @@ class Section extends BasePattern {
 			return;
 		} else {
 			$pr_update_token = $programme_round->controller->get_programme_round_token();
-			var_dump( $pr_update_token );
 		}
 		if ( $pr_update_token ) {
 			$verifications = array();
@@ -351,6 +350,8 @@ class Section extends BasePattern {
 				$verifications[] = sha1( $pr_update_token . $id );
 			}
 			if ( in_array( $update_token, $verifications ) ) {
+				var_dump( $update_token );
+				echo '<pre>' . print_r( $verifications, true ) . '</pre>';
 				$update_string = ' update="' . $update_id . '" ';
 				return $update_string;
 			}
