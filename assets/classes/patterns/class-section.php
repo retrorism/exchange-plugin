@@ -350,8 +350,6 @@ class Section extends BasePattern {
 				$verifications[] = sha1( $pr_update_token . $id );
 			}
 			if ( in_array( $update_token, $verifications ) ) {
-				var_dump( $update_token );
-				echo '<pre>' . print_r( $verifications, true ) . '</pre>';
 				$update_string = ' update="' . $update_id . '" ';
 				return $update_string;
 			}
@@ -365,10 +363,9 @@ class Section extends BasePattern {
 	protected function build_form( $section_contents ) {
 		$form = $section_contents['gravity_forms'];
 		if ( ! empty( $_SERVER['QUERY_STRING'] ) ) {
-			var_dump( $_SERVER['QUERY_STRING'] );
 			$processed = $this->process_token( $form['id'] );
-			$update_string = ! empty( $processed ) ? $processed : '';
-			var_dump( $update_string );
+			//$update_string = ! empty( $processed ) ? $processed : '';
+			$update_string = '';
 		}
 		$this->output .= do_shortcode( '[gravityform id="' . $form['id'] . '"' . $update_string . ' title="true" description="true" ajax="true"]' );
 	}
