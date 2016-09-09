@@ -248,10 +248,10 @@ function exchange_build_social_icons( $context = '', $platforms = array(), $exch
 		$email_share_subject_option = get_option( 'options_email_share_subject' );
 		$email_share_text_option = get_option( 'options_email_share_text' );
 		$email_share_subject = $email_share_subject_option
-			? rawurlencode( sprintf( $email_share_subject_option, $exchange->type, $exchange->title ) )
-			: rawurlencode( sprintf( '%s from %s: %s', ucfirst( $exchange->type ), $site_name, $exchange->title ) );
+			? rawurlencode( sprintf( $email_share_subject_option, $site_name, $exchange->title ) )
+			: rawurlencode( sprintf( '%s: %s', $site_name, $exchange->title ) );
 		$email_share_text = $email_share_text_option
-			? rawurlencode( sprintf( $email_share_text_option, ucfirst( $exchange->type ), $exchange->title, $exchange->link ) )
+			? rawurlencode( sprintf( $email_share_text_option, $exchange->type, $site_name, $exchange->title ) )
 			: rawurlencode( sprintf( "Hi!\n\nThis %s on %s might interest you: %s\n\n", $exchange->type, $site_name, $exchange->title ) );
 		$facebook_icon = '';
 		$facebook_appid = get_option( 'options_facebook_app_id' );
@@ -276,7 +276,7 @@ function exchange_build_social_icons( $context = '', $platforms = array(), $exch
 			'print'    => __( 'Open a printer-friendly version of this %s', EXCHANGE_PLUGIN ),
 		);
 		$button_links = array(
-			'twitter'  => 'https://twitter.com/intent/tweet?text=' . urlencode( sprintf( __( '%s from %s: %s', EXCHANGE_PLUGIN ), ucfirst( $exchange->type ), $site_name, $exchange->title ) ) . '&url=' . $encoded_link,
+			'twitter'  => 'https://twitter.com/intent/tweet?text=' . urlencode( sprintf( __( '%s: %s', EXCHANGE_PLUGIN ), $site_name, $exchange->title ) ) . '&url=' . $encoded_link,
 			'facebook' => $facebook_link,
 			'email'    => 'mailto:?subject=' . $email_share_subject . '&body=' . $email_share_text . '%0D%0A%0D%0A' . $encoded_link,
 			'print'    => $exchange->link . '?exchange_display=print',
