@@ -287,8 +287,8 @@ class Section extends BasePattern {
 
 	private function update_form_ids() {
 		$ids = array();
-		$updateable = array( 'collaboration', 'participant', 'story' );
-		foreach( $updateable as $type ) {
+		// $updateable = array( 'collaboration', 'participant', 'story' );
+		foreach( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['POST_TYPES']['available-for-form-updates'] as $type ) {
 			$update_form = get_option( 'options_' . $type . '_update_form');
 			if ( ! empty( $update_form ) ) {
 				$ids[] = $update_form;
@@ -297,9 +297,16 @@ class Section extends BasePattern {
 		return $ids;
 	}
 
+	/**
+	 * Process an update token to return a gravity form
+	 *
+	 * @param int $form_id Gravity Forms ID to check against
+	 * @return return $form_id
+	 *
+	 * @TODO add available post types to globals
+	 */
 	private function process_token( $form_id ) {
 		parse_str( $_SERVER[ 'QUERY_STRING' ] );
-		$updateable = array( 'collaboration', 'participant' );
 		$form_id_arr = $this->update_form_ids();
 		if ( empty( $form_id ) ) {
 			return;
@@ -310,7 +317,7 @@ class Section extends BasePattern {
 		if ( isset( $update_id )
 			&& isset( $update_token )
 			&& is_numeric( $update_id )
-			&& in_array( get_post_type( $update_id ), $updateable  ) ) {
+			&& in_array( get_post_type( $update_id ), $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['POST_TYPES']['available-for-form-updates'], true ) ) {
 				$exchange = BaseController::exchange_factory( $update_id );
 		}
 		if ( ! $exchange instanceof Exchange ) {
@@ -329,11 +336,12 @@ class Section extends BasePattern {
 			default:
 				return;
 		}
+		var_dump( $exchange );
 		if ( ! isset( $programme_round_id ) ) {
 			return;
 		}
 		$programme_round = BaseController::exchange_factory( $programme_round_id );
-		if ( ! is_a( $programme_round, 'Programme_Round' ) ) {
+		if ( ! $programme_round instanceof Programme_Round ) {
 			return;
 		} else {
 			$pr_update_token = $programme_round->controller->get_programme_round_token();
