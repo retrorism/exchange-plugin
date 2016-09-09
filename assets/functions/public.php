@@ -321,3 +321,67 @@ function exchange_build_social_icons( $context = '', $platforms = array(), $exch
 	$output .= '</ul>';
 	return $output;
 }
+
+
+/**
+ * Retrieve description outside loop
+ *
+ * @return void.
+ */
+function exchange_get_share_description() {
+	if ( is_single() ) {
+		global $post;
+		switch ( $post->post_type ) {
+			case 'page':
+			case 'story':
+				$description = get_post_meta( $post->ID, 'editorial_intro', true );
+				break;
+			case 'collaboration':
+				$description = get_post_meta( $post->ID, 'description' );
+				break;
+			default:
+				break;
+		}
+		if ( isset( $description ) && ! empty( $description ) ) {
+			echo esc_attr( $description );
+		}
+	}
+}
+
+/**
+ * Retrieve image outside loop
+ *
+ * @return void.
+ */
+function exchange_get_share_image() {
+	if ( function_exists( 'wp_get_attachment_thumb_url' ) ) {
+		$src = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'medium' );
+		if ( ! empty( $src ) ) {
+			echo esc_attr( $src[0] );
+		}
+	}
+}
+
+/**
+ * Retrieve title outside loop
+ *
+ * @return void.
+ * @TODO create a filter instead.
+ */
+ function exchange_get_share_title() {
+ 	if ( is_single() ) {
+ 		global $post;
+ 		switch ( $post->post_type ) {
+ 			case 'page':
+ 			case 'story':
+ 			case 'collaboration':
+ 				$title = $post->post_title;
+ 				break;
+ 			default:
+ 				break;
+ 		}
+ 		if ( isset( $title ) && ! empty( $title ) ) {
+ 			echo esc_attr( $title );
+ 		}
+ 	}
+ }
