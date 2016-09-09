@@ -301,11 +301,10 @@ class Section extends BasePattern {
 		parse_str( $_SERVER[ 'QUERY_STRING' ] );
 		$updateable = array( 'collaboration', 'participant' );
 		$form_id_arr = $this->update_form_ids();
-		var_dump( $form_id_arr );
 		if ( empty( $form_id ) ) {
 			return;
 		}
-		if ( ! in_array( $form_id, $form_id_arr  ) ) {
+		if ( ! in_array( strval( $form_id ), $form_id_arr, true ) ) {
 			return;
 		}
 		if ( isset( $update_id )
