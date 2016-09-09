@@ -292,7 +292,7 @@ function exchange_build_social_icons( $context = '', $platforms = array(), $exch
 			'facebook'  => ! empty( $facebook_page_url ) ? esc_url( $facebook_page_url ) : 'http://www.facebook.com/TandemforCulture',
 			'instagram' => ! empty( $instagram_url ) ? esc_url( $instagram_url ) : 'https://www.instagram.com/TandemforCulture',
 			//'twitter'   => ! empty( $twitter_url ) ? esc_url( $twitter_url ) : 'https://www.twitter.com/TandemforCulture',
-			'vimeo'     =>! empty( $vimeo_url ) ? esc_url( $vimeo_url ) : 'https://vimeo.com/mitost',
+			'vimeo'     =>! empty( $vimeo_url ) ? esc_url( $vimeo_url ) : 'https://vimeo.com/user50018472',
 		);
 	}
 
