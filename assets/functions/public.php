@@ -337,7 +337,7 @@ function exchange_get_share_description() {
 				$description = get_post_meta( $post->ID, 'editorial_intro', true );
 				break;
 			case 'collaboration':
-				$description = get_post_meta( $post->ID, 'description' );
+				$description = get_post_meta( $post->ID, 'description', true );
 				break;
 			default:
 				break;
