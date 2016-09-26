@@ -203,25 +203,51 @@ class Collaboration extends Exchange {
 	}
 
 	public function publish_collab_media_gallery( $context = '' ) {
-		$gallery_grid_items = array();
-		if ( ! $this->has_gallery ) {
+		if ( ! $this->has_gallery && ! $this->has_video ) {
 			return;
 		}
-		foreach ( $this->gallery as $item ) {
-			$pattern = array();
-
-			if ( $item instanceof Image ) {
-				$image_data = $item->get_raw_image_data();
-				$pattern['acf_fc_layout'] = 'grid_image';
-				$pattern['image'] = $image_data;
-				$pattern['image_orientation'] = 'landscape';
-				$pattern['grid_width'] = 'grid_sixth';
-				$gallery_grid_items[] = $pattern;
+		if ( $this->has_gallery ) {
+		// Clone gallery items for embedding in the collaboration grid
+			foreach ( $this->gallery as $gallery_image ) {
+				$item = clone $gallery_image;
+				if ( ! $item instanceof Image ) {
+					continue;
+				}
+				$griditem = new GridItem( $item, 'collaboration', $grid_mods );
+				$griditem->publish();
 			}
-
 		}
-		$grid = new SimpleGrid( $gallery_grid_items, 'collaboration' );
-		$grid->publish('collaboration__gallery');
+	}
+
+	public function publish_collab_video( $context = '' ) {
+		if ( $this->has_video ) {
+			// Clone first video item for embedding in the collaboration grid
+			$item = clone $this->video;
+			if ( $item instanceof Video ) {
+				$griditem = new GridItem( $item, 'collaboration', $grid_mods );
+				$griditem->publish();
+			}
+		}
+	}
+
+	public function publish_collab_files( $context = '' ) {
+		if ( ! $this->has_files ) {
+			return;
+		}
+		$doc_block_input = array(
+			'add_file' => array(),
+		);
+		foreach( $this->files as $file ) {
+			$doc_block_input['add_file'][] = array( 'file' => $file );
+		}
+		$doc_block = BasePattern::pattern_factory( $doc_block_input, 'uploaded_files', 'collaboration', true);
+		if ( $doc_block instanceof Documentblock ) {
+			$grid_mods = array(
+				'type' => 'documentblock',
+			);
+			$griditem = new GridItem( $doc_block, 'collaboration', $grid_mods );
+			$griditem->publish();
+		}
 	}
 
 	public function set_update_form_link( $link ) {

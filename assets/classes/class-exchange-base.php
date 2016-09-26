@@ -109,6 +109,24 @@ class Exchange {
 	public $gallery = array();
 
 	/**
+	 * Gallery
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var array $gallery List of files
+	 **/
+	public $files = array();
+
+	/**
+	 * Files check.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var boolean $has_files. Defaults to false.
+	 */
+	public $has_files = false;
+
+	/**
 	 * Has gallery check.
 	 *
 	 * @since 0.1.0
@@ -188,7 +206,7 @@ class Exchange {
 	 *
 	 * @since 0.1.0
 	 * @access public
-	 * @var boolean $has_locations When there's two or more geolocations added for mapping. Defaults to false.
+	 * @var boolean $has_video. Defaults to false.
 	 */
 	public $has_video = false;
 
@@ -301,7 +319,8 @@ class Exchange {
 		if ( $this->has_gallery ) {
 			$output .= '<ul class="gallery--' . $context_class . '">';
 			foreach( $this->gallery as $img ) {
-				$output .= $img->embed('gallery');
+				$img_string = $img->embed('gallery');
+				$output .= $img_string;
 			}
 			if ( $this->has_video ) {
 				$output .= $this->video->embed('gallery');
@@ -358,6 +377,12 @@ class Exchange {
 	public function publish_video( $context = '' ) {
 		if ( $this->has_video ) {
 			$this->video->publish();
+		}
+	}
+
+	public function publish_files( $context = '' ) {
+		if ( $this->has_video ) {
+			$this->files->publish();
 		}
 	}
 

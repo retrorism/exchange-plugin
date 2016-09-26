@@ -222,6 +222,7 @@ class Image extends BasePattern {
 		switch ( $this->context ) {
 			case 'imageduo':
 			case 'section':
+			case 'griditem__pattern':
 				$el['open'] = '<a data-open="story__modal--gallery" data-img_id="' . $this->modifiers['data']['img_id'] . '">';
 				$el['close'] = '</a>';
 				break;
