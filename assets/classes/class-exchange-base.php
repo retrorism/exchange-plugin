@@ -319,7 +319,8 @@ class Exchange {
 		if ( $this->has_gallery ) {
 			$output .= '<ul class="gallery--' . $context_class . '">';
 			foreach( $this->gallery as $img ) {
-				$output .= $img->embed('gallery');
+				$img_string = $img->embed('gallery');
+				$output .= $img_string;
 			}
 			if ( $this->has_video ) {
 				$output .= $this->video->embed('gallery');

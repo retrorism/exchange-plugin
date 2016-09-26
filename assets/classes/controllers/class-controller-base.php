@@ -174,7 +174,7 @@ class BaseController {
 	protected function get_header_image( $context ) {
 		switch ( $this->get_header_image_source( $context ) ) {
 			case 'upload_new_image':
-				$thumb = get_post_meta( 'upload_header_image', $this->container->post_id, true );
+				$thumb = get_post_meta( $this->container->post_id, 'upload_header_image', true );
 				break;
 			case 'none':
 				break;
@@ -291,15 +291,25 @@ class BaseController {
 	}
 
 	protected function get_gallery_from_acf() {
-		$gallery = get_post_meta( $this->container->type . '_gallery', $this->container->post_id, true );
-		return $gallery;
+		$unique_ids = get_post_meta( $this->container->post_id, $this->container->type . '_gallery', true );
+		foreach ( $unique_ids as $img_id ) {
+			if ( function_exists( 'acf_get_attachment' ) ) {
+				$img_arr = acf_get_attachment( $img_id );
+				if ( ! empty( $img_arr ) ) {
+					$unique_arrs[] = $img_arr;
+				}
+			}
+		}
+		return $unique_arrs;
 	}
 
 	protected function get_video_from_acf() {
 		// Set empty array for video properties
 		$input = array();
-		$video = get_post_meta( $this->container->type . '_video_embed_code', $this->container->post_id, true );
-		$video_caption = get_post_meta( $this->container->type . '_video_caption', $this->container->post_id, true );
+		if ( function_exists( 'get_field' ) ) {
+			$video = get_field( $this->container->type . '_video_embed_code', $this->container->post_id, true );
+			$video_caption = get_field( $this->container->type . '_video_caption', $this->container->post_id, true );
+		}
 		if ( empty( $video ) ) {
 			return;
 		}
@@ -377,9 +387,11 @@ class BaseController {
 				return;
 			}
 			foreach ( $unique_ids as $img_id ) {
-				$img_arr = acf_get_attachment( $img_id );
-				if ( ! empty( $img_arr ) ) {
-					$unique_arrs[] = $img_arr;
+				if ( function_exists( 'acf_get_attachment' ) ) {
+					$img_arr = acf_get_attachment( $img_id );
+					if ( ! empty( $img_arr ) ) {
+						$unique_arrs[] = $img_arr;
+					}
 				}
 			}
 		}
@@ -396,10 +408,11 @@ class BaseController {
 
 	protected function set_video() {
 		$input = $this->get_video_from_acf();
-		if ( ! empty( $input ) ) {
-			$video_obj = new Video( $input, 'section' );
+		if ( empty( $input ) ) {
+			return;
 		}
-		if ( ! empty( $video_obj ) ) {
+		$video_obj = new Video( $input );
+		if ( $video_obj instanceof Video ) {
 			$this->container->video = $video_obj;
 			$this->container->has_video = true;
 		}
@@ -425,7 +438,7 @@ class BaseController {
 			}
 			// Add gallery context
 			$img_obj = new Image( $img_arr, 'gallery', $image_mods );
-			if ( is_object( $img_obj ) && is_a( $img_obj, 'Image' ) ) {
+			if ( $img_obj instanceof Image ) {
 				$gallery[] = $img_obj;
 			}
 			$index++;

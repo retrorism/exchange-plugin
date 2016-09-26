@@ -634,6 +634,9 @@ abstract class BasePattern {
 				'type' => 'post-it',
 				'colour' => exchange_slug_to_hex('blue-1-web'),
 			);
+			if ( 'collaboration' === $context ) {
+				$document_mods['colour'] = exchange_slug_to_hex('blue-2-web');
+			}
 			$pattern = new DocumentBlock( $input, $context, $document_mods );
 			break;
 		default:
