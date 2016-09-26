@@ -203,17 +203,27 @@ class Collaboration extends Exchange {
 	}
 
 	public function publish_collab_media_gallery( $context = '' ) {
-		$gallery_grid_items = array();
 		if ( ! $this->has_gallery && ! $this->has_video ) {
 			return;
 		}
 		if ( $this->has_gallery ) {
-			// Clone first gallery item for embedding in the collaboration grid
-			$item = clone $this->gallery[0];
-			if ( $item instanceof Image ) {
-				$grid_mods = array(
-					'grid_width' => 'grid_two_third',
-				);
+		// Clone gallery items for embedding in the collaboration grid
+			foreach ( $this->gallery as $gallery_image ) {
+				$item = clone $gallery_image;
+				if ( ! $item instanceof Image ) {
+					continue;
+				}
+				$griditem = new GridItem( $item, 'collaboration', $grid_mods );
+				$griditem->publish();
+			}
+		}
+	}
+
+	public function publish_collab_video( $context = '' ) {
+		if ( $this->has_video ) {
+			// Clone first video item for embedding in the collaboration grid
+			$item = clone $this->video;
+			if ( $item instanceof Video ) {
 				$griditem = new GridItem( $item, 'collaboration', $grid_mods );
 				$griditem->publish();
 			}
@@ -233,7 +243,6 @@ class Collaboration extends Exchange {
 		$doc_block = BasePattern::pattern_factory( $doc_block_input, 'uploaded_files', 'collaboration', true);
 		if ( $doc_block instanceof Documentblock ) {
 			$grid_mods = array(
-				'grid_width' => 'grid_third',
 				'type' => 'documentblock',
 			);
 			$griditem = new GridItem( $doc_block, 'collaboration', $grid_mods );

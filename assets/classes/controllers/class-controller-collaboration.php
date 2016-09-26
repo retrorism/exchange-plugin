@@ -112,19 +112,6 @@ class CollaborationController extends BaseController {
 		$this->set_collaboration_files();
 	}
 
-	// protected function set_collaboration_video() {
-	// 	$post_id = $this->container->post_id;
-	//
-	// 	$video = get_post_meta( $post_id, 'collaboration_video_embed_code', true );
-	// 	if ( ! empty( $video ) ) {
-	// 		$video_obj = BasePattern::pattern_factory( $video, 'embedded_video', 'collaboration', true );
-	// 		if ( $video_obj instanceof Video ) {
-	// 			$this->video = $video_obj;
-	// 			$this->has_video = true;
-	// 		}
-	// 	}
-	// }
-
 	protected function set_collaboration_files() {
 		$post_id = $this->container->post_id;
 		$files = get_post_meta( $post_id, 'collaboration_documents', true );
