@@ -67,6 +67,7 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 				'globals.php',
 				'admin.php',
 				'admin-acf.php',
+				'admin-gravity.php',
 				'admin-options.php',
 				'admin-roles.php',
 				'taxonomies.php',
