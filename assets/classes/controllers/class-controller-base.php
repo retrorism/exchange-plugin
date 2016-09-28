@@ -307,8 +307,8 @@ class BaseController {
 		// Set empty array for video properties
 		$input = array();
 		if ( function_exists( 'get_field' ) ) {
-			$video = get_field( $this->container->type . '_video_embed_code', $this->container->post_id, true );
-			$video_caption = get_field( $this->container->type . '_video_caption', $this->container->post_id, true );
+			$video = get_field( $this->container->type . '_video_embed_code', $this->container->post_id );
+			$video_caption = get_field( $this->container->type . '_video_caption', $this->container->post_id );
 		}
 		if ( empty( $video ) ) {
 			return;

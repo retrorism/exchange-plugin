@@ -158,6 +158,18 @@ function jdn_set_collaboration_acf_gallery_and_documents_field( $entry, $form ) 
 	}
 }
 
-
+add_filter( 'gform_post_data', 'exchange_add_oembed_field_key', 11, 3 );
+/**
+* Add oEmbed field type key to directly show the right output in the frontend
+*
+* @return $post_data.
+*/
+function exchange_add_oembed_field_key( $post_data, $form, $entry ) {
+	$acf_field_key = 'field_57e9090e9b7da';
+	if ( is_int( $post_data['ID'] ) && ! empty( $post_data['post_custom_fields']['collaboration_video_embed_code'] ) ) {
+		$update_acf_field_key = update_post_meta( $post_data['ID'], '_collaboration_video_embed_code', $acf_field_key );
+	}
+	return $post_data;
+}
 
 ?>
