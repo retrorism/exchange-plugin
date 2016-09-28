@@ -32,12 +32,12 @@ function jdn_create_image_id( $image_url, $parent_post_id = null ) {
 	$wp_upload_path = $wp_upload_dir['basedir'];
 
 	// Get the file path.
-	$path_array = explode( 'uploads/', $image_url );
+	$path_array = explode( 'uploads', $image_url );
 	// File base name, e.g. image.jpg.
 	$file_base_name = basename( $image_url );
 
 	// Combine the two to get the uploaded file path.
-	$uploaded_file_path = untrailingslashit( $wp_upload_path ) . $path_array[1];
+	$uploaded_file_path = $wp_upload_path . $path_array[1];
 
 	// Check the type of file. We'll use this as the 'post_mime_type'.
 	$filetype = wp_check_filetype( $file_base_name, null );
@@ -68,8 +68,8 @@ function jdn_create_image_id( $image_url, $parent_post_id = null ) {
 				$attach_data = wp_generate_attachment_metadata( $attach_id, $uploaded_file_path );
 				wp_update_attachment_metadata( $attach_id, $attach_data );
 			} // End if file exists check.
-
-		} // End if error check.
+			$attachment_acf = acf_get_attachment( $attach_id );
+		}
 		return $attach_id;
 	} else {
 		return false;
