@@ -173,8 +173,8 @@ function tandem_create_programme_round() {
 
 // Make sure that the archive links always end up at the archive, not the page, even when the page's permalink is used.
 function exchange_rewrite_rules($rules) {
-	add_rewrite_rule('^stories$', 'index.php?post_type=story', 'top');
-	add_rewrite_rule('^collaborations$', 'index.php?post_type=collaborations', 'top');
+	add_rewrite_rule('^/stories$', 'index.php?post_type=story', 'top');
+	add_rewrite_rule('^/collaborations$', 'index.php?post_type=collaborations', 'top');
 }
 
 add_action('init', 'exchange_rewrite_rules');
