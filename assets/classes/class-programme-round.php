@@ -132,7 +132,7 @@ class Programme_Round extends Exchange {
 	}
 
 
-	public function create_token_form_cta( $obj ) {
+	public function create_token_form_cta( $obj, $pr_token = '', $c_obj = null ) {
 		if ( empty( $obj->type ) && empty( $obj->post_type ) ) {
 			return;
 		}
@@ -159,6 +159,12 @@ class Programme_Round extends Exchange {
 					$cta_colour = exchange_slug_to_hex('yellow-tandem');
 					$form_title = ! empty( $obj->post_title ) ? $obj->post_title : 'story';
 					$permalink = get_post_permalink( $obj->ID );
+					if ( $c_obj instanceof Collaboration && is_numeric( $c_obj->post_id ) ) {
+						$permalink = add_query_arg('update_id',$c_obj->post_id,$permalink);
+					}
+					if ( ! empty( $pr_token ) ) {
+						$permalink = add_query_arg('pr_ref',$pr_token,$permalink);
+					}
 					$update_link = ! empty( $permalink ) ? $permalink : '#';
 					break;
 				} else {
@@ -260,7 +266,7 @@ class Programme_Round extends Exchange {
 		$output .= '<select name="token-form-collab-select" class="token-form__collab-select">';
 		$output .= '<option value="null">Select your collaboration</option>';
 		foreach ( $collab_set as $collab ) {
-			$output .= sprintf( '<option data-programme-round="%s" value="%s">%s</option>', esc_attr( $this->post_id ), esc_attr( $collab->ID ), esc_html( $collab->post_title ) );
+			$output .= sprintf( '<option data-programme-round="%s" data-collaboration-token="%s" value="%s">%s</option>', esc_attr( $this->post_id ), esc_attr( $this->post_id ), esc_attr( $collab->ID ), esc_html( $collab->post_title ) );
 		}
 		$output .= '</select>';
 		$output .= '<a class="button--large button--token-form-submit token-form__submit" id="token-form__submit">' . __( 'Go!', EXCHANGE_PLUGIN ) . '</a>';

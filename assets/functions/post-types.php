@@ -16,13 +16,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 };
 
 /* Hook post creation to init. */
-add_action( 'init', 'tandem_create_story' );
-add_action( 'init', 'tandem_create_collaboration' );
-add_action( 'init', 'tandem_create_participant' );
-add_action( 'init', 'tandem_create_programme_round' );
+add_action( 'init', 'exchange_create_story' );
+add_action( 'init', 'exchange_create_collaboration' );
+add_action( 'init', 'exchange_create_participant' );
+add_action( 'init', 'exchange_create_programme_round' );
 
 // Register Story as Post Type.
-function tandem_create_story() {
+function exchange_create_story() {
 
 	// Set up labels.
 	$labels = array(
@@ -58,7 +58,7 @@ function tandem_create_story() {
 }
 
 // Register Collaboration as Post Type.
-function tandem_create_collaboration() {
+function exchange_create_collaboration() {
 
 	// Set up labels.
 	$labels = array(
@@ -101,7 +101,7 @@ function tandem_create_collaboration() {
 }
 
 // Register participant as Post Type.
-function tandem_create_participant() {
+function exchange_create_participant() {
 
 	// Set up labels.
 	$labels = array(
@@ -135,7 +135,7 @@ function tandem_create_participant() {
 }
 
 // Register Programme round as Post Type.
-function tandem_create_programme_round() {
+function exchange_create_programme_round() {
 
 	// Set up labels.
 	$labels = array(
@@ -187,3 +187,21 @@ add_filter( 'get_the_archive_title', function ( $title ) {
     return $title;
 
 });
+
+
+add_filter('pre_get_posts', 'exchange_post_types_admin_order');
+
+/* via http://wordpress.stackexchange.com/a/82018 */
+function exchange_post_types_admin_order( $wp_query ) {
+	if (is_admin()) {
+		// Get the post type from the query
+		$post_type = $wp_query->query['post_type'];
+
+		if ( $post_type == 'story') {
+
+		  $wp_query->set('orderby', 'date');
+
+		  $wp_query->set('order', 'DESC');
+		}
+	}
+}

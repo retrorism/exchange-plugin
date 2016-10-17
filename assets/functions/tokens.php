@@ -68,9 +68,10 @@ function exchange_token_form_callback() {
 		echo '<div class="loader-pointer section__helper">' . __( 'Whoa... where did YOU come from?', EXCHANGE_PLUGIN ) . '</div>';
 		wp_die();
 	}
-	if ( ! empty( $_POST['prid'] ) && ! empty( $_POST['cid'] ) ) {
+	if ( ! empty( $_POST['prid'] ) && ! empty( $_POST['update_id'] ) && ! empty( $_POST['token'] ) ) {
 		$pr_obj = BaseController::exchange_factory( $_POST['prid'], 'token-form' );
-		$c_obj = BaseController::exchange_factory( $_POST['cid'], 'token-form' );
+		$pr_token = $_POST['token'];
+		$c_obj = BaseController::exchange_factory( $_POST['update_id'], 'token-form' );
 		$story_page = get_option( 'options_story_update_form_page' );
 		$s_obj = get_post( $story_page );
 
@@ -82,14 +83,14 @@ function exchange_token_form_callback() {
 		$simplegrid = new SimpleGrid();
 
 		if ( $s_obj instanceof WP_Post ) {
-			$simplegrid->add_grid_item( $pr_obj->create_token_form_cta( $s_obj ) );
+			$simplegrid->add_grid_item( $pr_obj->create_token_form_cta( $s_obj, $pr_token, $c_obj ) );
 		}
 		if ( $c_obj instanceof Collaboration ) {
-			$simplegrid->add_grid_item( $pr_obj->create_token_form_cta( $c_obj ) );
+			$simplegrid->add_grid_item( $pr_obj->create_token_form_cta( $c_obj, $pr_token  ) );
 		}
 		if ( ! empty( $c_obj->participants ) ) {
 			foreach ( $c_obj->participants as $p ) {
-				$simplegrid->add_grid_item( $pr_obj->create_token_form_cta( $p ) );
+				$simplegrid->add_grid_item( $pr_obj->create_token_form_cta( $p, $pr_token ) );
 			}
 		}
 		// echo '<pre>' . print_r( $simplegrid, true ) . '</pre>';
@@ -122,6 +123,8 @@ add_action( 'template_redirect', 'exchange_url_rewrite_templates_for_tokens' );
 
 function exchange_token_query_vars( $qvars ) {
 	$qvars[] = 'pr';
+	$qvars[] = 'pr_ref';
+	$qvars[] = 'update_id';
 	return $qvars;
 }
 add_filter( 'query_vars', 'exchange_token_query_vars' , 10, 1 );

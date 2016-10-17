@@ -179,12 +179,14 @@ function exchange_add_update_form_link( $post_ID, $post_obj ) {
 		$field = 'field_57a0a397c1cd6';
 		$coll = BaseController::exchange_factory( $post_ID );
 	}
-	if ( ! isset( $coll ) ) {
+	if ( ! $coll instanceof Collaboration ) {
 		return;
 	}
-	if ( is_object( $coll ) && is_a( $coll->programme_round, 'Programme_Round' ) ) {
+
+	if ( $coll->programme_round instanceof Programme_Round ) {
 		$pr_token = $coll->programme_round->controller->get_programme_round_token();
 	}
+
 	if ( ! isset( $pr_token ) ) {
 		return;
 	}
