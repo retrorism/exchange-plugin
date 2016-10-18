@@ -31,6 +31,12 @@ function exchange_verify_token() {
 		return;
 	}
 	$pr = array_search( $token, $pr_tokens );
+	if ( ! $pr ) {
+		$token_store_renew = exchange_retrieve_and_store_pr_tokens();
+		if ( ! empty( $token_store_renew ) ) {
+			$pr = array_search( $token, $token_store );
+		}
+	}
 	if ( $pr ) {
 		return $pr;
 	}
