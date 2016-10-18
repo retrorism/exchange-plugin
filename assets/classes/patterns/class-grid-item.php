@@ -109,7 +109,7 @@ class GridItem extends BasePattern {
 			$exchange->controller->set_featured_image();
 			$exchange->controller->set_ordered_tag_list();
 		}
-		if ( false === $cta && 'cta' === $this->modifiers['type'] ) {
+		if ( false === $cta && isset( $this->modifiers['type'] ) && 'cta' === $this->modifiers['type'] ) {
 			$this->modifiers['type'] = $this->input->type;
 			$remove_class = array_search( 'griditem--cta', $this->classes, true );
 

@@ -213,7 +213,7 @@ class Collaboration extends Exchange {
 				if ( ! $item instanceof Image ) {
 					continue;
 				}
-				$griditem = new GridItem( $item, 'collaboration', $grid_mods );
+				$griditem = new GridItem( $item, 'collaboration' );
 				$griditem->publish();
 			}
 		}
@@ -224,7 +224,7 @@ class Collaboration extends Exchange {
 			// Clone first video item for embedding in the collaboration grid
 			$item = clone $this->video;
 			if ( $item instanceof Video ) {
-				$griditem = new GridItem( $item, 'collaboration', $grid_mods );
+				$griditem = new GridItem( $item, 'collaboration' );
 				$griditem->publish();
 			}
 		}
