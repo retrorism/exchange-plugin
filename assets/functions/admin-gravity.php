@@ -16,6 +16,7 @@
 	add_filter( 'gform_post_data', 'exchange_add_oembed_field_key', 11, 3 );
 
 	// Create unique identifier for stories added by f
+
 	add_filter( 'gform_post_data', 'exchange_add_form_entry_id_and_create_story_submission_hash', 12, 3 );
 
 	/**
@@ -24,7 +25,10 @@
 	* @author Joshua David Nelson, josh@joshuadnelson.com
 	* @return void
 	*/
-	add_filter( "gform_after_submission_3", 'exchange_set_gravity_collaboration_attachments', 10, 2 );
+	$collaboration_form_id = get_option( 'options_collaboration_update_form' );
+	if ( $collaboration_form_id && function_exists('exchange_set_gravity_collaboration_attachments') ) {
+		add_filter( 'gform_after_submission_' . $collaboration_form_id , 'exchange_set_gravity_collaboration_attachments', 10, 1 );
+	}
 
 	/**
 	* Attach images uploaded through Gravity Form to newly created story
@@ -32,8 +36,10 @@
 	* @author Joshua David Nelson, josh@joshuadnelson.com
 	* @return void
 	*/
-	add_filter( "gform_after_submission_8", 'exchange_set_gravity_story_attachments', 10, 1 );
-
+	$story_form_id = get_option( 'options_story_update_form' );
+	if ( $story_form_id && function_exists('exchange_set_gravity_story_attachments') ) {
+		add_filter( 'gform_after_submission_' . $story_form_id, 'exchange_set_gravity_story_attachments', 10, 1 );
+	}
 
 	function change_upload_path( $path_info, $form_id ) {
 		$upload_dir = wp_upload_dir();
@@ -114,13 +120,12 @@
 	* @return $post_data.
 	*/
 	function exchange_add_oembed_field_key( $post_data, $form, $entry ) {
-		$acf_field_key = 'field_57e9090e9b7da';
+		$acf_field_key = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['ACF']['fields']['collaboration-oembed'];
 		if ( is_int( $post_data['ID'] ) && ! empty( $post_data['post_custom_fields']['collaboration_video_embed_code'] ) ) {
 			$update_acf_field_key = update_post_meta( $post_data['ID'], '_collaboration_video_embed_code', $acf_field_key );
 		}
 		return $post_data;
 	}
-
 
 	/**
 	* Add submission hash and form id for file attachments.
@@ -136,12 +141,13 @@
 		if ( empty( $entry['id'] ) ) {
 			return $post_data;
 		}
-		$hash = sha1( $entry['id'] . $entry[1] );
+		$gf_story_title_field_id = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['GRAVITY_FORMS']['fields']['story-title'];
+
+		$hash = sha1( $entry['id'] . $entry[ $gf_story_title_field_id ] );
 		$post_data['post_custom_fields']['form_entry_id'] = $entry['id'];
 		$post_data['post_custom_fields']['story_form_submission_hash'] = $hash;
 		return $post_data;
 	}
-
 
 	/**
 	* Create the image attachment and return the new media upload id.
@@ -214,13 +220,19 @@
 		} // End if $filetype.
 	}
 
-	function exchange_set_gravity_collaboration_attachments( $entry, $form ) {
+	function exchange_set_gravity_collaboration_attachments( $entry ) {
 
-		$gf_gallery_field_id = 23; // the gallery upload field id
-		$gf_documents_field_id = 24; // the file upload field id
+		$gf_gallery_field_id = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['GRAVITY_FORMS']['fields']['collaboration-gallery']; // the gallery upload field id
+		$gf_documents_field_id = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['GRAVITY_FORMS']['fields']['collaboration-documents']; // the file upload field id
+		$acf_gallery_field_id = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['ACF']['fields']['collaboration-gallery']; // the acf gallery field id
+		$acf_documents_field_id = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['ACF']['fields']['collaboration-documents']; // the acf documents field id
 
-		$acf_documents_field_id = 'field_57e6561ec9866'; // the acf documents field id
-		$acf_gallery_field_id = 'field_577e3c937d7d6'; // the acf gallery field id
+
+		//Retrieve story form ID from options and verify.
+		$collaboration_form_id = get_option( 'options_collaboration_update_form' );
+		if ( empty( $collaboration_form_id ) || intval( $entry['form_id'] ) !== intval( $collaboration_form_id ) ) {
+			return;
+		}
 
 		// get post
 		if ( isset( $entry['post_id'] ) ) {
@@ -289,7 +301,8 @@
 	}
 
 	function exchange_set_gravity_story_attachments( $entry ) {
-		$gf_story_images_field_id = 11; // the story attachments
+		$gf_story_images_field_id = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['GRAVITY_FORMS']['fields']['story-images']; // the story attachments
+		$gf_story_title_field_id = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['GRAVITY_FORMS']['fields']['story-title'];
 
 		//Retrieve story form ID from options and verify.
 		$story_form_id = get_option( 'options_story_update_form' );
@@ -298,7 +311,7 @@
 		}
 		$post_id = $entry['post_id'];
 		$story_submission_hash = get_post_meta( $post_id, 'story_form_submission_hash', true );
-		if ( sha1( $entry['id'] . $entry[1] ) !== $story_submission_hash ) {
+		if ( sha1( $entry['id'] . $entry[ $gf_story_title_field_id ] ) !== $story_submission_hash ) {
 			return;
 		}
 		// Delete submission hash.

@@ -136,8 +136,23 @@ if ( empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOUR_PICKERS']['boxes'] ) ) {
 		$GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['blue-1-web'],
 		$GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['rose-1-web'],
 		$GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['blue-2-web'],
-
-
       );
   }
+}
+
+if ( empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['GRAVITY_FORMS']['fields'] ) ) {
+	$GLOBALS['EXCHANGE_PLUGIN_CONFIG']['GRAVITY_FORMS']['fields'] = array(
+		'collaboration-gallery' => 23,
+		'collaboration-documents' => 24,
+		'story-images' => 11,
+		'story-title' => 1,
+	);
+}
+
+if ( empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['ACF']['fields'] ) ) {
+	$GLOBALS['EXCHANGE_PLUGIN_CONFIG']['ACF']['fields'] = array(
+		'collaboration-gallery' => 'field_577e3c937d7d6',
+		'collaboration-documents' => 'field_57e6561ec9866',
+		'collaboration-oembed' => 'field_57e9090e9b7da',
+	);
 }

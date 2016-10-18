@@ -292,6 +292,10 @@ class BaseController {
 
 	protected function get_gallery_from_acf() {
 		$unique_ids = get_post_meta( $this->container->post_id, $this->container->type . '_gallery', true );
+		if ( empty( $unique_ids ) ) {
+			return;
+		}
+		$unique_arrs = array();
 		foreach ( $unique_ids as $img_id ) {
 			if ( function_exists( 'acf_get_attachment' ) ) {
 				$img_arr = acf_get_attachment( $img_id );
