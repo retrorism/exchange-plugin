@@ -162,6 +162,43 @@ if ( function_exists('acf_add_options_page' ) ) {
 	));
 }
 
+// Hook into collaboration / participant form update to change the update links.
+add_action( 'update_option_options_collaboration_update_form', 'exchange_update_collaboration_form_links_on_change', 10, 2);
+add_action( 'update_option_options_participant_update_form', 'exchange_update_participant_form_links_on_change', 10, 2);
+
+function exchange_update_collaboration_form_links_on_change( $old_option_value, $new_option_value ) {
+	if ( $old_option_value === $new_option_value ) {
+		return;
+	}
+	$args = array(
+		'post_type' => 'collaboration',
+		'posts_per_page' => -1,
+	);
+	$collaborations_query = new WP_Query( $args );
+	if ( $collaborations_query->have_posts() ) {
+		foreach ( $collaborations_query->posts as $collaboration ) {
+			exchange_add_update_form_link( $collaboration->ID, $collaboration );
+		}
+	}
+	wp_reset_query();
+}
+
+function exchange_update_participant_form_links_on_change( $old_option_value, $new_option_value ) {
+	if ( $old_option_value === $new_option_value ) {
+		return;
+	}
+	$args = array(
+		'post_type' => 'participant',
+		'posts_per_page' => -1,
+	);
+	$participants_query = new WP_Query( $args );
+	if ( $participants_query->have_posts() ) {
+		foreach( $participants_query->posts as $participant ) {
+			exchange_add_update_form_link( $participant->ID, $participant );
+		}
+	}
+	wp_reset_query();
+}
 
 add_action( 'save_post', 'exchange_add_update_form_link', 10, 3 );
 
