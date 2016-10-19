@@ -165,51 +165,46 @@ if ( function_exists('acf_add_options_page' ) ) {
 
 add_action( 'save_post', 'exchange_add_update_form_link', 10, 3 );
 
-function exchange_add_update_form_link( $post_ID, $post_obj ) {
+function exchange_add_update_form_link( $post_id, $post_obj ) {
 	$update = false;
 	$type = $post_obj->post_type;
-
 	// Gather token / form info for token verification.
 	$form_id = get_option('options_' . $type . '_update_form');
-	$form_link = get_field( $type . '_update_form_link', $post_ID );
+	$form_link = get_field( $type . '_update_form_link', $post_id );
+	$field = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['ACF']['fields'][ $type . '-update-link'];
 	if ( 'participant' === $type ) {
-		$field = 'field_57a0a3eff2d3c';
-		$coll = CollaborationController::get_collaboration_by_participant_id( $post_ID );
+		$coll = CollaborationController::get_collaboration_by_participant_id( $post_id );
 	} elseif ( 'collaboration' === $type ) {
-		$field = 'field_57a0a397c1cd6';
-		$coll = BaseController::exchange_factory( $post_ID );
+		$coll = BaseController::exchange_factory( $post_id );
 	}
 	if ( ! $coll instanceof Collaboration ) {
 		return;
 	}
-
 	if ( $coll->programme_round instanceof Programme_Round ) {
 		$pr_token = $coll->programme_round->controller->get_programme_round_token();
 	}
-
 	if ( ! isset( $pr_token ) ) {
 		return;
 	}
-
 	// See if anything needs to be changed.
-	$form_token = sha1( $pr_token . $form_id );
+	$form_token = sha1( $pr_token . $form_id . $post_id );
 	if ( ! empty( $form_link ) ) {
 		$parts = parse_url( $form_link );
 		parse_str( $parts[ 'query' ], $query );
-		if ( $query['update_token'] !== $form_token || $query['update_id'] !== $post_ID ) {
+		if ( $query['update_token'] !== $form_token || $query['update_id'] !== $post_id ) {
 			$update = true;
 		} else {
 			return;
 		}
 	}
 	// Update or save the link to the post.
-	$page_id = get_option('options_' . $type . '_update_form_page');
-	$page_url = get_permalink( $page_id );
-	$link = $page_url . '?update_token=' . $form_token . '&update_id=' . $post_ID;
+	$update_page_id = get_option('options_' . $type . '_update_form_page');
+	$update_page_url = get_permalink( $update_page_id );
+	$link = $update_page_url . '?update_token=' . $form_token . '&update_id=' . $post_id;
 	if ( $update ) {
-		update_post_meta( $post_ID, $type . '_update_form_link', $link );
+		update_post_meta( $post_id, $type . '_update_form_link', $link );
 	} else {
-		update_field( $field, $link, $post_ID );
+		update_field( $field, $link, $post_id );
 	}
 }
 

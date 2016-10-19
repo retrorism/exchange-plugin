@@ -154,5 +154,7 @@ if ( empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['ACF']['fields'] ) ) {
 		'collaboration-gallery' => 'field_577e3c937d7d6',
 		'collaboration-documents' => 'field_57e6561ec9866',
 		'collaboration-oembed' => 'field_57e9090e9b7da',
+		'collaboration-update-link' => 'field_57a0a397c1cd6',
+		'participant-update-link' => 'field_57a0a3eff2d3c',
 	);
 }
