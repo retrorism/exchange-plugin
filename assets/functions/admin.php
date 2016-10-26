@@ -26,7 +26,9 @@ add_action( 'admin_init', 'exchange_set_admin_menu_separator' );
 
 /* Hook meta boxes to the 'story' and 'collaboration' post types. */
 // add_action( 'add_meta_boxes_story', 'tandem_add_meta_boxes_for_story' );
-add_action( 'add_meta_boxes_collaboration', 'exchange_add_meta_boxes_for_collaboration' );
+add_action( 'add_meta_boxes_collaboration', 'exchange_add_meta_box_for_collaboration' );
+add_action( 'add_meta_boxes_story', 'exchange_add_meta_box_for_story' );
+
 
 function tandem_admin_enqueue_scripts() {
 	wp_enqueue_script( 'tandem-admin-js', plugin_dir_url( EXCHANGE_PLUGIN_FILE )  . '/assets/js/tandem_admin.js', array(), '0.1.0', true );
@@ -108,11 +110,23 @@ function exchange_add_and_remove_menu_options() {
 }
 
 /* Creates the meta box for project. */
-function exchange_add_meta_boxes_for_collaboration( $post ) {
+function exchange_add_meta_box_for_collaboration( $post ) {
 	add_meta_box(
 		'tandem-programme_round-parent',
 		__( 'Programme round', 'exchange-plugin' ),
 		'exchange_programme_rounds_parent_meta_box',
+		$post->post_type,
+		'side',
+		'core'
+	);
+}
+
+/* Creates the meta box for stories that are submitted via a form */
+function exchange_add_meta_box_for_story( $post ) {
+	add_meta_box(
+		'tandem-story-form-entry',
+		__( 'Form Entry', 'exchange-plugin' ),
+		'exchange_story_form_entry_meta_box',
 		$post->post_type,
 		'side',
 		'core'
@@ -133,6 +147,24 @@ function exchange_programme_rounds_parent_meta_box( $post ) {
 		$output .= '</select>';
 	} else {
 		$output = __( 'You have to add a programme round first', 'exchange-plugin' );
+	}
+	echo $output;
+}
+
+/* Display meta box proramme rounds. */
+function exchange_story_form_entry_meta_box( $post ) {
+	$output = '';
+	$form_entry_id = get_post_meta( $post->ID, 'form_entry_id', true );
+	if ( ! empty( $form_entry_id ) && is_numeric( $form_entry_id ) ) {
+		$output .= '<div class="form_entry_id-wrapper">';
+		$story_form_id = get_option('options_story_update_form');
+		if ( ! empty( $story_form_id ) ) {
+			$admin_link = admin_url( '/admin.php?page=gf_entries&view=entry&id=' . $story_form_id . '&lid=' . $form_entry_id );
+			$output .= '<a href="' . $admin_link . '">' . $form_entry_id . '</a>';
+		} else {
+			$output .= $form_entry_id;
+		}
+		$ouput .= '</div>';
 	}
 	echo $output;
 }

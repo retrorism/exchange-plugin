@@ -354,7 +354,8 @@ function exchange_get_share_description() {
  * @return void.
  */
 function exchange_get_share_image() {
-	if ( function_exists( 'wp_get_attachment_thumb_url' ) ) {
+	global $post;
+	if ( is_object( $post ) && function_exists( 'wp_get_attachment_thumb_url' ) ) {
 		$src = wp_get_attachment_image_src( get_post_thumbnail_id( $post->ID ), 'medium' );
 		if ( ! empty( $src ) ) {
 			echo esc_attr( $src[0] );

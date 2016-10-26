@@ -40,14 +40,18 @@ class Video extends BasePattern {
 	 * @return string $output HTML string
 	 */
 	protected function create_output() {
-
 		// Get iframe HTML
 		$iframe = $this->set_video_attributes();
-
+		$el = 'div';
 		if ( $this->context === 'gallery' ) {
-			$this->output .= '<li class="gallery__item orbit-slide">';
+			$this->classes[] = 'gallery__item';
+			$this->classes[] = 'orbit-slide';
+			$el = 'li';
 		}
-		$this->output_tag_open();
+
+		// Open element.
+		$this->output_tag_open($el);
+		$this->output .= '<div class="gallery__video-wrapper">';
 
 		$this->output .= $iframe;
 
@@ -60,13 +64,10 @@ class Video extends BasePattern {
 		if ( is_object( $this->caption ) ) {
 		   $this->output .= $this->caption->embed();
 		}
-
+		// Close wrapper.
+		$this->output .= '</div>';
 		// Close element.
-		$this->output_tag_close();
-
-		if ( $this->context === 'gallery' ) {
-			$this->output .= '</li>';
-		}
+		$this->output_tag_close($el);
 
 	}
 
@@ -79,10 +80,9 @@ class Video extends BasePattern {
 	 * @TODO Vimeo API to add extra styling
 	 */
 	protected function set_video_attributes() {
-		 $iframe = $this->input['video_embed_code'];
-
+		 $embed_code = $this->input['video_embed_code'];
  		// use preg_match to find iframe src
- 		preg_match( '/src="(.+?)"/', $iframe, $matches );
+ 		preg_match( '/src="(.+?)"/', $embed_code, $matches );
 		if ( empty( $matches ) ) {
 			return;
 		}
@@ -102,7 +102,7 @@ class Video extends BasePattern {
 
 	 		$new_src = add_query_arg($params, $src);
 
-	 		$iframe = str_replace($src, $new_src, $iframe);
+	 		$iframe = str_replace($src, $new_src, $embed_code);
 
 		}
 

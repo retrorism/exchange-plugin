@@ -222,6 +222,7 @@ class Image extends BasePattern {
 		switch ( $this->context ) {
 			case 'imageduo':
 			case 'section':
+			case 'griditem__pattern':
 				$el['open'] = '<a data-open="story__modal--gallery" data-img_id="' . $this->modifiers['data']['img_id'] . '">';
 				$el['close'] = '</a>';
 				break;
@@ -464,7 +465,7 @@ class Image extends BasePattern {
 		if ( $this->lazy ) {
 			$lazy_class = ' lazyload lazypreload';
 		}
-		$img = '<img class="image--main' . $lazy_class . $contact_class . '"';
+		$img = '<img class="image--main' . $lazy_class . '"';
 
 		// Add src to output.
 		if ( $this->lazy ) {

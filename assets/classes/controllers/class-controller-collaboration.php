@@ -109,7 +109,18 @@ class CollaborationController extends BaseController {
 	protected function set_media() {
 		$this->set_video();
 		$this->set_gallery();
+		$this->set_collaboration_files();
 	}
+
+	protected function set_collaboration_files() {
+		$post_id = $this->container->post_id;
+		$files = get_post_meta( $post_id, 'collaboration_documents', true );
+		if ( ! empty( $files ) ) {
+			$this->container->files = $files;
+			$this->container->has_files = true;
+		}
+	}
+
 
 	protected function set_collaboration_locations() {
 		$locations = array();

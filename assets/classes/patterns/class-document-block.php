@@ -25,11 +25,15 @@ class DocumentBlock extends EmphasisBlock {
 	protected function build_block_elements() {
 
 		// Subheader.
-		$subheader_text = ! empty( $this->input['uploaded_files_header'] )
+		$section_header_text = ! empty( $this->input['uploaded_files_header'] )
 		 	? $this->input['uploaded_files_header']
-			: __( 'Available files:',EXCHANGE_PLUGIN );
-		$subheader = new SubHeader( $subheader_text, $this->element );
-		$this->output .= $subheader->embed();
+			: __( 'Available downloads',EXCHANGE_PLUGIN );
+		$section_header_mods = array(
+			'type' => 'taped_header',
+			'colour' => exchange_slug_to_hex('blue-3'),
+		);
+		$section_header = new SectionHeader( $section_header_text, $this->element, $section_header_mods );
+		$this->output .= $section_header->embed();
 
 		// Paragraph.
 		$paragraph_text = '<ul class="documentblock__file-list dont-break-out">';
