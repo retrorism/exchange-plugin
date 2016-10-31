@@ -212,8 +212,8 @@ class CollaborationController extends BaseController {
 		}
 		$length = str_word_count( $description );
 		$add_translation = get_post_meta(  $post_id, 'add_translation', true );
-		if ( $add_translation ) {
-			$translations = get_post_meta( $post_id, 'translations', true );
+		if ( $add_translation && function_exists('get_field') ) {
+			$translations = get_field( 'translations', $post_id );
 		}
 		if ( ! isset( $translations ) || empty( $translations ) ) {
 			$this->container->description = new Paragraph( $description );
