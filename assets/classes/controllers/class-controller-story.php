@@ -150,11 +150,9 @@ class StoryController extends BaseController {
 				$this->container->storyteller = $storyteller;
 			}
 		}
-		if ( ! empty( $this->container->storyteller ) ) {
-			$this->set_byline();
-		} else {
-			$this->set_custom_byline();
-		}
+
+		// Set custom byline defaults to the 'default' byline :)
+		$this->set_custom_byline();
 
 		$this->set_gallery();
 	}
