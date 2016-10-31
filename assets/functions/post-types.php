@@ -54,6 +54,9 @@ function exchange_create_story() {
 		'supports'            => array( 'title','editor','thumbnail','revisions' ),
 		'rewrite'             => array( 'slug' => 'stories' ),
 		'taxonomies'          => array( 'post_tag','category','location','tandem_tag','topic','discipline','methodology','project_output'),
+		'show_in_rest'       => true,
+  		'rest_base'          => 'stories',
+  		'rest_controller_class' => 'WP_REST_Posts_Controller',
 	) );
 }
 
@@ -95,6 +98,9 @@ function exchange_create_collaboration() {
 			'with_front' => true,
 		),
 		'taxonomies'          => array( 'post_tag','location','tandem_tag','topic','discipline','methodology','project_output'),
+		'show_in_rest'       => true,
+		'rest_base'          => 'collaborations',
+		'rest_controller_class' => 'WP_REST_Posts_Controller',
 		)
 	);
 

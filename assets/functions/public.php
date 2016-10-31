@@ -386,3 +386,58 @@ function exchange_get_share_image() {
  		}
  	}
  }
+
+function exchange_create_tax_dropdown( $tax, $context = '' ) {
+	if ( empty( $tax ) ) {
+		return;
+	}
+	$args = array(
+		'taxonomy'   => $tax,
+		'orderby'    => 'count',
+		'order'      => 'DESC',
+		'hide_empty' => true
+	);
+	$tax_obj = get_taxonomy( $tax );
+	$terms = get_terms( $args );
+	if ( ! empty( $terms ) ) {
+		$id = $tax . '-select';
+		if ( 'post_tag' === $tax ) {
+			$rest_slug = 'tag';
+		} else {
+			$rest_slug = $tax;
+		}
+		if ( ! empty( $context ) ) {
+			$context = $context . '__';
+		}
+		$output = '<fieldset>';
+		$output .= '<datalist data-tax="' . $rest_slug . '" id="' . $id . '" class="' . $context . 'tax-datalist tax-datalist">' . PHP_EOL;
+		foreach ( $terms as $term ) {
+			if ( ! $term instanceof WP_Term ) {
+				continue;
+			}
+			$value = $term->term_id;
+			$output .= '<option data-slug="' . $term->slug . '" data-id="' . $term->term_id . '" value="' . $term->name . '">';
+			//$output .= $term->name . ' (' . $term->count . ')';
+			//$output .= $term->count;
+			//$output .= '</option>' . PHP_EOL;
+		}
+		$output .= '</datalist>' . PHP_EOL;
+		if ( ! empty( $tax_obj ) ) {
+			$output .= '<input data-tax="' . $rest_slug . '" type="text" class="' . $context . 'datalist ' . $rest_slug . '-input" type="text" placeholder="' . $tax_obj->label . '" list="' . $id . '"></input>' . PHP_EOL;
+			$output .= '<a data-tax="' . $rest_slug . '" class="' . $context . 'button ' . $rest_slug . '-button button--input" data-input="' . $id . '">' . __('Add filter',EXCHANGE_PLUGIN ) . '</a>' . PHP_EOL;
+		}
+		$output .= '</fieldset>';
+		echo $output;
+	}
+}
+
+function exchange_create_query_store( $tax, $context = '' ) {
+	if ( empty( $tax ) ) {
+		return;
+	}
+	if ( ! empty( $context ) ) {
+		$context = $context . '__';
+	}
+	$id = $tax . '-query';
+	echo '<input type="hidden" data-tax="' . $tax . '" id="' . $id . '" value="" class="' . $context . 'tax-query tax-query"></input>' . PHP_EOL;
+}

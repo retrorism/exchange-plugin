@@ -149,6 +149,9 @@ function exchange_create_taxonomies() {
 				'slug'       => 'language', // This controls the base slug that will display before each term.
 				'with_front' => false, // Don't display the category base before.
 			),
+			'show_in_rest'       => true,
+-			'rest_base'          => 'language',
+-			'rest_controller_class' => 'WP_REST_Terms_Controller',
 			'labels'       => array(
 				'add_new_item' => 'Add new language tag',
 			),
@@ -174,6 +177,9 @@ function exchange_create_taxonomies() {
 				'slug'       => 'topic', // This controls the base slug that will display before each term.
 				'with_front' => false, // Don't display the category base before.
 			),
+			'show_in_rest'       => true,
+-			'rest_base'          => 'topic',
+-			'rest_controller_class' => 'WP_REST_Terms_Controller',
 		)
 	);
 
@@ -195,6 +201,9 @@ function exchange_create_taxonomies() {
 				'slug'       => 'location', // This controls the base slug that will display before each term.
 				'with_front' => true, // Don't display the category base before.
 			),
+			'show_in_rest'       => true,
+-			'rest_base'          => 'location',
+-			'rest_controller_class' => 'WP_REST_Terms_Controller',
 		)
 	);
 
@@ -216,6 +225,9 @@ function exchange_create_taxonomies() {
 				'slug'       => 'methodology', // This controls the base slug that will display before each term
 				'with_front' => false, // Don't display the category base before.
 			),
+			'show_in_rest'       => true,
+-			'rest_base'          => 'methodology',
+-			'rest_controller_class' => 'WP_REST_Terms_Controller',
 		)
 	);
 
@@ -238,6 +250,9 @@ function exchange_create_taxonomies() {
 				'slug'       => 'discipline', // This controls the base slug that will display before each term.
 				'with_front' => false, // Don't display the category base before.
 			),
+			'show_in_rest'       => true,
+-			'rest_base'          => 'discipline',
+-			'rest_controller_class' => 'WP_REST_Terms_Controller',
 		)
 	);
 	register_taxonomy_for_object_type( 'discipline', 'collaboration' );
@@ -260,6 +275,9 @@ function exchange_create_taxonomies() {
 				'slug'       => 'output', // This controls the base slug that will display before each term.
 				'with_front' => false, // Don't display the category base before.
 			),
+			'show_in_rest'       => true,
+-			'rest_base'          => 'project_output',
+-			'rest_controller_class' => 'WP_REST_Terms_Controller',
 		)
 	);
 }

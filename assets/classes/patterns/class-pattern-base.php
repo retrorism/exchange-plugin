@@ -326,7 +326,7 @@ abstract class BasePattern {
 	 * @param string $key Data-attribute identifier.
 	 * @param string $val Contains the value for this data-attribute.
 	 **/
-	protected function set_attribute( $type, $key, $val ) {
+	public function set_attribute( $type, $key, $val ) {
 		$allowed_types = array( 'data','aria','link','misc' );
 		if ( ! in_array( $type, $allowed_types, true ) ) {
 			return;

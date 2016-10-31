@@ -75,6 +75,7 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 				'public.php',
 				'import_projects.php',
 				'tokens.php',
+				'rest-api.php',
 			);
 			$google_api_filter = ABSPATH . 'acf-google-api-key.php';
 			if ( file_exists( $google_api_filter ) ) {
@@ -130,6 +131,8 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 					'participantcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-participant.php',
 					'collaborationcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-collaboration.php',
 					'programme_roundcontroller'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-controller-programme-round.php',
+
+					'exchange_taxonomy_route'  => EXCHANGE_PLUGIN_PATH . 'assets/classes/controllers/class-exchange-taxonomy-route.php',
 
 					'basepattern' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-pattern-base.php',
 					'basegrid' => EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-grid-base.php',
