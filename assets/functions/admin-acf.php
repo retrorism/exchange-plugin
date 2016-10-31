@@ -203,8 +203,11 @@ function exchange_update_participant_form_links_on_change( $old_option_value, $n
 add_action( 'save_post', 'exchange_add_update_form_link', 10, 3 );
 
 function exchange_add_update_form_link( $post_id, $post_obj ) {
-	$update = false;
 	$type = $post_obj->post_type;
+	if ( ! in_array( $type, $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['POST_TYPES']['available-for-form-updates'] ) ) {
+		return;
+	}
+	$update = false;
 	// Gather token / form info for token verification.
 	$form_id = get_option('options_' . $type . '_update_form');
 	$form_link = get_field( $type . '_update_form_link', $post_id );

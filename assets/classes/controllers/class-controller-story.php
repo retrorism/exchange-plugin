@@ -262,7 +262,6 @@ class StoryController extends BaseController {
 			return;
 		}
 		$templates = $this->get_byline_templates();
-
 		if ( $this->container->storyteller->collaboration->programme_round->is_active ) {
 			$byline_template = $templates['present'];
 		} else {
