@@ -80,7 +80,7 @@ class Video extends BasePattern {
 	 * @TODO Vimeo API to add extra styling
 	 */
 	protected function set_video_attributes() {
-		 $embed_code = $this->input['video_embed_code'];
+		$embed_code = $this->input['video_embed_code'];
  		// use preg_match to find iframe src
  		preg_match( '/src="(.+?)"/', $embed_code, $matches );
 		if ( empty( $matches ) ) {
@@ -102,16 +102,16 @@ class Video extends BasePattern {
 
 	 		$new_src = add_query_arg($params, $src);
 
-	 		$iframe = str_replace($src, $new_src, $embed_code);
+			$embed_code = str_replace($src, $new_src, $embed_code);
 
 		}
 
  		// Add extra attributes to iframe html
  		$attributes = ' frameborder="2"';
 
- 		$iframe = str_replace('></iframe>', ' ' . $attributes . '></iframe>', $iframe );
+ 		$embed_code = str_replace('></iframe>', ' ' . $attributes . '></iframe>', $embed_code );
 
-		return $iframe;
+		return $embed_code;
 	}
 
 	/**
