@@ -513,6 +513,7 @@ abstract class BasePattern {
 	 * @return string $output HTML output consisting of tags and content.
 	 **/
 	public static function pattern_factory( $input, $type, $context = '', $return_as_object = false ) {
+		var_dump( $input );
 		if ( empty( $input ) ) {
 			return;
 		}
