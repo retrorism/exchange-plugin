@@ -40,6 +40,7 @@ class TranslatedParagraph extends BasePattern {
 	 * @TODO escape input here?
 	 **/
 	protected function create_output() {
+		var_dump( $this->input );
 		if ( empty( $this->input['text'] ) ) {
 			return;
 		}
