@@ -31,6 +31,14 @@ function exchange_add_options_page() {
 		EXCHANGE_PLUGIN,
 		'exchange_display_options_page'
 	);
+	add_submenu_page(
+		EXCHANGE_PLUGIN,
+		__( 'Exchange Import functions', EXCHANGE_PLUGIN ),
+		__( 'Imports', EXCHANGE_PLUGIN ),
+		'manage_options',
+		EXCHANGE_PLUGIN . '_imports',
+		'exchange_display_import_options_page'
+	);
 	$helper_plugins = exchange_helper_plugins();
 	foreach( $helper_plugins as $helper_plugin => $helper_plugin_class ) {
 		if ( ! class_exists( $helper_plugin_class ) ) {
@@ -50,6 +58,7 @@ function exchange_add_options_page() {
 	}
 }
 
+
 /**
  * Render the options page for plugin
  *
@@ -57,6 +66,15 @@ function exchange_add_options_page() {
  */
 function exchange_display_options_page() {
 	include_once EXCHANGE_PLUGIN_PATH . 'parts/admin-display.php';
+}
+
+/**
+ * Render the options page for plugin
+ *
+ * @since  0.1.0
+ */
+function exchange_display_import_options_page() {
+	include_once EXCHANGE_PLUGIN_PATH . 'parts/admin-import-options-display.php';
 }
 
 /**

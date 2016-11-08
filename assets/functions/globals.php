@@ -152,6 +152,7 @@ if ( empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['GRAVITY_FORMS']['fields'] ) ) {
 if ( empty( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['ACF']['fields'] ) ) {
 	$GLOBALS['EXCHANGE_PLUGIN_CONFIG']['ACF']['fields'] = array(
 		'collaboration-gallery' => 'field_577e3c937d7d6',
+		'collaboration-participants' => 'field_56b9b7c755a9f',
 		'collaboration-documents' => 'field_57e6561ec9866',
 		'collaboration-oembed' => 'field_57e9090e9b7da',
 		'collaboration-update-link' => 'field_57a0a397c1cd6',
