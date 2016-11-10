@@ -26,49 +26,61 @@ function exchange_get_collab_args() {
 }
 
 function exchange_attach_participant_to_collab( $participant ) {
-	$results = '';
-	$cid = get_field('collaboration_id', $participant->ID);
+	$cid = get_post_meta( $participant->ID, 'collaboration_id', true);
 	// Set as metavalue.
 	$collab_args = exchange_get_collab_args();
 	$collab_args['meta_value'] = $cid;
 	// Create new query with this metavalue.
-	$collab_query = new WP_Query($collab_args);
+	$collab_query = new WP_Query( $collab_args );
 	// Result is collab_post_id.
 	$collab = $collab_query->posts[0];
+	if ( empty( $collab ) ) {
+		return;
+	}
+
 	// Get relationship data from collab post.
-	$party = get_field('participants',$collab->ID,false);
+	$party = get_post_meta($collab,'participants',true);
+
 	// Skip to next participant if collaboration already has this participant ID.
-	if ( in_array( $participant->ID, $party ) ) {
-		$results .= $participant->name . ' already added.<br />';
-		continue;
-	}
-	if ( ! empty( $party ) ) {
-		array_push( $party, $participant->ID );
+	if ( ! empty( $party ) && in_array( strval( $participant->ID ), $party, true ) ) {
+		return;
 	} else {
-		$party[0] = $participant->ID;
+		if ( ! empty( $party ) ) {
+			array_push( $party, $participant->ID );
+		} else {
+			$party[0] = $participant->ID;
+		}
+		update_field( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['ACF']['fields']['collaboration-participants'], $party, $collab );
+		return $participant->ID;
 	}
-	update_field( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['ACF']['fields']['collaboration-participants'], $party, $collab->ID );
-	$results .= $participant->name . ' added to ' . $collab->title . '.<br />';
 }
 
-function exchange_importer() {
+function exchange_participant_matcher() {
+	$results = '';
 	$args = array(
 		'post_type' => 'participant',
 		'posts_per_page' => -1,
 		'post_status' => 'draft'
 	);
-	$query = new WP_Query($args);
+	$query = new WP_Query( $args );
 	// Find all participants.
 	$participants = $query->posts;
 	if( ! empty( $participants ) ) {
-		foreach($participants as $participant) {
+		foreach( $participants as $participant) {
 			// Lookup collab ID.
-			$result = exchange_attach_participant_to_collab( $participant );
+			if ( ! $participant instanceof WP_Post ) {
+				continue;
+			}
+			$pid = exchange_attach_participant_to_collab( $participant );
+			if ( is_int( $pid ) ) {
+				$results .= $pid . ', ';
+			}
 		}
-	} else {
-		$result = "No participants found";
 	}
-	return $result;
+	if ( $results === '' ) {
+		$results = "No unmatched or new participants found";
+	}
+	return $results;
 }
 
 function exchange_image_importer() {
