@@ -15,7 +15,7 @@
 <!-- This file should primarily consist of HTML with a little bit of PHP. -->
 
 <div class="wrap">
-	<?php $collabs_and_tags = exchange_importer(); ?>
+	<?php $match_collabs_and_participants = exchange_importer(); ?>
 	<h1>Results go here</h1>
-	<?php var_dump( $collabs_and_tags ); ?>
+	<?php echo $match_collabs_and_participants; ?>
 </div>

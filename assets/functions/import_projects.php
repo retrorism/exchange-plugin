@@ -14,13 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 };
 
-function exchange_importer() {
-	$result = array();
-	$args = array(
-		'post_type' => 'participant',
-		'posts_per_page' => -1,
-		'post_status' => 'draft'
-	);
+function exchange_get_collab_args() {
 	$collab_args = array(
 		'post_type' => 'collaboration',
 		'posts_per_page' => 1,
@@ -28,39 +22,51 @@ function exchange_importer() {
 		'meta_key' => 'collaboration_id',
 		'fields' => 'ids'
 	);
+	return $collab_args;
+}
+
+function exchange_attach_participant_to_collab( $participant ) {
+	$results = '';
+	$cid = get_field('collaboration_id', $participant->ID);
+	// Set as metavalue.
+	$collab_args = exchange_get_collab_args();
+	$collab_args['meta_value'] = $cid;
+	// Create new query with this metavalue.
+	$collab_query = new WP_Query($collab_args);
+	// Result is collab_post_id.
+	$collab = $collab_query->posts[0];
+	// Get relationship data from collab post.
+	$party = get_field('participants',$collab->ID,false);
+	// Skip to next participant if collaboration already has this participant ID.
+	if ( in_array( $participant->ID, $party ) ) {
+		$results .= $participant->name . ' already added.<br />';
+		continue;
+	}
+	if ( ! empty( $party ) ) {
+		array_push( $party, $participant->ID );
+	} else {
+		$party[0] = $participant->ID;
+	}
+	update_field( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['ACF']['fields']['collaboration-participants'], $party, $collab->ID );
+	$results .= $participant->name . ' added to ' . $collab->title . '.<br />';
+}
+
+function exchange_importer() {
+	$args = array(
+		'post_type' => 'participant',
+		'posts_per_page' => -1,
+		'post_status' => 'draft'
+	);
 	$query = new WP_Query($args);
 	// Find all participants.
 	$participants = $query->posts;
-	if( !empty( $participants ) ) {
+	if( ! empty( $participants ) ) {
 		foreach($participants as $participant) {
 			// Lookup collab ID.
-			$cid = get_field('collaboration_id', $participant->ID);
-			// Set as metavalue.
-			$collab_args['meta_value'] = $cid;
-			// Create new query with this metavalue.
-			$collab_query = new WP_Query($collab_args);
-			// Result is collab_post_id.
-			$collab = $collab_query->posts[0];
-			// Get relationship data from collab post.
-			$party = get_field('participants',$collab,false);
-			// Skip to next participant if collaboration already has this participant ID.
-			if ( in_array( $participant->ID, $party ) ) {
-				continue;
-			}
-			if ( ! empty( $party ) ) {
-				array_push( $party, $participant->ID );
-			} else {
-				$party[0] = $participant->ID;
-			}
-			update_field( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['ACF']['fields']['collaboration-participants'], $party, $collab );
-			$result['collab_post_id: '.$collab]['participants1'] = get_field('participants',$collab,false);
-			$result['collab_post_id: '.$collab]['title'] = get_the_title($collab);
-			$result['collab_post_id: '.$collab]['collab_id'] = $cid;
-			$result['collab_post_id: '.$collab]['participants2'] = $party;
+			$result = exchange_attach_participant_to_collab( $participant );
 		}
-	}
-	else {
-		$result[0] = "No participants found";
+	} else {
+		$result = "No participants found";
 	}
 	return $result;
 }
