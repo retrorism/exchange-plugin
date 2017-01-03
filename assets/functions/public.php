@@ -343,7 +343,7 @@ function exchange_get_share_description() {
 				break;
 		}
 		if ( isset( $description ) && ! empty( $description ) ) {
-			echo esc_attr( $description );
+			echo esc_attr( wp_strip_all_tags( $description ) );
 		}
 	}
 }
