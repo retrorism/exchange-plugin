@@ -17,7 +17,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	header( 'HTTP/1.1 403 Forbidden' );
 };
 
-
 function exchange_hex_to_slug( $hex ) {
 	$color_array = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS'];
 	$clean_hex = str_replace( '#','',strtolower( $hex ) );

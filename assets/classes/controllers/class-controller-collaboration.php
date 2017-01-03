@@ -183,7 +183,7 @@ class CollaborationController extends BaseController {
 	 *
 	 * @return void.
 	 */
-	protected function set_participants() {
+	public function set_participants() {
 		$acf_participants = get_post_meta($this->container->post_id, 'participants', true );
 		if ( empty( $acf_participants ) ) {
 			return;
