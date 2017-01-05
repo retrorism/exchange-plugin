@@ -393,7 +393,8 @@ class BaseController {
 			foreach ( $unique_ids as $img_id ) {
 				if ( function_exists( 'acf_get_attachment' ) ) {
 					$img_arr = acf_get_attachment( $img_id );
-					if ( ! empty( $img_arr ) ) {
+					// Check if it is an image mimetype
+					if ( ! empty( $img_arr ) && strpos( $img_arr['mime_type'],'image' ) ) {
 						$unique_arrs[] = $img_arr;
 					}
 				}

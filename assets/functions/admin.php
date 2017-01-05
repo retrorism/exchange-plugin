@@ -164,7 +164,8 @@ function exchange_story_form_entry_meta_box( $post ) {
 		} else {
 			$output .= $form_entry_id;
 		}
-		$ouput .= '</div>';
+		$output .= '</div>';
 	}
 	echo $output;
+
 }

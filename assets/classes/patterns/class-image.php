@@ -347,7 +347,7 @@ class Image extends BasePattern {
 			if ( ! isset( $this->modifiers['style'] ) || $this->modifiers['style'] !== 'tridem_or_more' ) {
 				$mlarge = $this->get_src_set_part( 'medium-large-square', $src_sets );
 			} else {
-				$mlarge = $large;
+				$mlarge = $wide;
 			}
 		}
 		switch ( $this->context ) {
@@ -366,6 +366,8 @@ class Image extends BasePattern {
 				$order = array( $mlarge );
 				break;
 			case 'griditem' :
+				$order = array( $medium );
+				break;
 			case 'section' :
 			default :
 				// Add full size if the ratio is severe pano or severe portrait.
@@ -402,7 +404,7 @@ class Image extends BasePattern {
 			$w = $this->input['width'];
 			// Get orientation and validate with actual height and width.
 			if ( is_int( $h ) && is_int( $w ) ) {
-				$this->set_image_orientation( $w, $h );
+				$this->set_image_orientation();
 				$this->set_image_quality( $w, $h );
 				$this->set_image_ratio( $w, $h );
 			}
@@ -436,16 +438,18 @@ class Image extends BasePattern {
 		$lazy_style = '';
 		$placeholder = '';
 		$ratio_perc = round( ( $this->ratio * 100 ), 3 );
-
 		if ( ! empty( $ratio_perc ) ) {
-			$lazy_style = ' style="position:relative;height:0;padding-bottom:' . $ratio_perc . '%;"';
+			$padding = 'story__header' === $this->context ? '40%' : $ratio_perc . '%';
+			$height = 'story__header' === $this->context ? 'height: 0; max-height:60vh;' : 'height: 0;';
+			$lazy_style = ' style="position:relative;' . $height .'padding-bottom:' . $padding . ';"';
 		}
 		if ( $this->lazy ) {
 			$placeholder .= '<div class="image__placeholder"' . $lazy_style . '>';
 		}
 		$placeholder .= $this->build_image_element();
+		$placeholder_thumb_size = 'landscape' === $this->orientation ? 'placeholder' : 'placeholder-' . $this->orientation;
 		if ( $this->lazy ) {
-			$placeholder .= '<img class="image__placeholder__thumb" src=' . $this->input['sizes']['placeholder'] . ' />';
+			$placeholder .= '<img class="image__placeholder__thumb" src=' . $this->input['sizes'][$placeholder_thumb_size] . ' />';
 			$placeholder .= '</div>';
 		}
 
@@ -588,10 +592,13 @@ class Image extends BasePattern {
 	 * @param int $h Image height.
 	 * @TODO resolve difference between user input and actual size.
 	 **/
-	protected function set_image_orientation( $w, $h ) {
-		// Defaults to landscape if 'portrait' is not explicitly set.
+	protected function set_image_orientation() {
+		// Defaults to landscape if 'portrait' is not explicitly set or ratio => 1
 		if ( isset( $this->modifiers['orientation'] ) ) {
 			$this->orientation = $this->modifiers['orientation'];
+		} elseif ( in_array( $this->context, array('contactblock','collaboration__header'), true )
+			&& ( ! isset( $this->modifiers['style'] ) || 'tridem_or_more' !== $this->modifiers['style'] ) ) {
+			$this->orientation = 'square';
 		}
 	}
 
@@ -642,11 +649,11 @@ class Image extends BasePattern {
 				case 'collaboration__header':
 					$this->ratio = 1;
 					if ( isset( $this->modifiers['style'] ) && $this->modifiers['style'] === 'tridem_or_more' ) {
-						$this->ratio = 0.5;
+						$this->ratio = 0.667;
 					}
 					break;
 				case 'griditem':
-					$this->ratio = 0.75;
+					$this->ratio = 0.667;
 					break;
 				case 'section':
 				case 'imageduo':

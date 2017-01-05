@@ -525,7 +525,7 @@ abstract class BasePattern {
 					$image_mods['data'] = array_merge( $image_mods['data'], $focus_points );
 					$image_mods['classes'] = array('focus');
 				}
-				if ( 'portrait' === $input['image_orientation']  ) {
+				if ( isset( $input['image_orientation'] ) && 'portrait' === $input['image_orientation']  ) {
 					$image_mods['orientation'] = 'portrait';
 				}
 				if ( ! empty( $input['image'] ) ) {
