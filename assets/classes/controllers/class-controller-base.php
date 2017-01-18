@@ -542,7 +542,7 @@ class BaseController {
 	 *
 	 * @TODO Expand selection options.
 	 **/
-	public function get_tag_short_list() {
+	public function get_tag_short_list( $max ) {
 		$tag_list = $this->container->ordered_tag_list;
 		if ( empty( $tag_list ) ) {
 			return;
@@ -550,7 +550,7 @@ class BaseController {
 		$shortlist = array();
 		$tag_number = count( $tag_list );
 		$i = 0;
-		while ( $i < $tag_number && count( $shortlist ) < $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['grid_tax_max'] ) {
+		while ( $i < $tag_number && count( $shortlist ) < $max ) {
 			$term = $tag_list[$i];
 			if ( $term instanceof WP_Term ) {
 				$shortlist[] = $term;

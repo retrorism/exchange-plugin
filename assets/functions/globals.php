@@ -84,6 +84,7 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 			'display_priority_collaboration' => array( 'topic','location','discipline','methodology','project_output' ),
 			// Maximum number of tags on grid items
 			'grid_tax_max' => 2,
+			'collaboration_tax_max' => 20,
 		),
 		'PATTERNS' => array(
 			'map_max-collaboration-count' => 20,

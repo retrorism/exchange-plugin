@@ -194,7 +194,7 @@ class Image extends BasePattern {
 				if ( isset( $this->modifiers['style'] ) && 'tridem_or_more' === $this->modifiers['style'] ) {
 					$style = $this->modifiers['style'];
 				}
-				$el['open'] = '<div class="collaboration__header__image-wrapper ' . $style . '" data-equalizer-watch>';
+				$el['open'] = '<div class="collaboration__header__image-wrapper ' . $style . '">';
 				$el['close'] = '</div>';
 				break;
 			case 'gallery':
@@ -366,7 +366,7 @@ class Image extends BasePattern {
 				$order = array( $mlarge );
 				break;
 			case 'griditem' :
-				$order = array( $medium );
+				$order = array( $medium, $mlarge, $large );
 				break;
 			case 'section' :
 			default :

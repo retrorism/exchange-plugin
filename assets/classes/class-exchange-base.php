@@ -390,7 +390,9 @@ class Exchange {
 		if ( $this->has_tags ) {
 			$output = "<ol>" . PHP_EOL;
 			if ( 'griditem' === $context ) {
-			 	$list = $this->controller->get_tag_short_list();
+			 	$list = $this->controller->get_tag_short_list( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['grid_tax_max'] );
+			} elseif ( 'collaboration' === $context ) {
+			 	$list = $this->controller->get_tag_short_list( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['collaboration_tax_max'] );
 			} else {
 				$list = $this->ordered_tag_list;
 			}
