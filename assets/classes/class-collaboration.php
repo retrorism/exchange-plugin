@@ -219,14 +219,22 @@ class Collaboration extends Exchange {
 		}
 	}
 
+	/**
+	 * Publish collaboration video
+	 *
+	 * @param string context Context
+	 * @return void if no videos are found
+	 */
 	public function publish_collab_video( $context = '' ) {
-		if ( $this->has_video ) {
-			// Clone first video item for embedding in the collaboration grid
-			$item = clone $this->video;
-			if ( $item instanceof Video ) {
-				$griditem = new GridItem( $item, 'collaboration' );
-				$griditem->publish();
-			}
+		if ( ! $this->has_video ) {
+			return;
+		}
+		// Clone first video item for embedding in the collaboration grid
+
+		$item = clone $this->video[0];
+		if ( $item instanceof Video ) {
+			$griditem = new GridItem( $item, 'collaboration' );
+			$griditem->publish();
 		}
 	}
 

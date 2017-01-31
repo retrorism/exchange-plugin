@@ -193,13 +193,13 @@ class Exchange {
 	public $sections = array();
 
 	/**
-	 * Video for publishing
+	 * Array of videos for publishing
 	 *
 	 * @since 0.1.0
 	 * @access public
-	 * @var object $video
+	 * @var array $video
 	 */
-	public $video;
+	public $video = array();
 
 	/**
 	 * Video check.
@@ -323,7 +323,10 @@ class Exchange {
 				$output .= $img_string;
 			}
 			if ( $this->has_video ) {
-				$output .= $this->video->embed('gallery');
+				var_dump( $this->video );
+				foreach( $this->video as $video ) {
+					$output .= $video->embed('gallery');
+				}
 			}
 			$output .= '</ul>';
 		}

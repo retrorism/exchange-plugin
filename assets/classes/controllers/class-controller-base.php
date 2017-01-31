@@ -102,7 +102,6 @@ class BaseController {
 		}
 		$type = self::is_correct_content_type( $post_id_or_object, $check_for_type );
 		if ( empty( $type ) ) {
-			//throw new Exception( __( 'The factory disagrees: type = ' ) . $type );
 			return;
 		}
 		$args = array( $post_id_or_object, $context );
@@ -324,6 +323,40 @@ class BaseController {
 		return $input;
 	}
 
+	protected function get_videos_from_query() {
+		global $wpdb;
+		$rows = $wpdb->get_results( $wpdb->prepare(
+			"
+			SELECT *
+			FROM {$wpdb->prefix}postmeta
+			WHERE post_id = %s
+				AND ( meta_key LIKE %s )
+			",
+			$this->container->post_id,
+			'sections_%_story_elements_%_video_embed_code'
+		));
+		if ( ! $rows ) {
+			return;
+		}
+		// Empty array for storing image ids.
+		$srcs = array();
+
+		// Iterate over rows
+		foreach( $rows as $row ) {
+			if ( empty( $row->meta_value ) ) {
+				continue;
+			}
+			$srcs[] = $row->meta_value;
+		}
+		if ( ! count( $srcs ) ) {
+			return;
+		}
+
+		// Filter srcs and sort by key
+		$unique_srcs = array_unique( $srcs );
+		return $unique_srcs;
+	}
+
 	protected function get_gallery_from_query() {
 		global $wpdb;
 		$rows = $wpdb->get_results( $wpdb->prepare(
@@ -379,12 +412,13 @@ class BaseController {
 	}
 
 	protected function set_gallery() {
-		if ( $this->container->has_gallery ) {
+		// Return if gallery already set.
+		if ( $this->container->has_gallery ) {			
 			return;
 		}
 		$unique_arrs = $this->get_gallery_from_acf();
 		if ( empty( $unique_arrs ) && 'story' === $this->container->type ) {
-		// Start over with a new gallery array to be filled with a query.
+			// Start over with a new gallery array to be filled with a query.
 			$unique_arrs = array();
 			$unique_ids = $this->get_gallery_from_query();
 			if ( empty( $unique_ids ) ) {
@@ -394,7 +428,7 @@ class BaseController {
 				if ( function_exists( 'acf_get_attachment' ) ) {
 					$img_arr = acf_get_attachment( $img_id );
 					// Check if it is an image mimetype
-					if ( ! empty( $img_arr ) && strpos( $img_arr['mime_type'],'image' ) ) {
+					if ( ! empty( $img_arr ) && strpos( $img_arr['mime_type'],'image' ) !== false ) {
 						$unique_arrs[] = $img_arr;
 					}
 				}
@@ -402,23 +436,39 @@ class BaseController {
 		}
 		$gallery = $this->prepare_gallery_images( $unique_arrs );
 		if ( empty( $gallery ) ) {
+			// Flag has_gallery as true when there's a video.
 			if ( $this->container->has_video ) {
 				$this->container->has_gallery = true;
 			}
-		} else {
+		} else {			
 			$this->container->gallery = $gallery;
 			$this->container->has_gallery = true;
 		}
 	}
 
 	protected function set_video() {
-		$input = $this->get_video_from_acf();
-		if ( empty( $input ) ) {
+		$video_src = $this->get_video_from_acf();
+		if ( empty( $video_src ) ) {		
 			return;
 		}
+		$input['video_embed_code'] = $video_src;
 		$video_obj = new Video( $input );
 		if ( $video_obj instanceof Video ) {
-			$this->container->video = $video_obj;
+			$this->container->video[0] = $video_obj;
+			$this->container->has_video = true;
+		}		
+	}
+
+	protected function set_videos() {
+		$videos = $this->get_videos_from_query();
+		foreach ( $videos as $video ) {
+			$input['video_embed_code'] = $video;
+			$video_obj = new Video( $input );
+			if ( $video_obj instanceof Video ) {
+				$this->container->video[] = $video_obj;
+			}
+		}
+		if ( ! empty( $this->container->video ) ) {
 			$this->container->has_video = true;
 		}
 	}

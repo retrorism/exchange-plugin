@@ -253,26 +253,62 @@ function exchange_iterate_filter( $input, $post_id, $indices, $last_iter = '', $
     foreach ( $input as $key => $val ) {
 		if ( is_array( $val ) ) {
 			$el_type = '_';
-			// Let's find out in what kind of array we are currently.
-			if ( 'field_56cf1e8d69ac5' === $key ) {
-				$last_iter = 'section_index';
-				// Depth 1: field_56cf1e8d69ac5 = section
-			} elseif ( 'field_57ad96b367287' === $key ) {
-				// Depth 2: field_57ad96b367287 = content
-				$last_iter = 'content_index';
-			} elseif ( 'field_57ad96b367288' === $key ) {
-				// Depth 3: field_57ad96b367288 = story_elements
-				$last_iter = 'element_index';
-				$last_iter_type = 'story_elements';
-			} elseif ( 'field_574c142388c64' === $key ) {
-				// Depth 3: field_57ad98f1884a4 = grid_elements
-				// Depth 4 = interviews, emphasisblocks, etc.
-				$last_iter = 'element_index';
-				$last_iter_type = 'select_grid_items';
-			} elseif ( is_int( $key ) ) {
-				$indices[ $last_iter ] = $key;
+			// // Let's find out in what kind of array we are currently.
+			// if ( 'field_56cf1e8d69ac5' === $key ) {
+			// 	$last_iter = 'section_index';
+			// 	// Depth 1: field_56cf1e8d69ac5 = section
+			// } elseif ( 'field_57ad96b367287' === $key ) {
+			// 	// Depth 2: field_57ad96b367287 = content
+			// 	$last_iter = 'content_index';
+			// } elseif ( 'field_57ad96b367288' === $key ) {
+			// 	// Depth 3: field_57ad96b367288 = story_elements
+			// 	$last_iter = 'element_index';
+			// 	$last_iter_type = 'story_elements';
+			// } elseif ( 'field_574c142388c64' === $key ) {
+			// 	// Depth 3: field_57ad98f1884a4 = grid_elements
+			// 	// Depth 4 = interviews, emphasisblocks, etc.
+			// 	$last_iter = 'element_index';
+			// 	$last_iter_type = 'select_grid_items';
+			// } elseif ( is_int( $key ) ) {
+			// 	$indices[ $last_iter ] = $key;
+			// }
+			switch ( $key ) {
+				case 'field_56cf1e8d69ac5':
+					// Depth 1: field_56cf1e8d69ac5 = section
+					$last_iter = 'section_index';
+					break;
+				case 'field_57ad96b367287':
+					// Depth 2: field_57ad96b367287 = content
+					$last_iter = 'content_index';
+					break;
+				case 'field_57ad96b367288':
+					// Depth 3: field_57ad96b367288 = story_elements
+					$last_iter = 'element_index';
+					$last_iter_type = 'story_elements';
+					break;
+				case 'field_574c142388c64':
+					// Depth 3: field_57ad98f1884a4 = grid_elements
+					$last_iter = 'element_index';
+					$last_iter_type = 'select_grid_items';
+					break;
+				case 'field_57bc1dd2a85d6':
+					// Depth 4 = interviews, emphasisblocks, documentblocks, etc.
+					$last_iter = 'subelement_index';
+					$last_iter_type = 'story_elements';
+					$last_sub_iter_type = 'add_file';
+					break;
+				case 'field_574c14b088c69':
+					// Depth 4 = interviews, emphasisblocks, documentblocks, etc.
+					$last_iter = 'subelement_index';
+					$last_sub_iter_type = 'emphasis_block';
+					$last_iter_type = 'story_elements';
+					break;
+				default:
+					if ( is_int( $key ) ) {
+						$indices[ $last_iter ] = $key;
+					}	
+					break;
 			}
-
 			$input[ $key ] = exchange_iterate_filter( $val, $post_id, $indices, $last_iter, $last_iter_type );
 		}
 

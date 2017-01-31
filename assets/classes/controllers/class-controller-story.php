@@ -155,7 +155,7 @@ class StoryController extends BaseController {
 		} else {
 			$this->set_custom_byline();
 		}
-
+		$this->set_videos();
 		$this->set_gallery();
 	}
 
