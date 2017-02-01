@@ -357,6 +357,7 @@ class Image extends BasePattern {
 				//$sizes = '(min-width: 60em) 80vw, 100vw';
 				break;
 			case 'story__header':
+			case 'featuredgriditem' :
 				$order = array( $medium, $mlarge, $large, $wide );
 				break;
 			case 'contactblock' :
@@ -439,7 +440,7 @@ class Image extends BasePattern {
 		$placeholder = '';
 		$ratio_perc = round( ( $this->ratio * 100 ), 3 );
 		if ( ! empty( $ratio_perc ) ) {
-			$padding = 'story__header' === $this->context ? '40%' : $ratio_perc . '%';
+			$padding = 'story__header' === $this->context || 'featuredgriditem' === $this->context ? '40%' : $ratio_perc . '%';
 			$height = 'story__header' === $this->context ? 'height: 0; max-height:60vh;' : 'height: 0;';
 			$lazy_style = ' style="position:relative;' . $height .'padding-bottom:' . $padding . ';"';
 		}
