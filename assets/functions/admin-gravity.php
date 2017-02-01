@@ -89,7 +89,7 @@
 		}
 		$pr_token_from_cid = $programme_round_obj->controller->get_programme_round_token();
 
-		if ( empty( $collaboration_obj->participants || $pr_token_from_cid !== $pr_reference ) ) {
+		if ( empty( $collaboration_obj->participants ) || $pr_token_from_cid !== $pr_reference ) {
 			return $form;
 		}
 
