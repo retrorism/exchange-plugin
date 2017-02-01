@@ -9,7 +9,7 @@
  * @package Exchange Plugin
  **/
 
-add_filter('relevanssi_content_to_index', 'exchange_relevanssi_add_extra_content', 10, 2);
+//add_filter('relevanssi_content_to_index', 'exchange_relevanssi_add_extra_content', 10, 2);
 function exchange_relevanssi_add_extra_content($content, $post) {
 	if ( $post->post_status !== 'publish' ) {
 		return $content;
