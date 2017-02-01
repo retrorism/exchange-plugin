@@ -70,7 +70,8 @@ function exchange_retrieve_and_store_pr_tokens() {
 
 function exchange_token_form_callback() {
 	$results = '';
-	if ( empty( check_ajax_referer( 'exchange-token-form-nonce', 'security', false ) ) ) {
+	$ajax_check = check_ajax_referer( 'exchange-token-form-nonce', 'security', false );
+	if ( empty( $ajax_check ) ) {
 		echo '<div class="loader-pointer section__helper">' . __( 'Whoa... where did YOU come from?', EXCHANGE_PLUGIN ) . '</div>';
 		wp_die();
 	}
