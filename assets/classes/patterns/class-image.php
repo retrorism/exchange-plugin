@@ -434,6 +434,7 @@ class Image extends BasePattern {
 	 * @since 0.1.0
 	 *
 	 * @return string $img HTML image element.
+	 * @todo remove styling from html altogether
 	 **/
 	protected function build_image_placeholder() {
 		$lazy_style = '';
