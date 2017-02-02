@@ -195,7 +195,7 @@ class BaseController {
 				$image_mods['classes'] = array('focus');
 			}
 			if ( $this->container->type === 'collaboration' ) {
-				if ( $this->container->has_participants && count( $this->container->participants ) > 2 || $this->container->description_length > 100 ) {
+				if ( $this->container->has_participants && count( $this->container->participants ) > 2 ) {
 					$image_mods['style'] = 'tridem_or_more';
 				}
 			}
