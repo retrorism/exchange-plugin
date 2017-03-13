@@ -268,18 +268,12 @@ class CollaborationController extends BaseController {
 	}
 
 	protected function set_related_content() {
-		$post_id = $this->container->post_id;
-		if ( get_post_meta(  $post_id, 'related_content_auto_select', $post_id, true ) ) {
-			$related_content = $this->get_related_grid_content_by_tags();
-		} else {
-			$related_content = get_post_meta( 'related_content', $post_id, true );
-		}
+		$related_content = $this->get_related_grid_content_by_tags();
 		if ( is_array( $related_content ) && count( $related_content ) > 0 ) {
 			$this->container->has_related_content = true;
 			$this->set_related_grid_content( $related_content );
 		}
 	}
-
 
 	protected function set_tag_from_programme_round() {
 		$slug = $this->container->programme_round->term;
