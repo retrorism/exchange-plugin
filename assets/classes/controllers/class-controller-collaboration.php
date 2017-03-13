@@ -367,7 +367,7 @@ class CollaborationController extends BaseController {
 			$video = get_field( $this->container->type . '_video_embed_code', $this->container->post_id );
 			$video_caption = get_field( $this->container->type . '_video_caption', $this->container->post_id );
 		}
-		if ( empty( $video ) ) {
+		if ( empty( $video ) || false === strpos( $video, 'iframe' ) ) {
 			return;
 		}
 		$input['video_embed_code'] = $video;
