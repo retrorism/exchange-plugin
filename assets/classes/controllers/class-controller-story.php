@@ -71,6 +71,7 @@ class StoryController extends BaseController {
 	 * @since 0.1.0
 	 * @access public
 	 * @return void;
+	 * @TODO make this ACF-independent (remove get_field)
 	 **/
 	public function map_full_story() {
 
@@ -155,8 +156,9 @@ class StoryController extends BaseController {
 		} else {
 			$this->set_custom_byline();
 		}
-
-		$this->set_gallery();
+ 		//$this->set_videos(); 
+		
+		$this->populate_gallery();
 	}
 
 	/**
@@ -179,7 +181,14 @@ class StoryController extends BaseController {
 		 $this->container->editorial_intro = new EditorialIntro( $intro_input, 'story' );
 	 }
 
-	 // Store sections in Exchange object
+	/**
+	 * Store sections in Exchange object
+	 *
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @return void
+	 **/
  	protected function set_sections( $acf_sections ) {
  		// Loop through sections.
  		foreach( $acf_sections as $s ) {
@@ -188,7 +197,7 @@ class StoryController extends BaseController {
  				$section_mods['type'] = $s['contents']['acf_fc_layout'];
  			}
  			$section = new Section( $s, strtolower( get_class( $this->container ) ), $section_mods );
- 			if ( is_object( $section ) && is_a( $section, 'Section' ) ) {
+ 			if ( $section instanceof Section ) {
  				$this->container->sections[] = $section;
  			}
  		}
@@ -296,6 +305,87 @@ class StoryController extends BaseController {
 		}
 		else {
 			$this->set_byline();
+		}
+	}
+
+	/**
+	 * Iterate over sections to find images to put in the gallery
+	 *
+	 * @since 0.1.0
+	 * @access protected
+	 **/
+	protected function populate_gallery_from_sections() {
+		if ( count( $this->container->gallery ) > 0 ) {
+			return;
+		}
+		if ( $this->container->has_header_image &&
+			$this->container->header_image instanceof Image ) {
+			$header_image = clone $this->container->header_image;
+			$header_image->context = 'gallery';
+			$this->container->gallery[] = $header_image;
+		}
+		foreach( $this->container->sections as $section ) {
+			if ( empty( $section->input )
+				|| empty( $section->input['contents'] ) ) {
+				continue;
+			}
+			foreach ( $section->input['contents'] as $section_item ) {
+				if ( ! empty( $section_item['acf_fc_layout'] )
+					&& 'has_story_elements' === $section_item['acf_fc_layout']
+					&& ! empty( $section_item['story_elements'] ) ) {
+
+					foreach( $section_item['story_elements'] as $story_element ) {
+						if ( ! in_array( $story_element['acf_fc_layout'], array( 'image', 'two_images', 'embedded_video' ), true ) ) {
+							continue;
+						}
+						if ( ! empty( $story_element['two_images'] ) 
+							&& ! empty( $story_element['image_orientation'] ) ) {
+							$orientation_arr = explode( '_', $story_element['image_orientation'] );
+							$i = 0;
+							foreach ( $story_element['two_images'] as $image ) {
+								$image_element = array(
+									'acf_layout' => 'image',
+									'image' => $image,
+									'image_orientation' => $orientation_arr[$i],
+								);
+								$this->add_element_to_gallery( $image_element );
+								$i++;
+							}
+						} elseif ( ! empty( $story_element['image'] ) ) {
+							$this->add_element_to_gallery( $story_element );
+						} elseif ( ! empty( $story_element['video_embed_code'] ) ) {
+							$this->add_element_to_gallery( $story_element, 'embedded_video' );
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get related grid content by tags (stories only)
+	 *
+	 * Take a cat list from an Exchange object and find 3 related posts.
+	 *
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @access protected
+	 * @return array Array of max. three related WP_Post objects or void.
+	 */
+	protected function get_related_grid_content_by_cat() {
+		$cat = $this->container->category;
+		if ( empty( $cat ) ) {
+			return;
+		} else {
+			$args = array(
+				'post_type' => array( 'story' ),
+				'cat' => $cat->slug,
+				'numberposts' => 3, /* you can change this to show more */
+				'post__not_in' => array( $this->container->post_id ),
+			);
+			$related_posts = get_posts( $args );
+			return $related_posts;
 		}
 	}
 

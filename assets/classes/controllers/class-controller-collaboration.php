@@ -107,9 +107,9 @@ class CollaborationController extends BaseController {
 	}
 
 	protected function set_media() {
-		$this->set_video();
-		$this->set_gallery();
+		$this->populate_video_from_uploads();
 		$this->set_collaboration_files();
+		$this->populate_gallery();
 	}
 
 	protected function set_collaboration_files() {
@@ -238,7 +238,6 @@ class CollaborationController extends BaseController {
 			$translated_description = new TranslatedParagraph($input, 'collaboration__description', $desc_mods );
 			$this->container->description = $translated_description;
 
-
 			$this->container->description_length = $length;
 		}
 	}
@@ -269,18 +268,12 @@ class CollaborationController extends BaseController {
 	}
 
 	protected function set_related_content() {
-		$post_id = $this->container->post_id;
-		if ( get_post_meta(  $post_id, 'related_content_auto_select', $post_id, true ) ) {
-			$related_content = $this->get_related_grid_content_by_tags();
-		} else {
-			$related_content = get_post_meta( 'related_content', $post_id, true );
-		}
+		$related_content = $this->get_related_grid_content_by_tags();
 		if ( is_array( $related_content ) && count( $related_content ) > 0 ) {
 			$this->container->has_related_content = true;
 			$this->set_related_grid_content( $related_content );
 		}
 	}
-
 
 	protected function set_tag_from_programme_round() {
 		$slug = $this->container->programme_round->term;
@@ -297,6 +290,121 @@ class CollaborationController extends BaseController {
 		$post_id = $this->container->post_id;
 		$link = get_post_meta( $post_id, 'collaboration_update_form_link', true );
 		$this->container->set_update_form_link( $link );
+	}
+
+	/**
+	 * Set video (for collaborations) to populate gallery with
+	 *
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @access protected
+	 * @return void
+	 * @author Willem Prins | Somtijds
+	 **/
+	protected function populate_video_from_uploads() {
+		$video_input = $this->get_video_from_acf();
+		if ( empty( $video_input ) ) {
+			return;
+		}
+		$video_obj = new Video( $video_input );
+		if ( $video_obj instanceof Video ) {
+			$this->container->video[0] = $video_obj;
+			$this->container->has_video = true;
+		}
+	}
+
+	protected function populate_gallery_from_uploads() {
+		$unique_arrs = $this->get_gallery_from_acf();
+		if ( ! empty( $unique_arrs ) ) {
+			$this->prepare_gallery_images( $unique_arrs );
+		}
+		if ( $this->container->has_video ) {
+			foreach( $this->container->video as $video ) {
+				if ( $video instanceof Video ) {
+					$this->container->gallery[] = clone $video;
+				} 
+			}
+		}
+	}
+
+	protected function get_gallery_from_acf() {
+		$unique_ids = get_post_meta( $this->container->post_id, $this->container->type . '_gallery', true );
+		if ( empty( $unique_ids ) ) {
+			return;
+		}
+		$unique_arrs = array();
+		foreach ( $unique_ids as $img_id ) {
+			if ( function_exists( 'acf_get_attachment' ) ) {
+				$img_arr = acf_get_attachment( $img_id );
+				if ( ! empty( $img_arr ) ) {
+					$unique_arrs[] = $img_arr;
+				}
+			}
+		}
+		return $unique_arrs;
+	}
+
+	 /**
+	 * Get videos to populate gallery.
+	 *
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @access protected
+	 * @return array Input array to create Video object with.
+	 **/
+	protected function get_video_from_acf() {
+		// Set empty array for video properties.
+		$input = array();
+		if ( function_exists( 'get_field' ) ) {
+			$video = get_field( $this->container->type . '_video_embed_code', $this->container->post_id );
+			$video_caption = get_field( $this->container->type . '_video_caption', $this->container->post_id );
+		}
+		if ( empty( $video ) || false === strpos( $video, 'iframe' ) ) {
+			return;
+		}
+		$input['video_embed_code'] = $video;
+		if ( ! empty( $video_caption ) ) {
+			$input['video_caption'] = $video_caption;
+		}
+		return $input;
+	}
+
+	/**
+	 * Prepare gallery images from array of unique image arrays.
+	 *
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @access protected
+	 * @param array $unique_arrs Array with images' properties for each unique image.
+	 * @return array $gallery or void
+	 **/
+	protected function prepare_gallery_images( $unique_arrs ) {
+		if ( empty( $unique_arrs ) ) {
+			return;
+		}
+		$index = 1;
+		foreach ( $unique_arrs as $img_arr ) {
+			$image_mods = array();
+			// Add Image post ID and index to gallery item.
+			$image_mods['data'] = array(
+				'img_id' => $img_arr['ID'],
+			 	'index'  => $index,
+			);
+			$focus_points = exchange_get_focus_points( $img_arr );
+			if ( ! empty( $focus_points ) ) {
+				$image_mods['data'] = array_merge( $image_mods['data'], $focus_points );
+				$image_mods['classes'] = array( 'focus' );
+			}
+			// Add gallery context.
+			$img_obj = new Image( $img_arr, 'gallery', $image_mods );
+			if ( $img_obj instanceof Image ) {
+				$this->container->gallery[] = $img_obj;
+			}
+			$index++;
+		}
 	}
 
 }

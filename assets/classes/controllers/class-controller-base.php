@@ -29,6 +29,8 @@ class BaseController {
 	/**
 	 * Container - reference to the Exchange object that has instantiated this controller.
 	 *
+	 * @since 0.1.0
+	 *
 	 * @access protected
 	 * @var object $container This controller's container.
 	 */
@@ -37,8 +39,9 @@ class BaseController {
 	/**
 	 * Attaches a reference to the instantiating object.
 	 *
+	 * @since 0.1.0
 	 * @access public
-	 * @param object (reference);
+	 * @param Object $object Exchange object to refer to.
 	 * @return void
 	 **/
 	public function set_container( $object ) {
@@ -50,15 +53,17 @@ class BaseController {
 	/**
 	 * Checks the post type against a list of appropriate post types.
 	 *
+	 * @since 0.1.0
+	 *
 	 * Prevents the creation of grid items from non-content post types.
 	 * @access public
-	 * @param WP_Post $post_object WP_Post types passed in function.
-	 * @param string $type Optional. Class name to be checked against.
+	 * @param integer | object $post_id_or_object WP_Post ID or Object.
+	 * @param string           $type Optional. Class name to be checked against.
 	 * @return content type, if the post is right for content creation.
 	 **/
 	public static function is_correct_content_type( $post_id_or_object, $type = null ) {
 		if ( is_numeric( $post_id_or_object ) && intval( $post_id_or_object ) > 0 ) {
-			$post_id_or_object = get_post( intval ( $post_id_or_object ) );
+			$post_id_or_object = get_post( intval( $post_id_or_object ) );
 		}
 		if ( ! is_object( $post_id_or_object ) ) {
 			return;
@@ -76,6 +81,13 @@ class BaseController {
 		}
 	}
 
+	/**
+	 * Return an associated array connecting an Exchange class to each CPT
+	 *
+	 * @since 0.1.0
+	 *
+	 * @access private
+	 **/
 	private static function exchange_types() {
 		return array(
 			'story'           => 'story',
@@ -89,20 +101,22 @@ class BaseController {
 	/**
 	 * Returns an Exchange class object based upon post type.
 	 *
+	 * @since 0.1.0
+	 *
 	 * @access public
 	 * @param WP_Post $post_id_or_object WP_Post types / IDs passed in function.
-	 * @param string $context Optional. Context in which the object will be instantiated.
+	 * @param string  $context Optional. Context in which the object will be instantiated.
+	 * @param string  $check_for_type Exchange type to match before creating an object.
 	 **/
 	public static function exchange_factory( $post_id_or_object, $context = '', $check_for_type = null ) {
 		if ( empty( $post_id_or_object ) ) {
 			return;
 		}
 		if ( is_numeric( $post_id_or_object ) && intval( $post_id_or_object ) > 0 ) {
-			$post_id_or_object = get_post( intval ( $post_id_or_object ) );
+			$post_id_or_object = get_post( intval( $post_id_or_object ) );
 		}
 		$type = self::is_correct_content_type( $post_id_or_object, $check_for_type );
 		if ( empty( $type ) ) {
-			//throw new Exception( __( 'The factory disagrees: type = ' ) . $type );
 			return;
 		}
 		$args = array( $post_id_or_object, $context );
@@ -125,16 +139,17 @@ class BaseController {
 	 * can be mapped directly depend on the WP_Post.
 	 *
 	 * @since 0.1.0
-	 * @access protected
-	 * @param object $exchange Exchange content object;
-	 * @param object $post WP_post object to be mapped;
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @access public
+	 * @param object  $exchange Exchange content object.
+	 * @param WP_Post $post WP_post object to be mapped.
 	 **/
 	public function map_basics( $exchange, $post ) {
-		// Check if the post and the newly created CPT object are of the same type
+		// Check if the post and the newly created CPT object are of the same type.
 		$class_lower = strtolower( get_class( $exchange ) );
 		if ( empty( self::is_correct_content_type( $post, $class_lower ) ) ) {
 			unset( $exchange );
-			//throw new Exception( 'This is not a valid post' );
 			return;
 		}
 
@@ -152,13 +167,14 @@ class BaseController {
 		// Set post_type.
 		$exchange->type = $post->post_type;
 
+		// Set programme round for collaborations.
 		if ( 'collaboration' === $exchange->type && $post->post_parent >= 1 ) {
 			$exchange->controller->set_programme_round( $post->post_parent );
 		}
 
+		// Set slug for programme rounds.
 		if ( 'programme_round' === $exchange->type ) {
 			 $slug = sanitize_title( $exchange->title );
-			 //$exchange->term = get_term_by( 'slug', $slug, 'post_tag' ) ? $slug : null;
 			 $exchange->term = $slug;
 		}
 
@@ -167,10 +183,32 @@ class BaseController {
 
 	}
 
+	/**
+	 * Retrieve value for header image source ( use_featured_image / upload_new_image / none )
+	 *
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @access protected
+	 * @return string containing header image source
+	 * @todo Use taxonomy instead of post_met
+	 **/
 	protected function get_header_image_source() {
 		return get_post_meta( 'header_image', $this->container->post_id, true );
 	}
 
+	/**
+	 * Retrieve header image object from DB
+	 *
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @access protected
+	 * @param string $context Context for the header image.
+	 * @return Image object or void
+	 *
+	 * @todo remove ACF dependency
+	 */
 	protected function get_header_image( $context ) {
 		switch ( $this->get_header_image_source( $context ) ) {
 			case 'upload_new_image':
@@ -188,13 +226,17 @@ class BaseController {
 				break;
 		}
 		if ( isset( $thumb ) ) {
+			$image_mods = array(
+				'data' => array( 
+					'img_id' => $thumb['id'],
+				)
+			);
 			$focus_points = exchange_get_focus_points( $thumb );
-			$image_mods = array();
 			if ( ! empty( $focus_points ) ) {
-				$image_mods['data'] = $focus_points;
-				$image_mods['classes'] = array('focus');
+				$image_mods['data'] = array_merge( $image_mods['data'], $focus_points );
+				$image_mods['classes'] = array( 'focus' );
 			}
-			if ( $this->container->type === 'collaboration' ) {
+			if ( 'collaboration' === $this->container->type ) {
 				if ( $this->container->has_participants && count( $this->container->participants ) > 2 ) {
 					$image_mods['style'] = 'tridem_or_more';
 				}
@@ -204,26 +246,31 @@ class BaseController {
 	}
 
 	/**
-	 * Attaches header image to story or collab
+	 * Attaches header image to story or collaboration
 	 *
-	 * @param string $acf_header_image Advanced Custom Fields Header selection option
-	 * @param integer $post_id.
-	 * @return HeaderImage object or null
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @access protected
+	 * @param string $context Context for the header image.
 	 */
 	protected function set_header_image( $context = '' ) {
 		$image = $this->get_header_image( $context );
-		if ( is_object( $image ) && is_a($image, 'Image') ) {
+		if ( $image instanceof Image ) {
 			$this->container->header_image = $image;
 			$this->container->has_header_image = true;
 		}
 	}
 
-
 	/**
 	 * Retrieves featured image to story (for example for use in grid views).
 	 *
-	 * @param integer $post_id.
-	 * @return null or Image object;
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @access protected
+	 * @param string $context Context for the featured image.
+	 * @return null or Image object.
 	 **/
 	protected function get_featured_image( $context ) {
 		$thumb_props = $this->get_featured_image_props();
@@ -231,13 +278,23 @@ class BaseController {
 		$image_mods = array();
 		if ( ! empty( $focus_points ) ) {
 			$image_mods['data'] = $focus_points;
-			$image_mods['classes'] = array('focus');
+			$image_mods['classes'] = array( 'focus' );
 		}
 		if ( ! empty( $thumb_props ) ) {
 			return new Image( $thumb_props, $context, $image_mods );
 		}
 	}
 
+	/**
+	 * Retrieves featured image properties.
+	 *
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @access protected
+	 * @return array of properties for featured image or for the fallback image.
+	 * @todo remove ACF dependency
+	 **/
 	protected function get_featured_image_props() {
 		$post_id = $this->container->post_id;
 		$thumb_id = get_post_thumbnail_id( $post_id );
@@ -252,12 +309,13 @@ class BaseController {
 	}
 
 	/**
-	 * Attaches featured image to content for use in grids.
+	 * Attaches featured image to content for use in grids
 	 *
-	 * @param string $acf_header_image Advanced Custom Fields Header selection option
-	 * @param object $exchange Content type to attach featured image to.
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
 	 *
-	 * @return void.
+	 * @access public
+	 * @param string $context for the featured image.
 	 **/
 	public function set_featured_image( $context = '' ) {
 		$image = $this->get_featured_image( $context );
@@ -267,197 +325,49 @@ class BaseController {
 		}
 	}
 
-	protected function get_gallery_from_attachments() {
-		$attachments = get_attached_media( 'image', $this->container->post_id );
-		if ( ! count( $attachments ) ) {
-			return;
+	/**
+	 * Retrieves images and videos to populate the gallery modal
+	 **/
+	protected function populate_gallery() {
+		if ( 'collaboration' === $this->container->type ) {
+			$this->populate_gallery_from_uploads();
+		} elseif ( 'story' === $this->container->type ) {
+			$this->populate_gallery_from_sections();
 		}
-		// Empty array to store Image objects;
-		$gallery = array();
-		foreach( $attachments as $attachment ) {
-			$img_array = acf_get_attachment( $attachment );
-			$image_mods = array();
-			$focus_points = exchange_get_focus_points( $img_array );
-			if ( ! empty( $focus_points ) ) {
-				$image_mods['data'] = $focus_points;
-				$image_mods['classes'] = array('focus');
-			}
-			$img_obj = new Image( $img_array, 'gallery', $image_mods );
-			if ( is_object( $img_obj ) && is_a( $img_obj, 'Image') ) {
-				$gallery[] = $img_obj;
-			}
-		}
-		return $gallery;
-	}
-
-	protected function get_gallery_from_acf() {
-		$unique_ids = get_post_meta( $this->container->post_id, $this->container->type . '_gallery', true );
-		if ( empty( $unique_ids ) ) {
-			return;
-		}
-		$unique_arrs = array();
-		foreach ( $unique_ids as $img_id ) {
-			if ( function_exists( 'acf_get_attachment' ) ) {
-				$img_arr = acf_get_attachment( $img_id );
-				if ( ! empty( $img_arr ) ) {
-					$unique_arrs[] = $img_arr;
-				}
-			}
-		}
-		return $unique_arrs;
-	}
-
-	protected function get_video_from_acf() {
-		// Set empty array for video properties
-		$input = array();
-		if ( function_exists( 'get_field' ) ) {
-			$video = get_field( $this->container->type . '_video_embed_code', $this->container->post_id );
-			$video_caption = get_field( $this->container->type . '_video_caption', $this->container->post_id );
-		}
-		if ( empty( $video ) ) {
-			return;
-		}
-		$input['video_embed_code'] = $video;
-		if ( ! empty( $video_caption ) ) {
-			$input['video_caption'] = $video_caption;
-		}
-		return $input;
-	}
-
-	protected function get_gallery_from_query() {
-		global $wpdb;
-		$rows = $wpdb->get_results( $wpdb->prepare(
-			"
-			SELECT *
-			FROM {$wpdb->prefix}postmeta
-			WHERE post_id = %s
-				AND ( meta_key LIKE %s OR meta_key LIKE %s OR meta_key LIKE %s OR meta_key LIKE %s )
-			",
-			$this->container->post_id,
-			'sections_%_story_elements_%_two_images',
-			'sections_%_story_elements_%_image',
-			'upload_header_image',
-			'_thumbnail_id'
-		));
-		if ( ! $rows ) {
-			return;
-		}
-		// Empty array for storing image ids.
-		$ids = array();
-
-		// Iterate over rows
-		foreach( $rows as $row ) {
-			$image_id = $row->meta_value;
-			$key = preg_replace( '/_(\d)_image/i', '_0${1}_image', $row->meta_key );
-			if ( empty( $image_id ) ) {
-				continue;
-			}
-			// Single IDs
-			if ( is_numeric( $image_id ) ) {
-				$ids[$key] = intval( $image_id );
-			} elseif ( is_string( $image_id ) ) {
-				$ids_array = unserialize( $image_id );
-				// Move to next row if this is not a serialized array;
-				if ( !is_array( $ids_array ) || ! count( $ids_array) ) {
-					continue;
-				}
-				foreach( $ids_array as $id ) {
-					if ( is_numeric( $id ) ) {
-						$ids[$key] = intval( $id );
-					}
-				}
-			}
-		}
-		if ( ! count( $ids ) ) {
-			return;
-		}
-
-		// Filter IDs and sort by key
-		$unique_ids = array_unique( $ids );
-		ksort( $unique_ids );
-		return $unique_ids;
-	}
-
-	protected function set_gallery() {
-		if ( $this->container->has_gallery ) {
-			return;
-		}
-		$unique_arrs = $this->get_gallery_from_acf();
-		if ( empty( $unique_arrs ) && 'story' === $this->container->type ) {
-		// Start over with a new gallery array to be filled with a query.
-			$unique_arrs = array();
-			$unique_ids = $this->get_gallery_from_query();
-			if ( empty( $unique_ids ) ) {
-				return;
-			}
-			foreach ( $unique_ids as $img_id ) {
-				if ( function_exists( 'acf_get_attachment' ) ) {
-					$img_arr = acf_get_attachment( $img_id );
-					// Check if it is an image mimetype
-					if ( ! empty( $img_arr ) && strpos( $img_arr['mime_type'],'image' ) ) {
-						$unique_arrs[] = $img_arr;
-					}
-				}
-			}
-		}
-		$gallery = $this->prepare_gallery_images( $unique_arrs );
-		if ( empty( $gallery ) ) {
-			if ( $this->container->has_video ) {
-				$this->container->has_gallery = true;
-			}
-		} else {
-			$this->container->gallery = $gallery;
+		if ( count( $this->container->gallery ) ) {
 			$this->container->has_gallery = true;
 		}
 	}
 
-	protected function set_video() {
-		$input = $this->get_video_from_acf();
-		if ( empty( $input ) ) {
+	/**
+	 * Add element to gallery
+	 *
+	 * @author Willem Prins | Somtijds
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 **/
+	protected function add_element_to_gallery( $element, $type = 'image' ) {
+		if ( empty( $element ) ) {
 			return;
 		}
-		$video_obj = new Video( $input );
-		if ( $video_obj instanceof Video ) {
-			$this->container->video = $video_obj;
-			$this->container->has_video = true;
+		// Return Image object
+		$obj = BasePattern::pattern_factory( $element,$type,'gallery',true );
+
+		if ( $obj instanceof Image || $obj instanceof Video ) {
+			$this->container->gallery[] = $obj;
 		}
 	}
 
-	protected function prepare_gallery_images( $unique_arrs ) {
-		if ( empty( $unique_arrs ) ) {
-			return;
-		}
-		$index = 1;
-		$gallery = array();
-		foreach ( $unique_arrs as $img_arr ) {
-			$image_mods = array();
-			// Add Image post ID and index to gallery item
-			$image_mods['data'] = array(
-				'img_id' => $img_arr['ID'],
-			 	'index'  => $index,
-			);
-			$focus_points = exchange_get_focus_points( $img_arr );
-			if ( ! empty( $focus_points ) ) {
-				$image_mods['data'] = array_merge( $image_mods['data'], $focus_points );
-				$image_mods['classes'] = array('focus');
-			}
-			// Add gallery context
-			$img_obj = new Image( $img_arr, 'gallery', $image_mods );
-			if ( $img_obj instanceof Image ) {
-				$gallery[] = $img_obj;
-			}
-			$index++;
-		}
-		return $gallery;
-	}
-
-	 /**
+	/**
 	 * Sets ordered tag_list
 	 *
 	 * Retrieves WP Term objects and adds them to the Exchange object as a property
 	 *
-	 * @param object $exchange Exchange Content Type
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
 	 *
+	 * @access public
 	 * @return void.
 	 **/
 	protected function get_ordered_tag_list() {
@@ -471,7 +381,7 @@ class BaseController {
 		if ( empty( $ordered_tag_list ) && 'collaboration' === $this->container->type ) {
 			$term_id = $this->set_tag_from_programme_round();
 			if ( is_numeric( $term_id ) ) {
-				$ordered_tag_list[] = get_term( intval( $term_id[0] ), 'post_tag');
+				$ordered_tag_list[] = get_term( intval( $term_id[0] ), 'post_tag' );
 			}
 		}
 		// Empty tax array.
@@ -522,7 +432,10 @@ class BaseController {
 	/**
 	 * Sets ordered tag list
 	 *
-	 * @return void.
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @access public
 	 **/
 	public function set_ordered_tag_list() {
 		$ordered_tag_list = $this->get_ordered_tag_list();
@@ -533,14 +446,16 @@ class BaseController {
 	}
 
 	/**
-	 * Returns short list of tags (no more than 2) for this story.
+	 * Returns short list of tags (no more than 2) for this story
 	 *
 	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
 	 * @access public
+	 * @param int $max Maximum number of tags.
+	 * @return array List of tags.
 	 *
-	 * @return array $shortlist List of tags.
-	 *
-	 * @TODO Expand selection options.
+	 * @todo Expand selection options.
 	 **/
 	public function get_tag_short_list( $max ) {
 		$tag_list = $this->container->ordered_tag_list;
@@ -551,7 +466,7 @@ class BaseController {
 		$tag_number = count( $tag_list );
 		$i = 0;
 		while ( $i < $tag_number && count( $shortlist ) < $max ) {
-			$term = $tag_list[$i];
+			$term = $tag_list[ $i ];
 			if ( $term instanceof WP_Term ) {
 				$shortlist[] = $term;
 			}
@@ -561,12 +476,16 @@ class BaseController {
 	}
 
 	/**
-	 * Gets grid content
+	 * Get grid content
 	 *
-	 * Taking an array of objects this function gets the related grid content
+	 * Taking in an array of objects, this function checks and returns the related grid content.
 	 *
-	 * @param object $exchange Exchange Content Type
-	 * @param array $related_content
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @access protected
+	 * @param array $grid_items List of WP_Posts to be validated.
+	 * @return array|void Array of objects to add to the related grid or void.
 	 **/
 	protected function get_grid_content( $grid_items ) {
 		$content = array();
@@ -587,12 +506,15 @@ class BaseController {
 	}
 
 	/**
-	 * Sets related content grid.
+	 * Set related content grid
 	 *
 	 * Taking an array of objects from ACF field input, this function sets the related content grid object.
 	 *
-	 * @param object $exchange Exchange Content Type
-	 * @param array $related_content
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @access protected
+	 * @param array $related_content Objects that form the related content grid.
 	 **/
 	protected function set_related_grid_content( $related_content ) {
 		$grid_content = $this->get_grid_content( $related_content );
@@ -604,27 +526,29 @@ class BaseController {
 	}
 
 	/**
-	 * undocumented function summary
+	 * Get related grid content by tags
 	 *
-	 * Undocumented function long description
+	 * Take a term list from an Exchange object and find 3 related posts.
 	 *
-	 * @param type var Description
-	 * @return {11:return type}
-	 * @TODO POST_TAGS FOR COLLABORATIONS!!!
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @access protected
+	 * @return array Array of max. three related WP_Post objects.
 	 */
 	protected function get_related_grid_content_by_tags() {
-		if( ! $this->container->has_tags && 'story' === $this->container->type ) {
+		if ( ! $this->container->has_tags && 'story' === $this->container->type ) {
 			$related_posts = $this->get_related_grid_content_by_cat();
 			return $related_posts;
 		} else {
 			$tag_arr = array();
 			$tags = $this->container->ordered_tag_list;
-			foreach( $tags as $tag ) {
+			foreach ( $tags as $tag ) {
 				$tag_arr[] = $tag->term_id;
 			}
 
 			$args = array(
-				'post_type' => array('story','collaboration','programme_round','page'),
+				'post_type' => array( 'story', 'collaboration', 'programme_round', 'page' ),
 				'tag__in' => $tag_arr,
 				'numberposts' => 3, /* you can change this to show more */
 				'post__not_in' => array( $this->container->post_id ),
@@ -634,24 +558,19 @@ class BaseController {
 		return $related_posts;
 	}
 
-	protected function get_related_grid_content_by_cat() {
-		$cat = $this->container->category;
-		if( empty( $cat ) ) {
-			return;
-		} else {
-			$args = array(
-				'post_type' => array('story'),
-				'cat' => $cat->slug,
-				'numberposts' => 3, /* you can change this to show more */
-				'post__not_in' => array( $this->container->post_id ),
-			);
-			$related_posts = get_posts( $args );
-			return $related_posts;
-		}
-	}
-
+	/**
+	 * Prepare tag modifiers for template output
+	 *
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @access protected
+	 * @param WP_Term $term Term object to add modifiers to.
+	 * @param string  $context Context for tag list.
+	 * @return array|void Term modifiers or void.
+	 */
 	public function prepare_tag_modifiers( $term, $context = '' ) {
-		if ( 'WP_Term' !== get_class( $term ) ) {
+		if ( ! $term instanceof WP_Term ) {
 			return;
 		}
 		$desc = ! empty( $term->description ) ? $tag->description : $term->name;
@@ -663,7 +582,7 @@ class BaseController {
 			),
 			'classes' => array(
 				'taxonomy' => $term->taxonomy,
-			)
+			),
 		);
 		$term_mods['link'] = array(
 			'title'       => $desc,
@@ -672,10 +591,29 @@ class BaseController {
 		return $term_mods;
 	}
 
+	/**
+	 * Add Programme Round object to the Exchange container
+	 *
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @param int $parent_id  $type Exchange type to be translated into a CPT.
+	 * @return void
+	 **/
 	protected function set_programme_round( $parent_id ) {
 		$this->container->programme_round = self::exchange_factory( $parent_id, '', 'programme_round' );
 	}
 
+	/**
+	 * Get all posts from a certain Exchange object type.
+	 *
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @param string $type Exchange type to be translated into a CPT.
+	 * @param string $fields Which field to return ('ids', 'id=>parent' or '').
+	 * @return array $results Array of posts that were retrieved.
+	 **/
 	public static function get_all_from_type( $type, $fields = '' ) {
 		$types = self::exchange_types();
 		if ( ! array_key_exists( $type, $types ) ) {
@@ -702,22 +640,18 @@ class BaseController {
 	/**
 	 * Get an attachment ID given a URL.
 	 *
-	 * via: https://wpscholar.com/blog/get-attachment-id-from-wp-image-url/
+	 * @link https://wpscholar.com/blog/get-attachment-id-from-wp-image-url/
 	 *
-	 * @param string $url
-	 *
+	 * @param string $url Image url.
 	 * @return int Attachment ID on success, 0 on failure
 	 */
 	public function get_attachment_id_from_url( $url ) {
 
 		$attachment_id = 0;
-
 		$dir = wp_upload_dir();
 
 		if ( false !== strpos( $url, $dir['baseurl'] . '/' ) ) { // Is URL in uploads directory?
-
 			$file = basename( $url );
-
 			$query_args = array(
 				'post_type'   => 'attachment',
 				'post_status' => 'inherit',
@@ -728,29 +662,22 @@ class BaseController {
 						'compare' => 'LIKE',
 						'key'     => '_wp_attachment_metadata',
 					),
-				)
+				),
 			);
 
 			$query = new WP_Query( $query_args );
 
 			if ( $query->have_posts() ) {
-
 				foreach ( $query->posts as $post_id ) {
-
 					$meta = wp_get_attachment_metadata( $post_id );
-
 					$original_file       = basename( $meta['file'] );
 					$cropped_image_files = wp_list_pluck( $meta['sizes'], 'file' );
-
-					if ( $original_file === $file || in_array( $file, $cropped_image_files ) ) {
+					if ( $original_file === $file || in_array( $file, $cropped_image_files = true ) ) {
 						$attachment_id = $post_id;
 						break;
 					}
-
 				}
-
 			}
-
 		}
 
 		return $attachment_id;
