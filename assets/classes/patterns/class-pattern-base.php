@@ -96,7 +96,7 @@ abstract class BasePattern {
 	 * @access public
 	 * @var mixed $input
 	 **/
-	protected $input;
+	public $input;
 
 	/**
 	 * Context in/through which this pattern object has been instantiated.
@@ -577,6 +577,7 @@ abstract class BasePattern {
 			case 'embedded_video':
 				$pattern = new Video( $input, $context );
 				break;
+				
 			case 'interview_conversation':
 				if ( ! empty( $input['interview'] ) ) {
 					$pattern = new InterviewConversation( $input['interview'], $context );

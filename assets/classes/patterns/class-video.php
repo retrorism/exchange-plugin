@@ -81,6 +81,7 @@ class Video extends BasePattern {
 	 */
 	protected function set_video_attributes() {
 		$embed_code = $this->input['video_embed_code'];
+			
  		// use preg_match to find iframe src
  		preg_match( '/src="(.+?)"/', $embed_code, $matches );
 		if ( empty( $matches ) ) {
@@ -108,10 +109,8 @@ class Video extends BasePattern {
 
  		// Add extra attributes to iframe html
  		$attributes = ' frameborder="2"';
-
- 		$embed_code = str_replace('></iframe>', ' ' . $attributes . '></iframe>', $embed_code );
-
-		return $embed_code;
+ 		$clean_embed_code = str_replace('></iframe>', ' ' . $attributes . '></iframe>', $embed_code );
+		return $clean_embed_code;
 	}
 
 	/**

@@ -208,24 +208,12 @@ class Collaboration extends Exchange {
 		}
 		if ( $this->has_gallery ) {
 		// Clone gallery items for embedding in the collaboration grid
-			foreach ( $this->gallery as $gallery_image ) {
-				$item = clone $gallery_image;
-				if ( ! $item instanceof Image ) {
-					continue;
+			foreach ( $this->gallery as $gallery_item ) {
+				$item = clone $gallery_item;
+				if ( $item instanceof Image || $item instanceof Video ) {
+					$griditem = new GridItem( $item, 'collaboration' );
+					$griditem->publish();
 				}
-				$griditem = new GridItem( $item, 'collaboration' );
-				$griditem->publish();
-			}
-		}
-	}
-
-	public function publish_collab_video( $context = '' ) {
-		if ( $this->has_video ) {
-			// Clone first video item for embedding in the collaboration grid
-			$item = clone $this->video;
-			if ( $item instanceof Video ) {
-				$griditem = new GridItem( $item, 'collaboration' );
-				$griditem->publish();
 			}
 		}
 	}
