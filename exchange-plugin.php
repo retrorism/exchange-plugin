@@ -70,6 +70,7 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 				'admin-options.php',
 				'admin-gravity.php',
 				'admin-roles.php',
+				'facets.php',
 				'taxonomies.php',
 				'post-types.php',
 				'public.php',
