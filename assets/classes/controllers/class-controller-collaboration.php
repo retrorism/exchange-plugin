@@ -56,13 +56,13 @@ class CollaborationController extends BaseController {
 		// Add participants.
 		$this->set_participants();
 
+		// Add featured image
+		$this->set_featured_image();
+
 		// Add participants' locations
 		if ( $this->container->has_participants ) {
 			$this->set_collaboration_locations();
 		}
-
-		// Add featured image
-		$this->set_featured_image();
 
 		// Add tags
 		$this->set_ordered_tag_list();
@@ -121,28 +121,64 @@ class CollaborationController extends BaseController {
 		}
 	}
 
+	protected function get_location_coords( $p_obj ) {
+
+		if ( ! class_exists( 'Leaflet_Map_Plugin' ) || ! is_a( $p_obj, 'Participant' ) ) {
+			return;
+		}
+		if ( ! empty( $p_obj->org_coords['address'] ) ) {
+			$geocoded = Leaflet_Map_Plugin::geocoder( $p_obj->org_coords['address'] );
+            $coords = array( $geocoded->{'lat'}, $geocoded->{'lng'} );
+		} elseif ( ! empty( $p_obj->org_city ) ) {
+			$geocoded = Leaflet_Map_Plugin::geocoder( $p_obj->org_city );
+			$coords = array( $geocoded->{'lat'}, $geocoded->{'lng'} );
+		}
+		if ( $coords ) {
+			return $coords;
+		}
+	}
+
 
 	protected function set_collaboration_locations() {
-		$locations = array();
+		$locations = array(
+			'title' => $this->container->title,
+			'link' => $this->container->link,
+			'locations' => array(),
+		);
+		if ( $this->container->has_featured_image && ! empty( $this->container->featured_image->input['sizes'] ) ) {
+			$locations['image'] = $this->container->featured_image->input['sizes']['thumbnail'];
+		}
 		foreach( $this->container->participants as $p_obj ) {
-			$p_id = $p_obj->post_id;
 			if ( ! is_a( $p_obj, 'Participant' ) ) {
 				continue;
 			}
-
-			if ( !empty( $p_obj->org_name ) ) {
-				$locations[$p_id]['org_name'] = $p_obj->org_name;
+			$p['exchange_id'] = $p_obj->post_id;
+			if ( ! empty( $p_obj->name ) ) {
+				$p['name'] = $p_obj->name;
+			}
+			if ( ! empty( $p_obj->org_name ) ) {
+				$p['org_name'] = $p_obj->org_name;
 			}
 			if ( ! empty( $p_obj->org_coords ) ) {
-				$locations[$p_id]['org_lat'] = $p_obj->org_coords['lat'];
-				$locations[$p_id]['org_lng'] = $p_obj->org_coords['lng'];
-				$locations[$p_id]['org_address'] = $p_obj->org_coords['address'];
+				$lat = floatval( $p_obj->org_coords['lat'] );
+				$lng = floatval( $p_obj->org_coords['lng'] );
+			}
+			if ( ! empty( $lat ) && ! empty( $lng ) ) {
+				$p['latlngs'] = array( $lat, $lng );
+			} elseif ( ! empty( $p_obj->org_city ) || ! empty( $p_obj->org_coords['address'] ) ) {
+				$geocoded_latlngs = $this->get_location_coords( $p_obj );
+				if ( ! empty( $geocoded_latlngs ) ) {
+					$p['latlngs'] = $geocoded_latlngs;
+				}
 			}
 			if ( ! empty( $p_obj->org_city ) ) {
-				$locations[$p_id]['org_city'] = $p_obj->org_city;
+				$p['org_city'] = $p_obj->org_city;
+			}
+			if ( $p['latlngs'] ) {
+				$locations['locations'][] = $p;
 			}
 		}
-		if ( count( $locations ) > 1 ) {
+		if ( count( $locations['locations'] ) >= 1 ) {
 			$this->container->locations = $locations;
 			$this->container->has_locations = true;
 		}

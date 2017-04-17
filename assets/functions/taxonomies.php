@@ -15,10 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 };
 
-/* Hook taxonomy creation to init. */
 add_action( 'init', 'exchange_connect_default_taxonomies' );
-add_action( 'init', 'exchange_modify_post_tag', 11 );
-add_action( 'init', 'exchange_fix_tag_labels' );
+add_action( 'init', 'exchange_modify_post_tag' );
 add_action( 'init', 'exchange_create_taxonomies' );
 
 add_action( 'save_post_programme_round', 'exchange_create_tax_for_programme_round', 10, 3 );
@@ -28,36 +26,54 @@ add_action( 'save_post_collaboration', 'exchange_set_attachments_post_tag', 10, 
 add_action( 'save_post_programme_round', 'exchange_set_attachments_post_tag', 10, 4 );
 add_action( 'attachment_updated', 'exchange_set_attachment_media_tags', 10, 3 );
 
-// add_filter( 'pre_option_tag_base', 'exchange_change_tag_base' );
-// function exchange_change_tag_base( $value ) {
-//
-//    // let's change our tag slug to ravings
-//    // this will change the permalink to http://wpdreamer.com/ravings/custom-post-types/
-//    return 'programme-rounds';
-//
-// }
+add_action( 'pre_get_posts', 'exchange_modify_post_tag_query' );
 
 function exchange_connect_default_taxonomies() {
 	register_taxonomy_for_object_type( 'category', 'story' );
-	// register_taxonomy_for_object_type( 'post_tag', 'story' );
-	// register_taxonomy_for_object_type( 'post_tag', 'collaboration' );
-	// register_taxonomy_for_object_type( 'post_tag', 'programme_round' );
 }
 
 function exchange_modify_post_tag() {
-    // get the arguments of the already-registered taxonomy
-    $programme_round_args = get_taxonomy( 'post_tag' ); // returns an object
+	
+	// Maintain the built-in rewrite functionality of WordPress tags
+	global $wp_rewrite;
 
-    // make changes to the args
-    // in this example there are three changes
-    // again, note that it's an object
-	$programme_round_args->query_var = 'programme-round';
-    $programme_round_args->rewrite['slug'] = 'programme-round';
-    $programme_round_args->rewrite['with_front'] = 1;
-	$programme_round_args->rewrite['show_ui'] = 0;
+	$rewrite =  array(
+		'hierarchical'               => false, // Maintains tag permalink structure
+		'slug'                       => get_option('tag_base') ? get_option('tag_base') : 'programme-round',
+		'with_front'                 => ! get_option('tag_base') || $wp_rewrite->using_index_permalinks(),
+		'ep_mask'                    => EP_TAGS,
+	);
 
-    // re-register the taxonomy
-    register_taxonomy( 'post_tag', array( 'story', 'collaboration', 'programme_round' ), (array) $programme_round_args);
+	// Redefine tag labels (or leave them the same)
+	$labels = array(
+	    'name'                       => 'Programme Round (Tags)',
+	    'menu_name'                  => 'Programme Round (Tags)',
+	    'singular_name'              => 'Programme Round (Tag)',
+	    'search_items'               => 'Search Programme Round (Tags)',
+	    'popular_items'              => 'Popular Programme Round (Tags)',
+	    'all_items'                  => 'All Programme Round (Tags)',
+	    'parent_item'                => 'Programme',
+	    'parent_item_colon'          => 'Programme:',
+	    'edit_item'                  => 'Edit Programme Round (Tag)',
+	    'update_item'                => 'Update Programme Round (Tag)',
+	    'add_new_item'               => 'Add new Programme Round (Tag)',
+	    'new_item_name'              => 'New Programme Round (Tag) Name',
+	    'separate_items_with_commas' => 'Separate Programme Round (Tags) with commas',
+	    'add_or_remove_items'        => 'Add or remove Programme Round (Tags)',
+	    'choose_from_most_used'      => 'Choose from the most used Programme Round (Tags)',
+	);
+
+	// Override structure of built-in WordPress tags
+	register_taxonomy( 'post_tag', array('story','collaboration','programme_round'), array(
+		'hierarchical'               => true, // Was false, now set to true
+		'query_var'                  => 'programme-round',
+		'labels'                     => $labels,
+		'rewrite'                    => $rewrite,
+		'public'                     => true,
+		'show_ui'                    => true,
+		'show_admin_column'          => true,
+		'_builtin'                   => true,
+	) );
 }
 
 /**
@@ -67,19 +83,31 @@ function exchange_modify_post_tag() {
  * @return return void if the query does not contain a post_tag.
  */
 function exchange_modify_post_tag_query( $query ) {
-	$programme_round = get_query_var( 'programme-round' );
-	if ( ! $query->is_main_query() || empty( $programme_round ) ) {
+	$pr = get_query_var( 'programme-round' );
+	if ( ! $query->is_main_query() || empty( $pr ) ) {
 		return;
 	}
+	if ( is_string( $pr ) ) {
+		$args = array(
+			'taxonomy' => 'post_tag',
+			'slug' => $pr,
+			'number' => 1
+		);
+		$pr_obj = get_terms( $args );
+		if ( $pr_obj[0] instanceof WP_Term ) {
+			$pr_children = get_term_children( intval( $pr_obj[0]->term_id ), 'post_tag' );
+		}
+	}
 	$post_type = get_query_var( 'post_type' );
-	$query->query_vars['tag_slug__in'][] = $programme_round;
+	if ( $pr_children ) {
+		$query->query_vars['tag__in'] = $pr_children;
+	}
+	$query->query_vars['tag__in'][] = $pr;
 	if ( empty( $post_type ) ) {
 		$query->set( 'post_type', array( 'collaboration','story' ) );
 		// elseif ( is_post_type_archive('collaboration') || is_post_type_archive('story') ) {
 	}
 }
-
-add_action( 'pre_get_posts', 'exchange_modify_post_tag_query' );
 
 function exchange_query_vars_filter($vars) {
 	$vars[] = 'programme-round';
@@ -262,33 +290,6 @@ function exchange_create_taxonomies() {
 			),
 		)
 	);
-}
-
-function exchange_fix_tag_labels() {
-    global $wp_taxonomies;
-
-    // The list of labels we can modify comes from
-    //  http://codex.wordpress.org/Function_Reference/register_taxonomy
-    //  http://core.trac.wordpress.org/browser/branches/3.0/wp-includes/taxonomy.php#L350
-    $wp_taxonomies['post_tag']->labels = (object) array(
-        'name' => 'Programme Round (Tags)',
-        'menu_name' => 'Programme Round (Tags)',
-        'singular_name' => 'Programme Round (Tag)',
-        'search_items' => 'Search Programme Round (Tags)',
-        'popular_items' => 'Popular Programme Round (Tags)',
-        'all_items' => 'All Programme Round (Tags)',
-        'parent_item' => null, // Tags aren't hierarchical
-        'parent_item_colon' => null,
-        'edit_item' => 'Edit Programme Round (Tag)',
-        'update_item' => 'Update Programme Round (Tag)',
-        'add_new_item' => 'Add new Programme Round (Tag)',
-        'new_item_name' => 'New Programme Round (Tag) Name',
-        'separate_items_with_commas' => 'Separate Programme Round (Tags) with commas',
-        'add_or_remove_items' => 'Add or remove Programme Round (Tags)',
-        'choose_from_most_used' => 'Choose from the most used Programme Round (Tags)',
-    );
-
-    $wp_taxonomies['post_tag']->label = 'Programme Round (Tag)s';
 }
 
 // Add taxonomies by checking against a sluggified $term name.

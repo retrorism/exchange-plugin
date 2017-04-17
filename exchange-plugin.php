@@ -46,7 +46,7 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 		 **/
 		 public function __construct() {
 
-			add_action( 'plugins_loaded', array( $this, 'exchange_require_functions' ) );
+			add_action( 'plugins_loaded', array( $this, 'exchange_require_functions' ), 99 );
 
 			/* Runs on plugin is activated */
 	 		register_activation_hook( EXCHANGE_PLUGIN_FILE, array( $this, 'exchange_plugin_activate' ) );
@@ -167,10 +167,8 @@ if ( ! class_exists( 'Exchange_Plugin' ) ) {
 
 				);
 				// Plugin-dependent patterns - check if the plugin exists, add extra pattern clas when available
-				if ( class_exists( 'Exchange_Leaflet_Map', false ) ) {
-					$classes['basemap'] = EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-map-base.php';
-					$classes['simplemap'] = EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-map-simple.php';
-				}
+				$classes['basemap'] = EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-map-base.php';
+				$classes['simplemap'] = EXCHANGE_PLUGIN_PATH . 'assets/classes/patterns/class-map-simple.php';
 			}
 
 			$cn = strtolower( $class );

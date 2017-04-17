@@ -24,6 +24,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 abstract class BaseMap extends BasePattern {
 
 	/**
+	 * Hash the input to create a unique ID.
+	 *
+	 * @var string $map_hash 
+	 **/
+	protected $map_hash;
+
+	/**
 	 * Map Markers variable
 	 *
 	 * @var array $map_markers Items array containing all Mappable objects
@@ -31,11 +38,25 @@ abstract class BaseMap extends BasePattern {
 	protected $map_markers;
 
 	/**
+	 * Map Markers variable
+	 *
+	 * @var array $map_markers Items array containing all Mappable objects
+	 */
+	protected $map_marker_shortcodes;
+
+	/**
 	 * Collaboration Data variable
 	 *
 	 * @var array $collaboration_data Items array containing all Mappable objects
 	 */
-	protected $collaboration_data;
+	protected $map_polylines;
+
+	/**
+	 * Collaboration Data variable
+	 *
+	 * @var array $collaboration_shortcodes;
+	 */
+	protected $map_polyline_shortcodes;
 
 	/**
 	 * Map Markers Check
@@ -59,6 +80,13 @@ abstract class BaseMap extends BasePattern {
 	protected $has_caption = false;
 
 	/**
+	 * Map Caption Check
+	 *
+	 * @var boolean $has_caption
+	 */
+	protected $use_shortcodes_for_objects = false;
+
+	/**
 	 * Map Caption
 	 *
 	 * @var object $caption (if available)
@@ -80,8 +108,8 @@ abstract class BaseMap extends BasePattern {
 			$el = 'figure';
 		}
 
-		if ( class_exists( 'Exchange_Leaflet_Map' ) ) {
-			$map_shortcode = $this->prepare_map_attributes();
+		if ( class_exists( 'Leaflet_Map_Plugin_Extension' ) ) {
+			$map_shortcode = $this->create_map_shortcode();
 
 			if ( 'dots' === $this->input['map_style'] ) {
 				$this->set_map_markers();
@@ -90,21 +118,23 @@ abstract class BaseMap extends BasePattern {
 			}
 			$this->set_caption();
 
+			// Random string for via: http://stackoverflow.com/questions/4356289/php-random-string-generator#comment35061829_4356295
+			$this->map_hash = substr(str_shuffle(MD5(microtime())), 0, 10);
+
+			$this->set_attribute('data','map-hash', $this->map_hash );
+
 			$this->output_tag_open( $el );
+
 
 			$this->output .= apply_filters('the_content', $map_shortcode);
 
-			// Add individual marker script elements.
-			if ( $this->has_markers ) {
-				$markers = $this->map_markers;
-				foreach ( $markers as $marker ) {
-					$this->output .= apply_filters('the_content', $marker );
-				}
-			} elseif ( $this->has_network ) {
-				$collaborations = $this->collaboration_data;
-				foreach ( $collaborations as $collaboration ) {
-					$this->output .= apply_filters('the_content', $collaboration );
-				}
+			if ( $this->use_shortcodes_for_objects ) {
+				$this->embed_object_shortcodes();
+			} else {
+				$this->pass_json_as_var();
+				$auto_draw = count( $this->map_polylines ) === 1 ? ' auto_draw=1' : '';
+				$layers_shortcode = '[leaflet-layers map_hash="' . $this->map_hash . '"' . $auto_draw . ']';
+				$this->output .= apply_filters( 'the_content', $layers_shortcode );
 			}
 
 			// Add caption.
@@ -147,7 +177,7 @@ abstract class BaseMap extends BasePattern {
 	 *
 	 * Sets input array to map_markers property.
 	 */
-	protected function set_map_collaborations() {
+	protected function set_map_collaborations( ) {
 		$objects = $this->input['map_collaborations'];
 		if ( ! is_array( $objects ) && count( $objects ) > 0 ) {
 			return;
@@ -179,26 +209,25 @@ abstract class BaseMap extends BasePattern {
 			$collab_total = count( $collaborations );
 
 			// Limit to 20 collaborations.
-			for ( $i = 0; $i < $collab_total && $i < $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['PATTERNS']['map_max-collaboration-count']; $i++ ) {
-				$this->set_collaboration_data( $collaborations[ $i ] );
+			//for ( $i = 0; $i < $collab_total && $i < $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['PATTERNS']['map_max-collaboration-count']; $i++ ) {
+			$col_loc_transient = get_transient( 'collaboration_locations' );
+			if ( $col_loc_transient ) {
+				for ( $i = 0; $i < $collab_total; $i++ ) {
+					if ( ! empty( $col_loc_transient[ $collaborations[$i]->ID ] ) ) {
+						$this->map_polylines[] = $col_loc_transient[ $collaborations[$i]->ID ];
+					} else {
+						$this->set_collaboration_data( $collaborations[$i] );
+					}
+				}
+			} else {
+				for ( $i = 0; $i < $collab_total; $i++ ) {
+					$this->set_collaboration_data( $collaborations[ $i ] );
+				}
 			}
-			if ( ! empty( $this->collaboration_data ) ) {
+			if ( ! empty( $this->map_polylines ) ) {
 				$this->has_network = true;
 			}
 		}
-	}
-
-	protected function prepare_map_attributes() {
-		$sizes = $this->get_map_size();
-		$map_shortcode = '[leaflet-map zoomcontrol=1 ';
-		$map_shortcode .= 'height=' . $sizes[1] ;
-		if ( 'network' !== $this->input['map_style'] ) {
-			$map_shortcode .= ' zoom=' . $this->input['map_zoom_level'] . ' ';
-			$map_shortcode .= 'lat=' . $this->input['map_center']['lat'] . ' ';
-			$map_shortcode .= 'lng=' . $this->input['map_center']['lng'];
-		}
-		$map_shortcode .= ']';
-		return $map_shortcode;
 	}
 
 	/**
@@ -235,11 +264,12 @@ abstract class BaseMap extends BasePattern {
 			return;
 		}
 		// Create label
-		$line_label = addslashes( exchange_create_link( $c_object ) );
-		// Feed the collaboration geodata into a shortcode
-		$location_line = $this->create_map_line( $c_object->locations, $line_label );
-		if ( is_string( $location_line ) ){
-			$this->collaboration_data[] = $location_line;
+		if ( $this->use_shortcodes_for_objects ) {
+			$line_label = addslashes( exchange_create_link( $c_object ) );
+			// Feed the collaboration geodata into a shortcode
+			$this->map_polyline_shortcodes[] = $this->create_map_polyline_shortcode( $c_object->locations, $line_label );
+		} else {
+			$this->map_polylines[] = $this->create_map_polyline_data( $c_object );
 		}
 	}
 
@@ -266,27 +296,53 @@ abstract class BaseMap extends BasePattern {
 		if ( is_array( $marker_location ) && array_key_exists( 'lat', $marker_location ) && array_key_exists( 'lng', $marker_location ) ) {
 			if ( is_string( $marker_location['lat'] ) && is_string( $marker_location['lng'] ) ) {
 				$verified_marker = $this->prepare_map_marker( $marker_location, $marker_label );
-				$this->create_map_marker( $verified_marker );
+				$this->map_markers[] = $verified_marker;
+				if ( $this->use_shortcodes_for_objects ) {
+					$this->map_marker_shortcodes[] = $this->create_map_marker_shortcode( $verified_marker );
+				}
 			}
 		}
 	}
 
+	protected function create_map_shortcode() {
+		$sizes = $this->get_map_size();
+		$map_shortcode = '[leaflet-map zoomcontrol=1 ';
+		$map_shortcode .= 'height=' . $sizes[1] ;
+		if ( 'network' !== $this->input['map_style'] ) {
+			$map_shortcode .= ' zoom=' . $this->input['map_zoom_level'] . ' ';
+			$map_shortcode .= 'lat=' . $this->input['map_center']['lat'] . ' ';
+			$map_shortcode .= 'lng=' . $this->input['map_center']['lng'];
+		}
+		$map_shortcode .= ']';
+		return $map_shortcode;
+	}
+
 	/**
-	 * Add map markers.
+	 * Create map marker shortcode
 	 *
 	 * If not empty, sets input array to map_markers property.
 	 *
 	 * @param array $marker Array with marker data.
 	 */
-	protected function create_map_marker( $marker ) {
+	protected function create_map_marker_shortcode( $marker ) {
 		$marker_shortcode = '[leaflet-marker ';
-		// $marker_shortcode .= 'visible="true" ';
+		if ( ! empty( $marker['options'] ) ) {
+			foreach( $marker_options as $option => $value ) {
+				if ( ! empty( $value ) ) {
+					if ( is_array( $value ) ) {
+						$value = implode( ',', $value );
+					}
+					$marker_shortcode .= $option . '=' . '"' . $value .'" ';
+				}
+			}
+		}
 		$marker_shortcode .= 'lat=' . $marker['lat'] . ' ';
 		$marker_shortcode .= 'lng=' . $marker['lng'] . ']';
+
 		if ( isset( $marker['message'] ) ) {
 			$marker_shortcode .= $marker['message'] . '[/leaflet-marker]';
 		}
-		$this->map_markers[] = $marker_shortcode;
+		return $marker_shortcode;
 	}
 
 	/**
@@ -296,8 +352,8 @@ abstract class BaseMap extends BasePattern {
 	 * @param string $line_label defaults to ''.
 	 * @return string $line Map line shortcode with either addresses or coordinates.
 	 */
-	protected function create_map_line( $locations, $line_label = '' ) {
-		$line = '[leaflet-line fitline=1 ';
+	protected function create_map_polyline_shortcode( $locations, $line_label = '' ) {
+		$line = '[leaflet-polyline fitbounds=1 ';
 		$line .= 'color="#' . $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['yellow-tandem'] . '" ';
 		$no_of_locations = count( $locations );
 		$latlngs = array();
@@ -331,9 +387,98 @@ abstract class BaseMap extends BasePattern {
 		}
 		$line .=']';
 		if ( ! empty( $line_label ) ) {
-			$line .= $line_label . '[/leaflet-line]';
+			$line .= $line_label . '[/leaflet-polyline]';
 		}
 		return $line;
+	}
+
+	protected function create_map_polyline_data( $collab ) {
+		$response = array(
+			'title' => $collab->locations->title,
+			'link' => $collab->locations->link,
+		);
+		$response_locations = array();
+		// Set locations
+		foreach ( $collab->locations as $participant => $location ) {
+			$lat = floatval( $location['org_lat'] );
+			$lng = floatval( $location['org_lng'] );
+			if ( ! empty( $lat ) && ! empty( $lng ) ) {
+				$response_locations[ $participant ]['latlngs'] = array( $lat, $lng );
+			} elseif ( ! empty( $location['org_city'] ) || ! empty( $location['org_address'] ) ) {
+				$geocoded_latlngs = $this->get_location_coords( $location );
+				if ( ! empty( $geocoded_latlngs ) ) {
+					$response_locations[ $participant ]['latlngs'] = $geocoded_latlngs;
+				}
+			}
+			if ( $location['name'] ) {
+				$response_locations[ $participant ]['name'] = $location['name'];
+			}
+			if ( $location['exchange_id'] ) {
+				$response_locations[ $participant ]['exchange_id'] = $location['exchange_id'];
+			}
+			if ( $location['org_city'] ) {
+				$response_locations[ $participant ]['city'] = $location['org_city'];
+			}
+			if ( $location['org_name'] ) {
+				$response_locations[ $participant ]['org_name'] = $location['org_name'];
+			}
+		}
+		$response['locations'] = $response_locations;
+		if ( $collab->has_featured_image && ! empty( $collab->featured_image->input['sizes'] ) ) {
+			$response['image'] = $collab->featured_image->input['sizes']['thumbnail'];
+		}
+		return $response;
+	}
+
+	protected function create_map_polyline_data_1( $collab, $line_label = '' ) {
+		$no_of_locations = count( $locations );
+		$latlngs = array();
+		$cities = array();
+		$addresses = array();
+
+		foreach ( $collab->locations as $location ) {
+			$lat = floatval( $location['org_lat'] );
+			$lng = floatval( $location['org_lng'] );
+			if ( ! empty( $lat ) && ! empty( $lng ) ) {
+				$latlngs[] = array( $lat, $lng );
+			} elseif ( ! empty( $location['org_city'] ) || ! empty( $location['org_address'] ) ) {
+				$geocoded_latlngs = $this->get_location_coords( $location );
+				if ( ! empty( $geocoded_latlngs ) ) {
+					$latlngs[] = $geocoded_latlngs;
+				}
+			}
+			if ( ! empty( $location['org_city'] ) ) {
+				$cities[] = $location['org_city'];
+			} else {
+				$cities[] = '';
+			}
+		}
+		if ( count( $latlngs ) !== $no_of_locations ) {
+			return false;
+		}
+		$response = array(
+			'line_label' => $line_label,
+			'latlngs' => $latlngs,
+		);
+		if ( count( $cities ) == $no_of_locations ) {
+			$response['cities'] = $cities;
+		}
+		return $response;
+	}
+
+	protected function get_location_coords( $location ) {
+		if ( ! class_exists( 'Leaflet_Map_Plugin' ) || ! count( $location ) ) {
+			return;
+		}
+		if ( ! empty( $location['org_address'] ) ) {
+			$geocoded = Leaflet_Map_Plugin::geocoder( $address );
+            $coords = array( $geocoded->{'lat'}, $geocoded->{'lng'} );
+		} elseif ( ! empty( $location['org_city'] ) ) {
+			$coords = array( $geocoded->{'lat'}, $geocoded->{'lng'} );
+		}
+		if ( $coords ) {
+			return $coords;
+		}
 	}
 
 	/**
@@ -346,6 +491,7 @@ abstract class BaseMap extends BasePattern {
 			'message' => $marker_label['title'],
 			'lat'   => $marker_location['lat'],
 			'lng'  => $marker_location['lng'],
+			'options' => $this->get_marker_icon_options(),
 		);
 		if ( ! empty( $marker_label['linked_object'] ) ) {
 			// Create link from object
@@ -359,6 +505,29 @@ abstract class BaseMap extends BasePattern {
 	}
 
 	/**
+	 * Get marker options available in plugin, 
+	 *
+	 * @return void
+	 * @author 
+	 **/
+	protected function get_marker_icon_options() {
+		$leaflet_options = array(
+			'iconUrl' => NULL,
+			'iconSize' => NULL,
+			'iconAnchor' => NULL
+			);
+		$stored_options = get_option( 'leaflet_map_plugin_extension_options' );
+		if ( ! empty( $stored_options ) ) {
+			foreach( $stored_options as $option => $val ) {
+				if ( array_key_exists( $option, $leaflet_options ) && ! empty( $val ) ) {
+					$leaflet_options[ $option ] = $val;
+				}
+			}
+		}
+		return $leaflet_options;
+	}
+
+	/**
 	 * Set caption object
 	 *
 	 * @access protected
@@ -369,5 +538,43 @@ abstract class BaseMap extends BasePattern {
 			$this->caption = new Caption( $caption, $this->element );
 			$this->has_caption = true;
 		}
+	}
+
+	/**
+	 * Embed object shortcodes
+	 *
+	 * @return void
+	 * @author Willem Prins | Somtijds
+	 **/
+	protected function embed_object_shortcodes() {
+	// Add individual marker script elements.
+		if ( $this->has_markers ) {
+			$markers = $this->map_marker_shortcodes;
+			foreach ( $markers as $marker ) {
+				$this->output .= apply_filters('the_content', $marker );
+			}
+		} elseif ( $this->has_network ) {
+			$collaborations = $this->map_polyline_shortcodes;
+			foreach ( $collaborations as $collaboration ) {
+				$this->output .= apply_filters('the_content', $collaboration );
+			}
+		}
+	}
+
+	/**
+	 * Make map JSON available for script
+	 *
+	 * @return void
+	 * @author 
+	 **/
+	protected function pass_json_as_var() {
+		if ( class_exists( 'Leaflet_Map_Plugin_Extension' ) ) {
+			$translate_this = array(
+				'map_hash'      => $this->map_hash,
+				'map_markers'   => $this->map_markers,
+				'map_polylines' => $this->map_polylines,
+			);
+	        wp_localize_script( 'leaflet_create_route_js', 'leaflet_objects_' . $this->map_hash, $translate_this );
+        }
 	}
 }
