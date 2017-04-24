@@ -608,6 +608,11 @@ abstract class BasePattern {
 					$pattern = new SectionHeader( $input['text'], $context, $header_mods );
 				}
 				break;
+			case 'simple_map':
+				if ( ! empty( $input ) ) {
+					$pattern = new SimpleMap( $input, $context );
+				}
+				break;
 			case 'emphasis_block':
 				$block_mods = array();
 				$type = $input['block_type'];

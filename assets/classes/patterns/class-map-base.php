@@ -104,7 +104,8 @@ abstract class BaseMap extends BasePattern {
 	 protected function create_output() {
 
 		// If a grid is created inside a story, make this into an figure class.
-		if ( is_single() || is_page() ) {
+		$el = 'div';
+		if ( is_single() || is_page() || is_archive() ) {
 			$el = 'figure';
 		}
 
@@ -179,8 +180,14 @@ abstract class BaseMap extends BasePattern {
 	 */
 	protected function set_map_collaborations( ) {
 		$objects = $this->input['map_collaborations'];
-		if ( ! is_array( $objects ) && count( $objects ) > 0 ) {
-			return;
+		$col_loc_transient = get_transient( 'collaboration_locations' );
+		if ( empty( $objects ) || count( $objects ) == 0 ) {
+			if ( $col_loc_transient ) {
+				foreach( $col_loc_transient as $col_loc_id => $col_loc ) {
+					$col_loc['id'] = $col_loc_id;
+					$this->map_polylines[] = $col_loc;
+				}
+			}
 		} else {
 			$collaborations = array();
 			foreach ( $objects as $object ) {
@@ -210,7 +217,6 @@ abstract class BaseMap extends BasePattern {
 
 			// Limit to 20 collaborations.
 			//for ( $i = 0; $i < $collab_total && $i < $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['PATTERNS']['map_max-collaboration-count']; $i++ ) {
-			$col_loc_transient = get_transient( 'collaboration_locations' );
 			if ( $col_loc_transient ) {
 				for ( $i = 0; $i < $collab_total; $i++ ) {
 					if ( ! empty( $col_loc_transient[ $collaborations[$i]->ID ] ) ) {
@@ -224,9 +230,9 @@ abstract class BaseMap extends BasePattern {
 					$this->set_collaboration_data( $collaborations[ $i ] );
 				}
 			}
-			if ( ! empty( $this->map_polylines ) ) {
-				$this->has_network = true;
-			}
+		}
+		if ( ! empty( $this->map_polylines ) ) {
+			$this->has_network = true;
 		}
 	}
 
@@ -238,6 +244,7 @@ abstract class BaseMap extends BasePattern {
 	 */
 	protected function get_map_size() {
 		$sizes = array(
+			'full' => array( '100%', '700px'),
 			'wide' => array( '100%', '460px' ),
 			'square' => array( '100%', '575px' ),
 			'small' => array( '100%', '460px' ),
@@ -313,6 +320,9 @@ abstract class BaseMap extends BasePattern {
 			$map_shortcode .= 'lat=' . $this->input['map_center']['lat'] . ' ';
 			$map_shortcode .= 'lng=' . $this->input['map_center']['lng'];
 		}
+		// if ( 'full' === $this->input['map_size'] ) {
+		// 	$map_shortcode .= ' zoomcontrol=0'; 
+		// }
 		$map_shortcode .= ']';
 		return $map_shortcode;
 	}

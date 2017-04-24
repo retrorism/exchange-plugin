@@ -574,7 +574,11 @@ class BaseController {
 			return;
 		}
 		$desc = ! empty( $term->description ) ? $tag->description : $term->name;
-		$term_link = get_term_link( $term );
+		if ( class_exists( 'FacetWP' ) ) {
+			$term_link = get_home_url() . '/archive/?fwp_' . $term->taxonomy . '=' . $term->slug;
+		} else {
+			$term_link = get_term_link( $term );
+		}
 		$link = ! empty( $term_link ) ? $term_link : '#';
 		$term_mods = array(
 				'data' => array(
