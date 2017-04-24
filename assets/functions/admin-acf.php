@@ -271,7 +271,7 @@ function exchange_update_location_transients_on_save( $post_id, $post_obj ) {
 		return;
 	}
 	$stored_locations[ $coll->post_id ] = $coll->locations;
-	set_transient( 'collaboration_locations', $stored_locations, 7 * 24 * HOUR_IN_SECONDS );
+	set_transient( 'collaboration_locations', $stored_locations, 365 * 24 * HOUR_IN_SECONDS );
 }
 
 
