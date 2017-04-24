@@ -248,6 +248,33 @@ function exchange_add_update_form_link( $post_id, $post_obj ) {
 	}
 }
 
+add_action( 'save_post', 'exchange_update_location_transients_on_save', 10, 2 );
+
+function exchange_update_location_transients_on_save( $post_id, $post_obj ) {
+	$type = $post_obj->post_type;
+	if ( $type !== 'participant' ) {
+		return;
+	}
+	$stored_locations = get_transient('collaboration_locations');
+	
+	if ( empty( $stored_locations ) ) {
+		$stored_locations = array();
+	}
+	if ( ! is_array( $stored_locations ) ) {
+		return;
+	}
+	$coll = CollaborationController::get_collaboration_by_participant_id( $post_id );
+	if ( ! $coll instanceof Collaboration ) {
+		return;
+	}
+	if ( ! $coll->has_locations ) {
+		return;
+	}
+	$stored_locations[ $coll->post_id ] = $coll->locations;
+	set_transient( 'collaboration_locations', $stored_locations, 7 * 24 * HOUR_IN_SECONDS );
+}
+
+
 function exchange_iterate_filter( $input, $post_id, $indices, $last_iter = '', $last_iter_type = 'story_elements' ) {
 
     foreach ( $input as $key => $val ) {
