@@ -15,6 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 };
 
+add_action( 'admin_menu', 'exchange_register_settings');
+add_action( 'admin_menu', 'exchange_add_options_page');
+
 function exchange_helper_plugins() {
 	return array(
 		'exchange-leaflet-map' => 'Exchange_Leaflet_Map',
@@ -88,31 +91,33 @@ function exchange_register_settings() {
 	// Add a General section
 	add_settings_section(
 		EXCHANGE_PLUGIN . '_general',
-		__( 'Tandem Exchange theme Settings', EXCHANGE_PLUGIN ),
+		__( 'Exchange theme Settings', EXCHANGE_PLUGIN ),
 		'exchange_settings_general_cb' ,
 		EXCHANGE_PLUGIN
 	);
 
-	add_settings_field(
-		EXCHANGE_PLUGIN . '_byline_template_past',
-		__( 'Byline template (past)', EXCHANGE_PLUGIN ),
-		'exchange_settings_byline_template_past_cb',
-		EXCHANGE_PLUGIN,
-		EXCHANGE_PLUGIN . '_general',
-		array( 'label_for' => EXCHANGE_PLUGIN . '_byline_template_past' )
-	);
+	if ( current_theme_supports( 'bylines' ) ) {
+		add_settings_field(
+			EXCHANGE_PLUGIN . '_byline_template_past',
+			__( 'Byline template (past)', EXCHANGE_PLUGIN ),
+			'exchange_settings_byline_template_past_cb',
+			EXCHANGE_PLUGIN,
+			EXCHANGE_PLUGIN . '_general',
+			array( 'label_for' => EXCHANGE_PLUGIN . '_byline_template_past' )
+		);
 
-	add_settings_field(
-		EXCHANGE_PLUGIN . '_byline_template_present',
-		__( 'Byline template (present)', EXCHANGE_PLUGIN ),
-		'exchange_settings_byline_template_present_cb',
-		EXCHANGE_PLUGIN,
-		EXCHANGE_PLUGIN . '_general',
-		array( 'label_for' => EXCHANGE_PLUGIN . '_byline_template_present' )
-	);
+		add_settings_field(
+			EXCHANGE_PLUGIN . '_byline_template_present',
+			__( 'Byline template (present)', EXCHANGE_PLUGIN ),
+			'exchange_settings_byline_template_present_cb',
+			EXCHANGE_PLUGIN,
+			EXCHANGE_PLUGIN . '_general',
+			array( 'label_for' => EXCHANGE_PLUGIN . '_byline_template_present' )
+		);
 
-	register_setting( EXCHANGE_PLUGIN, EXCHANGE_PLUGIN . '_byline_template_present', 'exchange_settings_sanitize_byline_template' );
-	register_setting( EXCHANGE_PLUGIN, EXCHANGE_PLUGIN . '_byline_template_past', 'exchange_settings_sanitize_byline_template' );
+		register_setting( EXCHANGE_PLUGIN, EXCHANGE_PLUGIN . '_byline_template_present', 'exchange_settings_sanitize_byline_template' );
+		register_setting( EXCHANGE_PLUGIN, EXCHANGE_PLUGIN . '_byline_template_past', 'exchange_settings_sanitize_byline_template' );
+	}
 
 }
 
@@ -122,7 +127,7 @@ function exchange_register_settings() {
  * @since  0.1.0
  */
 function exchange_settings_general_cb() {
-	echo '<p>' . __( 'Display options for the Tandem website', EXCHANGE_PLUGIN ) . '</p>';
+	echo '<p>' . sprintf( __( 'Display options for the %s website', EXCHANGE_PLUGIN ), get_bloginfo('name') ) . '</p>';
 }
 
 /**

@@ -577,6 +577,10 @@ abstract class BasePattern {
 			case 'embedded_video':
 				$pattern = new Video( $input, $context );
 				break;
+
+			case 'embed':
+				$pattern = new Embed( $input, $context );
+				break;
 				
 			case 'interview_conversation':
 				if ( ! empty( $input['interview'] ) ) {
@@ -598,8 +602,20 @@ abstract class BasePattern {
 				$colour = $input['tape_colour'];
 				$type = $input['type'];
 				if ( ! empty( $colour ) ) {
-					$header_mods['colour'] = $input['tape_colour'];
+					$header_mods['colour'] = $colour;
 					$header_mods['data'] = array( 'tape_colour' => $colour );
+				}
+				// Check for decoration colour
+				if ( current_theme_supports( 'decorated_section_headers' ) ) {
+					$colour = $input[ 'decoration_colour' ];
+					$decoration_position = $input[ 'decoration_position' ];
+					if ( ! empty( $colour ) ) {
+						$header_mods['colour'] = $colour;
+						$header_mods['data'] = array( 'decoration_colour' => $colour );
+					}
+					if ( ! empty( $decoration_position ) ) {
+						$header_mods['position'] = $decoration_position;
+					}
 				}
 				if ( ! empty( $type ) ) {
 					$header_mods['type'] = $input['type'];

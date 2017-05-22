@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 0.1.0
  **/
-class Video extends BasePattern {
+class Embed extends BasePattern {
 
 	/**
 	 * Video Caption, if available.
@@ -41,7 +41,7 @@ class Video extends BasePattern {
 	 */
 	protected function create_output() {
 		// Get iframe HTML
-		$iframe = $this->set_video_attributes();
+		$iframe = $this->set_embed_attributes();
 		$el = 'div';
 		if ( $this->context === 'gallery' ) {
 			$this->classes[] = 'gallery__item';
@@ -86,8 +86,8 @@ class Video extends BasePattern {
 	 *
 	 * @TODO Vimeo API to add extra styling
 	 */
-	protected function set_video_attributes() {
-		$embed_code = $this->input['video_embed_code'];
+	protected function set_embed_attributes() {
+		$embed_code = $this->input['embed_code'];
 			
  		// use preg_match to find iframe src
  		preg_match( '/src="(.+?)"/', $embed_code, $matches );

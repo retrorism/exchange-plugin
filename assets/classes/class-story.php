@@ -84,9 +84,32 @@ class Story extends Exchange {
 	 *
 	 * @return void
 	 */
-	public function publish_byline( $context= '' ) {
+	public function publish_byline( $context = '' ) {
 		if ( isset( $this->byline ) ) {
 			$this->byline->publish( $context );
+		}
+	}
+
+	/**
+	 * Publish category
+	 * 
+	 * @since 0.2.0
+	 * @access public
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @param string context for this category
+	 * @return void
+	 *
+	 */
+	public function publish_category( $context = '' ) {
+		if ( empty( $this->category ) ) {
+			return;
+		}
+		$cat_mods = $this->controller->prepare_tag_modifiers( $this->category, $context );
+		$cat = new Tag( $this->category, $context, $cat_mods );
+
+		if ( $cat instanceof Tag ) {
+			$cat->publish( $context );
 		}
 	}
 }

@@ -31,9 +31,17 @@ class Tag extends BasePattern {
 	 * @access protected
 	 **/
 	 protected function create_output() {
+	 	if ( empty( $this->input->name ) || ! is_string( $this->input->name ) ) {
+	 		return;
+	 	}
 		$el = 'a';
  		$this->output_tag_open( $el );
- 		$this->output .= $this->input->name;
+ 		if ( current_theme_supports( 'lowercase_tags' ) && 'location' !== $this->input->taxonomy ) {
+ 			$name = '<span>' . strtolower( $this->input->name ) . '</span>';
+		} else {
+ 			$name = '<span>' . $this->input->name . '</span>';
+		}
+		$this->output .= $name;
  		$this->output_tag_close( $el );
 	}
 

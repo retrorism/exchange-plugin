@@ -36,7 +36,12 @@ class ParticipantController extends BaseController {
 		$this->container->name = $this->container->title;
 
 		// Mapping organisation data.
-		$this->set_organisation_data();
+		if ( ! current_theme_supports( 'exchange_participant_profiles' ) ) {
+			$this->set_organisation_data();
+		} else {
+			$this->set_participant_details();
+			$this->set_featured_image('participant');
+		}
 
 		// Add update token
 		$this->set_participant_update_form_link();
@@ -76,6 +81,24 @@ class ParticipantController extends BaseController {
 		}
 		if ( !empty( $p_contactme ) ) {
 			$this->container->set_contactme( $p_contactme );
+		}
+	}
+
+	public function set_participant_details() {
+		$post_id = $this->container->post_id;
+		$p_meta = get_post_meta( $post_id, '', true );
+		if ( empty( $p_meta ) ) {
+			return;
+		}
+		foreach( $p_meta as $key => $value ) {
+			if ( 0 !== strpos( $key, 'participant_' ) ) {
+				continue;
+			}
+			if ( 'participant_email' === $key ) {
+				$this->container->set_contactme( $value[0] );
+			} else {
+				$this->container->details[ $key ] = $value[0];
+			}
 		}
 	}
 

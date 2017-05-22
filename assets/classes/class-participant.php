@@ -71,7 +71,6 @@ class Participant extends Exchange {
 	 */
 	public $collaboration;
 
-
 	/**
 	 * The organisation this person works/worked for at the time of participation in a Tandem Programme
 	 * Participant admin page.
@@ -136,6 +135,15 @@ class Participant extends Exchange {
 	 * @var string $org_website
 	 */
 	public $org_description;
+	
+	/**
+	 * Any other personal details collected by a theme
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var array $detais
+	 */
+	public $details;
 
 	/**
 	 * Update form link
@@ -196,7 +204,11 @@ class Participant extends Exchange {
 
 	public function publish_contactme() {
 		if ( $this->has_contactme ) {
-			$cm = eae_encode_str( $this->contactme );
+			if ( function_exists( 'eae_encode_str' ) ) {
+				$cm = eae_encode_str( $this->contactme );
+			} else {
+				$cm = $this->contactme;
+			}
 			echo '<a href="mailto:' . $cm . '">' . $cm . '</a>';
 		}
 	}

@@ -259,6 +259,13 @@ class Exchange {
 		$this->controller->set_container( $this );
 	}
 
+	/**
+	 * Publish the featured image.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @param string context.
+	 **/
 	public function publish_featured_image( $context = '' ) {
 		if ( $this->has_featured_image ) {
 			$this->featured_image->publish( $context );

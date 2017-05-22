@@ -331,7 +331,7 @@ class Image extends BasePattern {
 	 private function set_src_set_and_sizes() {
 		$src_sets = $this->check_for_src_set();
 		$full = $this->get_src_set_part( 'full', $src_sets );
-		if ( 'contactblock' === $this->context ) {
+		if ( 'contactblock' === $this->context || 'participant' === $this->context ) {
 			$thumb = $this->get_src_set_part( 'thumbnail', $src_sets );
 		} elseif ( 'portrait' !== $this->orientation ) {
 			$wide = $this->get_src_set_part( 'header-image', $src_sets );
@@ -361,6 +361,7 @@ class Image extends BasePattern {
 				$order = array( $medium, $mlarge, $large, $wide );
 				break;
 			case 'contactblock' :
+			case 'participant' :
 				$order = array( $thumb );
 				break;
 			case 'collaboration__header' :
@@ -415,7 +416,7 @@ class Image extends BasePattern {
 		$this->set_src_set_and_sizes();
 
 		// Set src just in case, defaulting to medium when not available.
-		if ( 'contactblock' === $this->context ) {
+		if ( 'contactblock' === $this->context || 'participant' === $this->context ) {
 			$this->src = $this->input['sizes']['thumbnail'];
 		} else {
 			$this->src = $this->input['sizes']['medium'];
@@ -598,7 +599,7 @@ class Image extends BasePattern {
 		// Defaults to landscape if 'portrait' is not explicitly set or ratio => 1
 		if ( isset( $this->modifiers['orientation'] ) ) {
 			$this->orientation = $this->modifiers['orientation'];
-		} elseif ( in_array( $this->context, array('contactblock','collaboration__header'), true )
+		} elseif ( in_array( $this->context, array('contactblock','collaboration__header','participant'), true )
 			&& ( ! isset( $this->modifiers['style'] ) || 'tridem_or_more' !== $this->modifiers['style'] ) ) {
 			$this->orientation = 'square';
 		}

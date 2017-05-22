@@ -40,7 +40,11 @@ class StoryController extends BaseController {
 
 		// Map ACF variables.
 		$acf_intro = get_post_meta( $post_id, 'editorial_intro', true );
-		$acf_language = wp_get_post_terms( $post_id, 'language', true );
+
+		if ( current_theme_supports( 'language_tags' ) ) {
+			$acf_language = wp_get_post_terms( $post_id, 'language', true );
+		}
+
 		$acf_category = wp_get_post_terms( $post_id, 'category', true );
 		$acf_has_cta = get_post_meta( $post_id, 'has_cta', true );
 
@@ -141,7 +145,6 @@ class StoryController extends BaseController {
 
 		// Set header image.
 		$this->set_header_image( 'story__header' );
-
 
 		// Set participant as storyteller
 		$acf_storyteller = get_post_meta( $post_id, 'storyteller', true );

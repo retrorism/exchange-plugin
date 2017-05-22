@@ -194,7 +194,7 @@ class BaseController {
 	 * @todo Use taxonomy instead of post_met
 	 **/
 	protected function get_header_image_source() {
-		return get_post_meta( 'header_image', $this->container->post_id, true );
+		return get_post_meta( $this->container->post_id, 'header_image', true );
 	}
 
 	/**
@@ -210,9 +210,10 @@ class BaseController {
 	 * @todo remove ACF dependency
 	 */
 	protected function get_header_image( $context ) {
+
 		switch ( $this->get_header_image_source( $context ) ) {
 			case 'upload_new_image':
-				$thumb = get_post_meta( $this->container->post_id, 'upload_header_image', true );
+				$thumb_id = get_post_meta( $this->container->post_id, 'upload_header_image', true );
 				break;
 			case 'none':
 				break;
@@ -220,10 +221,10 @@ class BaseController {
 			default:
 				$thumb_id = get_post_thumbnail_id( $this->container->post_id );
 				// Use ACF function to create array for Image object constructor.
-				if ( ! empty( $thumb_id ) && function_exists( 'acf_get_attachment' ) ) {
-					$thumb = acf_get_attachment( $thumb_id );
-				}
 				break;
+		}
+		if ( ! empty( $thumb_id ) && function_exists( 'acf_get_attachment' ) ) {
+			$thumb = acf_get_attachment( $thumb_id );
 		}
 		if ( isset( $thumb ) ) {
 			$image_mods = array(

@@ -20,8 +20,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /* Register admin menu pages upon loading admin menu */
 add_action( 'admin_menu', 'exchange_add_and_remove_menu_options' );
-add_action( 'admin_menu', 'exchange_register_settings');
-add_action( 'admin_menu', 'exchange_add_options_page');
 add_action( 'admin_init', 'exchange_set_admin_menu_separator' );
 
 /* Hook meta boxes to the 'story' and 'collaboration' post types. */

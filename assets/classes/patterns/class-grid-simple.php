@@ -14,9 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 };
 
 /**
- * Related Grid Class
+ * Simple Grid Class
  *
- * This class serves as the basis for Related post views.
+ * This class serves as the basis for curated grids in stories.
  *
  * @since 0.1.0
  **/
