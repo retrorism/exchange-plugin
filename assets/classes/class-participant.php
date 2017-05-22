@@ -146,6 +146,15 @@ class Participant extends Exchange {
 	public $details;
 
 	/**
+	 * Participant type: container for optional taxonomy.
+	 *
+	 * @since 0.1.0
+	 * @access public
+	 * @var object participant type
+	 */
+	public $participant_type;
+
+	/**
 	 * Update form link
 	 *
 	 * @since 0.1.0

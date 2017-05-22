@@ -43,6 +43,9 @@ class ParticipantController extends BaseController {
 			$this->set_featured_image('participant');
 		}
 
+		if ( current_theme_supports( 'exchange_participant_types' ) ) {
+			$this->set_participant_type();
+		}
 		// Add update token
 		$this->set_participant_update_form_link();
 	}
@@ -99,6 +102,17 @@ class ParticipantController extends BaseController {
 			} else {
 				$this->container->details[ $key ] = $value[0];
 			}
+		}
+	}
+
+	protected function set_participant_type() {
+		if ( ! current_theme_supports( 'exchange_participant_types' ) ) {
+			return;
+		}
+		$post_id = $this->container->post_id;
+		$terms = get_the_terms( $post_id, 'participant_type' );
+		if ( ! empty( $terms ) && $terms[0] instanceof WP_Term ) {
+			$this->container->participant_type = $terms[0];
 		}
 	}
 
