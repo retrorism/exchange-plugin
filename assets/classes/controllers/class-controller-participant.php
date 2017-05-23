@@ -41,6 +41,7 @@ class ParticipantController extends BaseController {
 		} else {
 			$this->set_participant_details();
 			$this->set_featured_image('participant');
+			$this->set_participant_location();
 		}
 
 		if ( current_theme_supports( 'exchange_participant_types' ) ) {
@@ -95,11 +96,19 @@ class ParticipantController extends BaseController {
 			return;
 		}
 		foreach( $p_meta as $key => $value ) {
-			if ( 0 !== strpos( $key, 'participant_' ) ) {
+			if ( 0 !== strpos( $key, 'participant_' ) && 'participant_location' !== $key ) {
 				continue;
 			}
 			if ( 'participant_email' === $key ) {
 				$this->container->set_contactme( $value[0] );
+			} elseif ( 'participant_location' === $key ) {
+				// Double unserialization to allow for complicated ACF imports using a CSV importer
+				$coords = maybe_unserialize( maybe_unserialize( $value[0] ) );
+				if ( is_array( $coords )
+					&& ! empty( $coords['lat'] ) 
+					&& ! empty( $coords['lng'] ) ) {
+					$this->container->org_coords = $coords;
+				}
 			} else {
 				$this->container->details[ $key ] = $value[0];
 			}
@@ -129,5 +138,45 @@ class ParticipantController extends BaseController {
 		$post_id = $this->container->post_id;
 		$link = get_post_meta( $post_id, 'participant_update_form_link', true );
 		$this->container->set_update_form_link( $link );
+	}
+
+	protected function set_participant_location() {
+		$locations = array(
+			'title' => $this->container->title,
+			'link' => $this->container->link,
+			'locations' => array(),
+		);
+		if ( $this->container->has_featured_image && ! empty( $this->container->featured_image->input['sizes'] ) ) {
+			$locations['image'] = $this->container->featured_image->input['sizes']['thumbnail'];
+		}
+		$p['exchange_id'] = $this->container->post_id;
+		if ( ! empty( $this->container->name ) ) {
+			$p['name'] = $this->container->name;
+		}
+		if ( ! empty( $this->container->org_name ) ) {
+			$p['org_name'] = $this->container->org_name;
+		}
+		if ( ! empty( $this->container->org_coords ) ) {
+			$lat = floatval( $this->container->org_coords['lat'] );
+			$lng = floatval( $this->container->org_coords['lng'] );
+		}
+		if ( ! empty( $lat ) && ! empty( $lng ) ) {
+			$p['latlngs'] = array( $lat, $lng );
+		} elseif ( ! empty( $this->container->org_city ) || ! empty( $this->container->org_coords['address'] ) ) {
+			$geocoded_latlngs = $this->get_location_coords( $this->container );
+			if ( ! empty( $geocoded_latlngs ) ) {
+				$p['latlngs'] = $geocoded_latlngs;
+			}
+		}
+		if ( ! empty( $this->container->org_city ) ) {
+			$p['org_city'] = $this->container->org_city;
+		}
+		if ( $p['latlngs'] ) {
+			$locations['locations'][] = $p;
+		}
+		if ( count( $locations['locations'] ) >= 1 ) {
+			$this->container->locations = $locations;
+			$this->container->has_locations = true;
+		}
 	}
 }

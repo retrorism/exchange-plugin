@@ -310,6 +310,33 @@ class BaseController {
 	}
 
 	/**
+	 * Retrieve coords for a participant using the Leaflet Plugin
+	 *
+	 * @since 0.1.0
+	 * @author Willem Prins | Somtijds
+	 *
+	 * @access protected
+	 * @return array of properties for featured image or for the fallback image.
+	 * @todo remove ACF dependency
+	 **/			
+	protected function get_location_coords( $p_obj ) {
+
+		if ( ! class_exists( 'Leaflet_Map_Plugin' ) || ! is_a( $p_obj, 'Participant' ) ) {
+			return;
+		}
+		if ( ! empty( $p_obj->org_coords['address'] ) ) {
+			$geocoded = Leaflet_Map_Plugin::geocoder( $p_obj->org_coords['address'] );
+            $coords = array( $geocoded->{'lat'}, $geocoded->{'lng'} );
+		} elseif ( ! empty( $p_obj->org_city ) ) {
+			$geocoded = Leaflet_Map_Plugin::geocoder( $p_obj->org_city );
+			$coords = array( $geocoded->{'lat'}, $geocoded->{'lng'} );
+		}
+		if ( $coords ) {
+			return $coords;
+		}
+	}
+
+	/**
 	 * Attaches featured image to content for use in grids
 	 *
 	 * @since 0.1.0

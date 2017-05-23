@@ -121,24 +121,6 @@ class CollaborationController extends BaseController {
 		}
 	}
 
-	protected function get_location_coords( $p_obj ) {
-
-		if ( ! class_exists( 'Leaflet_Map_Plugin' ) || ! is_a( $p_obj, 'Participant' ) ) {
-			return;
-		}
-		if ( ! empty( $p_obj->org_coords['address'] ) ) {
-			$geocoded = Leaflet_Map_Plugin::geocoder( $p_obj->org_coords['address'] );
-            $coords = array( $geocoded->{'lat'}, $geocoded->{'lng'} );
-		} elseif ( ! empty( $p_obj->org_city ) ) {
-			$geocoded = Leaflet_Map_Plugin::geocoder( $p_obj->org_city );
-			$coords = array( $geocoded->{'lat'}, $geocoded->{'lng'} );
-		}
-		if ( $coords ) {
-			return $coords;
-		}
-	}
-
-
 	protected function set_collaboration_locations() {
 		$locations = array(
 			'title' => $this->container->title,

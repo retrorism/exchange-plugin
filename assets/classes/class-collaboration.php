@@ -62,25 +62,6 @@ class Collaboration extends Exchange {
 	public $has_participants = false;
 
 	/**
-	 * Geo locations stored in associative array where participant IDs are key, and values
-	 * are the organisation's names, lat, and long.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 * @var array $locations List that holds participants' location details.
-	 */
-	public $locations;
-
-	/**
-	 * Geo check.
-	 *
-	 * @since 0.1.0
-	 * @access public
-	 * @var boolean $has_locations When there's two or more geolocations added for mapping. Defaults to false.
-	 */
-	public $has_locations = false;
-
-	/**
 	 * Stories list.
 	 *
 	 * @since 0.1.0

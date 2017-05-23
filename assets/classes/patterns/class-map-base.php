@@ -113,7 +113,7 @@ abstract class BaseMap extends BasePattern {
 			$map_shortcode = $this->create_map_shortcode();
 
 			if ( 'dots' === $this->input['map_style'] ) {
-				$this->set_map_markers();
+				$this->set_participant_markers();
 			} elseif ( 'network' === $this->input['map_style'] ) {
 				$this->set_map_collaborations();
 			}
@@ -125,7 +125,6 @@ abstract class BaseMap extends BasePattern {
 			$this->set_attribute('data','map-hash', $this->map_hash );
 
 			$this->output_tag_open( $el );
-
 
 			$this->output .= apply_filters('the_content', $map_shortcode);
 
@@ -159,9 +158,9 @@ abstract class BaseMap extends BasePattern {
 	 *
 	 * Sets input array to map_markers property.
 	 */
-	protected function set_map_markers() {
+	protected function set_map_markers_1() {
 		$markers = $this->input['map_markers'];
-		if ( ! is_array( $markers ) && count( $markers ) > 0 )  {
+		if ( empty( $markers ) || count( $markers ) > 0 )  {
 			return;
 		} else {
 			foreach( $markers as $marker ) {
@@ -170,6 +169,57 @@ abstract class BaseMap extends BasePattern {
 			if ( ! empty( $this->map_markers > 0 ) ) {
 				$this->has_markers = true;
 			}
+		}
+	}
+
+	/**
+	 * Set map markers.
+	 *
+	 * Sets input array to map_markers property.
+	 */
+	protected function set_participant_markers() {
+		$objects = $this->input['map_markers'];
+		$p_loc_transient = get_transient( 'participant_locations' );
+		if ( empty( $objects ) || count( $objects ) == 0 ) {
+			if ( $p_loc_transient ) {
+				foreach( $p_loc_transient as $p_loc_id => $p_loc ) {
+					$p_loc['id'] = $p_loc_id;
+					$this->map_markers[] = $p_loc;
+				}
+			}
+		} else {
+			$participants = array();
+			foreach ( $objects as $object ) {
+				if ( is_numeric( $object ) && $object > 0 ) {
+					$object = get_post( $object );
+				}
+				switch ( $object->post_type ) {
+					case 'participant' :
+						$participants[] = $object;
+						break;
+					default :
+						break;
+				}
+			}
+			$participants = array_unique( $participants, SORT_REGULAR );
+			$participant_total = count( $participants );
+
+			if ( $p_loc_transient ) {
+				for ( $i = 0; $i < $participant_total; $i++ ) {
+					if ( ! empty( $p_loc_transient[ $participants[$i]->ID ] ) ) {
+						$this->map_markers[] = $p_loc_transient[ $participants[$i]->ID ];
+					} else {
+						$this->set_participant_data( $participants[$i] );
+					}
+				}
+			} else {
+				for ( $i = 0; $i < $participant_total; $i++ ) {
+					$this->set_participant_data( $participants[ $i ] );
+				}
+			}
+		}
+		if ( ! empty( $this->map_markers ) ) {
+			$this->has_markers = true;
 		}
 	}
 
@@ -236,6 +286,57 @@ abstract class BaseMap extends BasePattern {
 		}
 	}
 
+		/**
+	 * Set map markers.
+	 *
+	 * Sets input array to map_markers property.
+	 */
+	protected function set_map_participants( ) {
+		$objects = $this->input['map_participants'];
+		$p_loc_transient = get_transient( 'participant_locations' );
+		if ( empty( $objects ) || count( $objects ) == 0 ) {
+			if ( $p_loc_transient ) {
+				foreach( $p_loc_transient as $p_loc_id => $p_loc ) {
+					$p_loc['id'] = $p_loc_id;
+					$this->map_markers[] = $p_loc;
+				}
+			}
+		} else {
+			$participants = array();
+			foreach ( $objects as $object ) {
+				if ( is_numeric( $object ) && $object > 0 ) {
+					$object = get_post( $object );
+				}
+				switch ( $object->post_type ) {
+					case 'participant' :
+						$participants[] = $object;
+						break;
+					default :
+						break;
+				}
+			}
+			$participants = array_unique( $participants, SORT_REGULAR );
+			$participant_total = count( $participants );
+
+			if ( $p_loc_transient ) {
+				for ( $i = 0; $i < $participant_total; $i++ ) {
+					if ( ! empty( $p_loc_transient[ $participants[$i]->ID ] ) ) {
+						$this->map_markers[] = $p_loc_transient[ $participants[$i]->ID ];
+					} else {
+						$this->set_collaboration_data( $collaborations[$i] );
+					}
+				}
+			} else {
+				for ( $i = 0; $i < $collab_total; $i++ ) {
+					$this->set_collaboration_data( $collaborations[ $i ] );
+				}
+			}
+		}
+		if ( ! empty( $this->map_polylines ) ) {
+			$this->has_network = true;
+		}
+	}
+
 	/**
 	 * Retrieve the right map size from the users selection
 	 *
@@ -253,6 +354,36 @@ abstract class BaseMap extends BasePattern {
 		return $sizes[$key];
 	}
 
+	/**
+	 * Set participant data
+	 *
+	 * This function creates a marker
+	 *
+	 * @param object $collaboration Post object
+	 * @return void
+	 */
+	 protected function set_participant_data( $participant ) {
+		$p_object = BaseController::exchange_factory( $participant );
+		if ( ! $p_object instanceof Participant ) {
+			return;
+		}
+		if ( ! $p_object->has_locations ) {
+			return;
+		}
+		// Create label
+		if ( $this->use_shortcodes_for_objects ) {
+			$line_label = addslashes( exchange_create_link( $c_object ) );
+			// Feed the collaboration geodata into a shortcode
+			$marker = array(
+				'lat'     => $p_object->locations[0]['lat'],
+				'lng'     => $p_object->locations[0]['lng'],
+				'message' => $line_label,
+			);
+			$this->map_marker_shortcodes[] = $this->create_map_marker_shortcode( $marker );
+		} else {
+			$this->map_markers[] = $this->create_map_marker_data( $p_object );
+		}
+	}
 
 	/**
 	 * Set collaboration data
@@ -315,11 +446,11 @@ abstract class BaseMap extends BasePattern {
 		$sizes = $this->get_map_size();
 		$map_shortcode = '[leaflet-map zoomcontrol=1 ';
 		$map_shortcode .= 'height=' . $sizes[1] ;
-		if ( 'network' !== $this->input['map_style'] ) {
-			$map_shortcode .= ' zoom=' . $this->input['map_zoom_level'] . ' ';
-			$map_shortcode .= 'lat=' . $this->input['map_center']['lat'] . ' ';
-			$map_shortcode .= 'lng=' . $this->input['map_center']['lng'];
-		}
+		// if ( 'network' !== $this->input['map_style'] ) {
+		// 	$map_shortcode .= ' zoom=' . $this->input['map_zoom_level'] . ' ';
+		// 	$map_shortcode .= 'lat=' . $this->input['map_center']['lat'] . ' ';
+		// 	$map_shortcode .= 'lng=' . $this->input['map_center']['lng'];
+		// }
 		// if ( 'full' === $this->input['map_size'] ) {
 		// 	$map_shortcode .= ' zoomcontrol=0'; 
 		// }
@@ -401,6 +532,46 @@ abstract class BaseMap extends BasePattern {
 		}
 		return $line;
 	}
+
+	protected function create_map_marker_data( $obj ) {
+		$response = array(
+			'title' => $obj->locations->title,
+			'link' => $obj->locations->link,
+		);
+		$response_locations = array();
+		// Set locations
+		foreach ( $obj->locations as $p => $location ) {
+			$lat = floatval( $location['org_lat'] );
+			$lng = floatval( $location['org_lng'] );
+			if ( ! empty( $lat ) && ! empty( $lng ) ) {
+				$response_locations[ $p ]['latlngs'] = array( $lat, $lng );
+			} elseif ( ! empty( $location['org_city'] ) || ! empty( $location['org_address'] ) ) {
+				$geocoded_latlngs = $this->get_location_coords( $location );
+				if ( ! empty( $geocoded_latlngs ) ) {
+					$response_locations[ $p ]['latlngs'] = $geocoded_latlngs;
+				}
+			}
+			if ( $location['name'] ) {
+				$response_locations[ $p ]['name'] = $location['name'];
+			}
+			if ( $location['exchange_id'] ) {
+				$response_locations[ $p ]['exchange_id'] = $location['exchange_id'];
+			}
+			if ( $location['org_city'] ) {
+				$response_locations[ $p ]['city'] = $location['org_city'];
+			}
+			if ( $location['org_name'] ) {
+				$response_locations[ $p ]['org_name'] = $location['org_name'];
+			}
+		}
+		// There should be only one, otherwise, take the first.
+		$response['location'] = $response_locations[0];
+		if ( $obj->has_featured_image && ! empty( $obj->featured_image->input['sizes'] ) ) {
+			$response['image'] = $obj->featured_image->input['sizes']['thumbnail'];
+		}
+		return $response;
+	}
+
 
 	protected function create_map_polyline_data( $collab ) {
 		$response = array(
