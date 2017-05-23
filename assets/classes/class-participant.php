@@ -190,6 +190,15 @@ class Participant extends Exchange {
 	}
 
 	public function set_contactme( $e ) {
+		$post_id = $this->post_id;
+
+		if ( current_theme_supports( 'exchange_participant_toggle_email' ) ) {
+			$show_contactme = get_post_meta( $post_id, 'participant_toggle_email', true );
+			if ( '1' !== $show_contactme ) {
+				return;
+			}
+		}
+
 		$this->contactme = $e;
 		$this->has_contactme = true;
 	}

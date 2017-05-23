@@ -46,6 +46,7 @@ class ParticipantController extends BaseController {
 		if ( current_theme_supports( 'exchange_participant_types' ) ) {
 			$this->set_participant_type();
 		}
+
 		// Add update token
 		$this->set_participant_update_form_link();
 	}
