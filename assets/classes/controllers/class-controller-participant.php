@@ -35,6 +35,11 @@ class ParticipantController extends BaseController {
 		// Mapping / aliasing title to name.
 		$this->container->name = $this->container->title;
 
+		// Set participant type
+		if ( current_theme_supports( 'exchange_participant_types' ) ) {
+			$this->set_participant_type();
+		}
+
 		// Mapping organisation data.
 		if ( ! current_theme_supports( 'exchange_participant_profiles' ) ) {
 			$this->set_organisation_data();
@@ -44,9 +49,7 @@ class ParticipantController extends BaseController {
 			$this->set_participant_location();
 		}
 
-		if ( current_theme_supports( 'exchange_participant_types' ) ) {
-			$this->set_participant_type();
-		}
+
 
 		// Add update token
 		$this->set_participant_update_form_link();
@@ -170,6 +173,12 @@ class ParticipantController extends BaseController {
 		}
 		if ( ! empty( $this->container->org_city ) ) {
 			$p['org_city'] = $this->container->org_city;
+		}
+		if ( current_theme_supports('exchange_participant_profiles') && ! empty( $this->container->details['participant_country'] ) ) {
+			$p['country'] = $this->container->details['participant_country'];
+		}
+		if ( current_theme_supports('exchange_participant_types') && ! empty( $this->container->participant_type ) ) {
+			$p['participant_type'] = $this->container->participant_type->slug;
 		}
 		if ( $p['latlngs'] ) {
 			$locations['locations'][] = $p;

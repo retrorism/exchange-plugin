@@ -563,6 +563,9 @@ abstract class BaseMap extends BasePattern {
 			if ( $location['org_name'] ) {
 				$response_locations[ $p ]['org_name'] = $location['org_name'];
 			}
+			if ( $location['country'] ) {
+				$response_locations[ $p ]['country'] = $location['country'];
+			}
 		}
 		// There should be only one, otherwise, take the first.
 		$response['location'] = $response_locations[0];
