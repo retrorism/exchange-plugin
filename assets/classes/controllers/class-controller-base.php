@@ -420,6 +420,13 @@ class BaseController {
 			case 'collaboration':
 				$tax_list = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['display_priority_collaboration'];
 				break;
+			case 'participant':
+				if ( ! current_theme_supports( 'exchange_participant_profiles' ) ) {
+					break;
+				} else {
+					$tax_list = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['display_priority_participant'];
+					break;
+				}
 			default:
 				return;
 		}
@@ -481,11 +488,12 @@ class BaseController {
 	 *
 	 * @access public
 	 * @param int $max Maximum number of tags.
+     * @param string select a taxonomy.
 	 * @return array List of tags.
 	 *
 	 * @todo Expand selection options.
 	 **/
-	public function get_tag_short_list( $max ) {
+	public function get_tag_short_list( $max, $tax = '' ) {
 		$tag_list = $this->container->ordered_tag_list;
 		if ( empty( $tag_list ) ) {
 			return;
@@ -496,7 +504,13 @@ class BaseController {
 		while ( $i < $tag_number && count( $shortlist ) < $max ) {
 			$term = $tag_list[ $i ];
 			if ( $term instanceof WP_Term ) {
-				$shortlist[] = $term;
+				if ( '' === $tax ) {
+					$shortlist[] = $term;
+				} elseif ( is_string( $tax )
+					&& taxonomy_exists( $tax ) 
+					&& $term->taxonomy === $tax ) {
+					$shortlist[] = $term;
+				}
 			}
 			$i++;
 		}

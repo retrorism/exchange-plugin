@@ -419,13 +419,17 @@ class Exchange {
 		}
 	}
 
-	public function publish_tags( $context = '' ) {
+	public function publish_tags( $context = '', $tax = '' ) {
 		if ( $this->has_tags ) {
 			$output = "<ol>" . PHP_EOL;
 			if ( 'griditem' === $context ) {
-			 	$list = $this->controller->get_tag_short_list( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['grid_tax_max'] );
+			 		$list = $this->controller->get_tag_short_list( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['grid_tax_max'] );
 			} elseif ( 'collaboration' === $context ) {
 			 	$list = $this->controller->get_tag_short_list( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['collaboration_tax_max'] );
+			} elseif ( 'participant__details' === $context
+				&& $tax !== ''
+				&& taxonomy_exists( $tax ) ) {
+					$list = $this->controller->get_tag_short_list( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['single_tax_max'], $tax );
 			} else {
 				$list = $this->ordered_tag_list;
 			}

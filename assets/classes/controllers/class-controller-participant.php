@@ -43,10 +43,12 @@ class ParticipantController extends BaseController {
 		// Mapping organisation data.
 		if ( ! current_theme_supports( 'exchange_participant_profiles' ) ) {
 			$this->set_organisation_data();
+
 		} else {
 			$this->set_participant_details();
 			$this->set_featured_image('participant');
 			$this->set_participant_location();
+			$this->set_ordered_tag_list();
 		}
 
 
