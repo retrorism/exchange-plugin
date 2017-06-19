@@ -146,19 +146,30 @@ class StoryController extends BaseController {
 		// Set header image.
 		$this->set_header_image( 'story__header' );
 
-		// Set participant as storyteller
+		// Set one or more participants as storytellers
 		$acf_storyteller = get_post_meta( $post_id, 'storyteller', true );
 		if ( is_numeric( $acf_storyteller ) ) {
-			$storyteller = BaseController::exchange_factory( $acf_storyteller );
+			$s_obj = BaseController::exchange_factory( $acf_storyteller );
 			if ( $storyteller instanceof Participant ) {
-				$this->container->storyteller = $storyteller;
+				$this->container->storyteller[] = $s_obj;
 			}
 		}
-		if ( ! empty( $this->container->storyteller ) ) {
-			$this->set_byline();
-		} else {
-			$this->set_custom_byline();
+		if ( is_array( $acf_storyteller ) ) {
+			foreach ( $acf_storyteller as $s ) {
+				$s_obj = BaseController::exchange_factory( $s );
+				if ( $s_obj instanceof Participant ) {
+					$this->container->storyteller[] = $s_obj;
+				}
+			}
 		}
+		if ( current_theme_supports( 'bylines') ) {
+			if ( ! empty( $this->container->storyteller ) ) {
+				$this->set_byline();
+			} else {
+				$this->set_custom_byline();
+			}
+		}
+
  		//$this->set_videos(); 
 		
 		$this->populate_gallery();
@@ -310,6 +321,21 @@ class StoryController extends BaseController {
 			$this->set_byline();
 		}
 	}
+
+	// /**
+	//  * undocumented function
+	//  *
+	//  * @return void
+	//  * @author 
+	//  **/
+	// protected function set_storyteller_card() {
+	// 	if ( empty( $this->container->storyteller ) || ! count( $this->container->storyteller ) ) {
+	// 		return;
+	// 	}
+	// 	foreach( $this->container->storyteller as $s_object ) {
+
+	// 	}
+	// }
 
 	/**
 	 * Iterate over sections to find images to put in the gallery

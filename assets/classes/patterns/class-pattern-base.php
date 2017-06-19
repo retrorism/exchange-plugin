@@ -146,7 +146,7 @@ abstract class BasePattern {
 		$this->context = ! empty( $context ) ? $context : '';
 
 		// Check if the modifiers provided at instantiation are not empty.
-		if ( !empty( $modifiers ) ) {
+		if ( ! empty( $modifiers ) ) {
 			$this->modifiers = $modifiers;
 		}
 
@@ -455,6 +455,18 @@ abstract class BasePattern {
 	}
 
 	/**
+	 * 
+	 *
+	 *
+     **/
+	public function clear_output() {
+		// If this pattern is reused, make sure its output = empty;
+		$this->output = '';
+		$this->context = '';
+		$this->classes = array();
+		$this->modifiers = array();
+	}
+	/**
 	 * Prints escaped pattern output. Make sure to escape anywhere else.
 	 *
 	 * @since 0.1.0
@@ -474,6 +486,7 @@ abstract class BasePattern {
 	 * @param int $limit
 	 **/
 	public function publish_stripped( $context = '', $limit = 0 ) {
+		// If this pattern is reused, make sure its output = empty;
 		$this->prepare( $context )->create_output();
 		$out = strip_tags( strip_shortcodes( $this->output ), '<div><p><em>' ) . PHP_EOL;
 		if ( is_int( $limit ) && $limit > 0 ) {
@@ -491,6 +504,7 @@ abstract class BasePattern {
 	 * @return string $output HTML output consisting of tags and content.
 	 **/
 	public function embed( $context = '' ) {
+		// If this pattern is reused, make sure its output = empty;
 		$this->prepare( $context )->create_output();
 		return $this->output;
 	}

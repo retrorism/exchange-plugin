@@ -163,6 +163,24 @@ class Participant extends Exchange {
 	 */
 	 private $update_form_link;
 
+ 	/**
+	 * Flag for the existence of shared stories for this participant
+	 *
+	 * @since 0.2.0
+	 * @access public
+	 * @var boolean $has_stories will be true if there are stories for this participant
+	 */
+	 public $has_stories = false;
+
+ 	/**
+	 * Stories list.
+	 *
+	 * @since 0.2.0
+	 * @access public
+	 * @var array $stories For gathering all related stories for this participant
+	 */
+	public $stories = array();
+
 	/**
 	 * Constructor for participant objects.
 	 *

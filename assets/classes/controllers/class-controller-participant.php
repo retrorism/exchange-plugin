@@ -49,6 +49,7 @@ class ParticipantController extends BaseController {
 			$this->set_featured_image('participant');
 			$this->set_participant_location();
 			$this->set_ordered_tag_list();
+			$this->set_participant_stories();
 		}
 
 
@@ -189,5 +190,31 @@ class ParticipantController extends BaseController {
 			$this->container->locations = $locations;
 			$this->container->has_locations = true;
 		}
+	}
+
+	protected function set_participant_stories() {
+		$mq_value = '"' . $this->container->post_id . '"';
+		$args = array(
+			'post_type' => 'story',
+			'post_status' => 'publish',
+			'meta_query' => array(
+				array(
+					'key'   => 'storyteller',
+					'value' => $mq_value,
+					'compare' => 'LIKE'
+				),
+			)
+		);
+		$query = new WP_Query( $args );
+		if ( empty( $query->posts ) ) {
+			return;
+		}
+		foreach( $query->posts as $post ) {
+			$this->container->stories[] = $post;
+		}
+		if ( count( $this->container->stories ) > 0 ) {
+			$this->container->has_stories = true;
+		}
+		wp_reset_postdata();
 	}
 }

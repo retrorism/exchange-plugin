@@ -144,18 +144,6 @@ class Collaboration extends Exchange {
 		}
 	}
 
-	public function publish_related_stories( $context = '' ) {
-		$grid_mods = array(
-			'related' => 'has_stories'
-		);
-		if ( ! $this->has_stories ) {
-			return;
-		}
-		$grid = new RelatedGrid( $this->stories, $this->type, $grid_mods );
-		$grid->publish( $context );
-
-	}
-
 	/**
 	 * Publish collaboration map.
 	 *

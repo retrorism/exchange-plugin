@@ -26,6 +26,7 @@ class RelatedGrid extends BaseGrid {
 	 *
 	 * @since 0.1.0
 	 * @access protected
+	 * @todo remove reference to global color
 	 **/
 	 protected function create_output() {
 
@@ -35,7 +36,7 @@ class RelatedGrid extends BaseGrid {
 		} else {
 			$el = 'div';
 		}
-		$colour = '#' . $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['salmon-1-web'];
+		$colour = '#' . $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['COLOURS']['related-grid-background'];
 		$this->set_grid_items();
 		 // Create grid with posts embedded.
 		if ( $this->has_grid_items ) {
@@ -46,6 +47,8 @@ class RelatedGrid extends BaseGrid {
 			$this->set_attribute('data','children', count( $this->grid_items ) );
 			$header_text = __( 'Read more','exchange' );
 			if ( 'collaboration' === $this->context && 'has_stories' === $this->modifiers['related'] ) {
+				$header_text = __( 'Shared stories','exchange');
+			} elseif ( current_theme_supports('exchange_participant_profiles' ) && 'participant' === $this->context ) {
 				$header_text = __( 'Shared stories','exchange');
 			}
 			$header = new SectionHeader( $header_text, $this->element );

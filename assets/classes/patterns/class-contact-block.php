@@ -43,16 +43,17 @@ class ContactBlock extends BasePattern {
 	 * @access protected
 	 **/
 	protected function create_output() {
-
-		if ( is_array( $this->input ) && ! empty( $this->input['ID'] ) ) {
+		$this->output_tag_open();
+		if ( $this->input instanceof Participant ) {
+			// $this->set_participant_meta();
+			// $this->set_participant_image();
+			$this->output .= $this->create_storyteller_card();
+		} elseif ( is_array( $this->input ) && ! empty( $this->input['ID'] ) ) {
 			$this->set_user_meta();
 			$this->set_user_image();
-			$this->output_tag_open();
-
 			$this->output .= $this->create_contact_block();
-
-			$this->output_tag_close();
 		}
+		$this->output_tag_close();
 	}
 
 	/**
@@ -65,6 +66,19 @@ class ContactBlock extends BasePattern {
 		}
 	}
 
+	// /**
+	//  * Set participant image
+	//  */
+	// protected function set_participant_image() {
+	// 	if ( ! $this->input->has_featured_image ) {
+	// 		return;
+	// 	}
+	// 	$image = $this->input->featured_image;
+	// 	if ( $image instanceof Image ) ) {
+	// 		$this->user_image = $image;
+	// 	}
+	// }
+
 	/**
 	 * Set extra user fields
 	 */
@@ -74,6 +88,17 @@ class ContactBlock extends BasePattern {
 			$this->user_meta = $user_meta;
 		}
 	}
+
+	// /**
+	//  * Set extra participant fields
+	//  */
+	// private function set_participant_meta() {
+	// 	$user_meta = array();
+	// 	$this->input->details;
+	// 	if ( ! empty( $user_meta ) ) {
+	// 		$this->user_meta = $user_meta;
+	// 	}
+	// }
 
 	/**
 	 * Get user image.
@@ -119,6 +144,24 @@ class ContactBlock extends BasePattern {
 			}
 			$user_info = $this->input;
 			include( locate_template( 'parts/contact-block.php' ) );
+			$contact_block = ob_get_contents();
+			ob_end_clean();
+		}
+		return $contact_block;
+	}
+
+		/**
+	 * Retrieve team member details;
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return string $contact_block HTML output.
+	 **/
+	protected function create_storyteller_card() {
+		if ( '' !== locate_template( 'parts/storyteller-card.php' ) ) {
+			ob_start();
+			$exchange = $this->input;
+			include( locate_template( 'parts/storyteller-card.php' ) );
 			$contact_block = ob_get_contents();
 			ob_end_clean();
 		}

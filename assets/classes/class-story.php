@@ -46,11 +46,11 @@ class Story extends Exchange {
 	/**
 	 * Storyteller
 	 *
-	 * @since 0.1.0
+	 * @since 0.2.0
 	 * @access public
-	 * @var Participant object.
+	 * @var array with Storyteller objects.
 	 **/
-	public $storyteller;
+	public $storyteller = array();
 
 	/**
 	 * $has_custom_byline
@@ -88,6 +88,31 @@ class Story extends Exchange {
 		if ( isset( $this->byline ) ) {
 			$this->byline->publish( $context );
 		}
+	}
+
+	/**
+	 * Publish contact card for storyteller
+	 *
+	 * @return void
+	 * @author Willem Prins | SOMTIJDS
+	 * @since 0.2.0
+	 *
+	 **/
+	public function publish_contact_card( $context = '' ) {
+		if ( empty( $this->storyteller ) ) {
+			return;
+		}
+		$output = '';
+		foreach( $this->storyteller as $s_object ) {
+			if ( ! $s_object instanceof Participant ) {
+				continue;
+			}
+			$contact_card = new ContactBlock( $s_object, $context );
+			if ( $contact_card instanceof ContactBlock) {
+				$output .= $contact_card->embed();
+			}
+		}
+		echo $output;
 	}
 
 	/**
