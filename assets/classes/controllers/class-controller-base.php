@@ -633,7 +633,13 @@ class BaseController {
 		}
 		$desc = ! empty( $term->description ) ? $tag->description : $term->name;
 		if ( class_exists( 'FacetWP' ) ) {
-			$term_link = get_home_url() . '/archive/?fwp_' . $term->taxonomy . '=' . $term->slug;
+			if ( array_key_exists( 'post-type-archive-exlusive', $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES'] )
+				&& in_array( $term->taxonomy, $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['TAXONOMIES']['post-type-archive-exlusive'], true ) ) {
+				$root = get_post_type_archive_link( $this->container->type );
+			} else {
+				$root = get_home_url() . '/archive/';
+			}
+			$term_link = $root . '?fwp_' . $term->taxonomy . '=' . $term->slug;
 		} else {
 			$term_link = get_term_link( $term );
 		}
