@@ -560,7 +560,7 @@ class BaseController {
 	 **/
 	protected function set_related_grid_content( $related_content ) {
 		$grid_content = $this->get_grid_content( $related_content );
-		if ( isset( $grid_content ) ) {
+		if ( ! empty( $grid_content ) ) {
 			$this->container->has_related_content = true;
 			$grid = new RelatedGrid( $grid_content, $this->container->type );
 			$this->container->related_content = $grid;
@@ -579,23 +579,39 @@ class BaseController {
 	 * @return array Array of max. three related WP_Post objects.
 	 */
 	protected function get_related_grid_content_by_tags() {
-		if ( ! $this->container->has_tags && 'story' === $this->container->type ) {
-			$related_posts = $this->get_related_grid_content_by_cat();
-			return $related_posts;
-		} else {
-			$tag_arr = array();
-			$tags = $this->container->ordered_tag_list;
-			foreach ( $tags as $tag ) {
-				$tag_arr[] = $tag->term_id;
+		$tag_arr = array();
+		$tags = $this->container->ordered_tag_list;
+		foreach ( $tags as $tag ) {
+			$tag_arr[$tag->taxonomy][] = $tag->term_id;
+		}
+		$tax_query = array('relation' => 'OR');
+		foreach ( $tag_arr as $k => $v ) {
+			$tax_query[] = array(
+				'taxonomy' => $k,
+				'terms'    => $v,
+				);
+		}
+		$post_types = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['POST_TYPES']['related_content'];
+		if ( empty( $post_types ) ) {
+			$post_types = 'story';
+		}
+		$args = array(
+			'post_type' => $post_types,
+			'posts_per_page' => 3, /* you can change this to show more */
+			'post__not_in' => array( $this->container->post_id ),
+			'orderby' => 'rand',
+			'tax_query' => $tax_query,
+		);
+		$related_posts_query = new WP_Query( $args );
+		if ( ! empty( $related_posts_query->posts ) ) {
+			$related_posts = $related_posts_query->posts;
+		}
+		if ( count( $related_posts < 3 ) ) {
+			$cat_related_posts = $this->get_related_grid_content_by_cat();
+			$index = 0;
+			while ( count( $related_posts ) < 3 && isset( $cat_related_posts[$index] ) ) {
+				$related_posts[] = $cat_related_posts[$index];
 			}
-
-			$args = array(
-				'post_type' => array( 'story', 'collaboration', 'programme_round', 'page' ),
-				'tag__in' => $tag_arr,
-				'numberposts' => 3, /* you can change this to show more */
-				'post__not_in' => array( $this->container->post_id ),
-			);
-			$related_posts = get_posts( $args );
 		}
 		return $related_posts;
 	}

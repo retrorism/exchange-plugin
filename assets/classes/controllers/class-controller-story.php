@@ -95,14 +95,10 @@ class StoryController extends BaseController {
 
 		// Get related
 		$curation = get_post_meta( $post_id, 'related_content_auto_select', true );
-		if ( ! $curation ) {
+		if ( '1' !== $curation ) {
 			$related_content = $this->get_related_grid_content_by_tags();
 		} else {
 			$related_content = get_post_meta( $post_id, 'related_content', true );
-		}
-
-		if ( is_array( $related_content ) && count( $related_content ) > 0 ) {
-			$this->set_related_grid_content( $related_content );
 		}
 
 		//Set sections.
@@ -172,6 +168,10 @@ class StoryController extends BaseController {
 
  		//$this->set_videos(); 
 		
+		if ( is_array( $related_content ) && count( $related_content ) > 0 ) {
+			$this->set_related_grid_content( $related_content );
+		}
+
 		$this->populate_gallery();
 	}
 
@@ -410,7 +410,7 @@ class StoryController extends BaseController {
 			$args = array(
 				'post_type' => array( 'story' ),
 				'cat' => $cat->slug,
-				'numberposts' => 3, /* you can change this to show more */
+				'numberposts' => $number_posts, /* you can change this to show more */
 				'post__not_in' => array( $this->container->post_id ),
 			);
 			$related_posts = get_posts( $args );

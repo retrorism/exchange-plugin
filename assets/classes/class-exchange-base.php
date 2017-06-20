@@ -365,9 +365,10 @@ class Exchange {
 	}
 
 	public function publish_related_content( $context = '' ) {
-		if ( $this->has_related_content ) {
-			$this->related_content->publish( $context );
+		if ( ! $this->has_related_content ) {
+			return;
 		}
+		$this->related_content->publish( $context );
 	}
 
 	public function publish_related_stories( $context = '' ) {
