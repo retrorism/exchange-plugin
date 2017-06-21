@@ -37,7 +37,7 @@ function exchange_relevanssi_add_extra_content($content, $post) {
 	    		}
 	    	}
 	    }
-    } elseif ( 'story' === $post->post_type ) {
+    } elseif ( in_array( $post->post_type, array('story','page'), true ) ) {
     	global $wpdb;
     	$rows = $wpdb->get_results("SELECT meta_value FROM wp_postmeta WHERE post_id = $post->ID AND meta_key LIKE 'sections_%text' OR meta_key LIKE 'sections_%question' OR meta_key LIKE 'sections_%answer'");
     	if ( empty( $rows ) ) {
@@ -48,6 +48,17 @@ function exchange_relevanssi_add_extra_content($content, $post) {
 				$add_to_content[] = $row->meta_value;
 			}
 		}
+    } elseif ( current_theme_supports('exchange_participant_profiles') && 'participant' === $post->post_type ) {
+		$p_obj = BaseController::exchange_factory( $post );
+		if ( ! $p_obj instanceof Participant ) {
+			return $content;
+		}
+		$index_these_deets = array('participant_headline','participant_headline_extension','participant_initiative','participant_town','participant_country');
+		foreach( $index_these_deets as $prop ) {
+			if ( ! empty( $p_obj->details[$prop] ) ) {
+				$add_to_content[] = $p_obj->details[$prop];
+			}
+		}		    
     }
     if ( empty( $add_to_content ) ) {
 		return $content;
