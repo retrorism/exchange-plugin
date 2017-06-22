@@ -111,10 +111,14 @@ function exchange_build_breadcrumb_base( $exchange ) {
 	$title_string = $exchange->title;
 	$tag = '';
 	$maxchars = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['BREADCRUMBS']['max-chars-default'];
+	$parent_link = get_post_type_archive_link( $exchange->type );
 	switch( $exchange->type ) {
 		case 'story':
 			$type_string = 'Stories';
 			$maxchars = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['BREADCRUMBS']['max-chars-story'];
+			break;
+		case 'participant':
+			$type_string = 'People';
 			break;
 		case 'collaboration':
 			$type_string = 'Collaborations';
@@ -134,12 +138,13 @@ function exchange_build_breadcrumb_base( $exchange ) {
 			break;
 		case 'page':
 			$parent = get_post( $post->post_parent );
+			$parent_link = get_the_permalink( $post->post_parent );
 			$type_string = $parent->post_title;
 			break;
 		default:
 			return;
 	}
-	$type = '<li><a href="' . get_post_type_archive_link( $exchange->type ) . '">' . $type_string . '</a></li>' . $arrow;
+	$type = '<li><a href="' . $parent_link . '">' . $type_string . '</a></li>' . $arrow;
 	if ( strlen( $title_string ) > $maxchars ) {
 		$title_string = substr( $title_string, 0, $maxchars ) . __( '...', EXCHANGE_PLUGIN );
 	}
