@@ -392,6 +392,7 @@ abstract class BasePattern {
 			default:
 				return;
 		}
+		$svg = apply_filters( 'exchange_section_border', $svg, $pos, $colour );
 		return $svg;
 	}
 
