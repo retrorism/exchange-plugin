@@ -107,7 +107,7 @@ function exchange_create_link( $obj, $with_text = true, $class = '' ) {
 
 function exchange_build_breadcrumb_base( $exchange ) {
 	global $post;
-	$arrow = '<li>' . exchange_build_svg( get_stylesheet_directory() . '/assets/images/svg/exchange_arrows_Single_WEB.svg' ) . '</li>';
+	$divider = '<li>' . exchange_build_svg( get_stylesheet_directory() . '/assets/images/svg/exchange_arrows_Single_WEB.svg' ) . '</li>';
 	$title_string = $exchange->title;
 	$tag = '';
 	$maxchars = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['BREADCRUMBS']['max-chars-default'];
@@ -125,7 +125,7 @@ function exchange_build_breadcrumb_base( $exchange ) {
 			$maxchars = $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['BREADCRUMBS']['max-chars-collaboration'];
 			if ( ! empty( $exchange->programme_round ) && is_string( $exchange->programme_round->term ) ) {
 				$participant_list = array();
-				$tag = '<li>' . exchange_create_link( $exchange->ordered_tag_list[0] ) . '</li>' . $arrow;
+				$tag = '<li>' . exchange_create_link( $exchange->ordered_tag_list[0] ) . '</li>' . $divider;
 			}
 			if ( ! empty( $exchange->participants ) ) {
 				foreach( $exchange->participants as $participant ) {
@@ -144,11 +144,13 @@ function exchange_build_breadcrumb_base( $exchange ) {
 		default:
 			return;
 	}
-	$type = '<li><a href="' . $parent_link . '">' . $type_string . '</a></li>' . $arrow;
+	$type = '<li><a href="' . $parent_link . '">' . $type_string . '</a></li>' . $divider;
+	$type = apply_filters( 'exchange_breadcrumb_type', $type, $exchange, $divider );
 	if ( strlen( $title_string ) > $maxchars ) {
 		$title_string = substr( $title_string, 0, $maxchars ) . __( '...', EXCHANGE_PLUGIN );
 	}
 	$title = '<li><span class="show-for-sr">Current: </span>'. $title_string. '</li>';
+	$title = apply_filters( 'exchange_breadcrumb_title', $title, $exchange, $divider );
 	return '<ol>' . $type . $tag . $title . '</ol>';
 }
 

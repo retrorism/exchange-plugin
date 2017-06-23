@@ -131,6 +131,7 @@ abstract class BaseGrid extends BasePattern {
 	 * @param integer $item Post object to be represented by grid item.
 	 */
 	public static function create_grid_item_from_post( $item, $context ) {
+
 		$exchange = BaseController::exchange_factory( $item, 'griditem' );
 		$item_mods = self::add_grid_modifiers( $exchange );
 		if ( 'relatedgrid' === $context ) {

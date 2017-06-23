@@ -56,9 +56,9 @@ class PullQuote extends BaseQuote {
 	}
 
 	protected function prepare_quotes() {
-		$open_path = get_stylesheet_directory() . '/assets/images/svg/T_quotes_Opening_WEB.svg';
+		$open_path = get_stylesheet_directory() . '/assets/images/svg/exchange_quotes_Opening_WEB.svg';
 		$open_icon = exchange_build_svg( $open_path );
-		$close_path = get_stylesheet_directory() . '/assets/images/svg/T_quotes_Closing_WEB.svg';
+		$close_path = get_stylesheet_directory() . '/assets/images/svg/exchange_quotes_Closing_WEB.svg';
 		$close_icon = exchange_build_svg( $close_path );
 		$this->quotes['close'] = $close_icon ? '<div class="pullquote__quote--close">' . $close_icon . '</div>' : '';
 		$this->quotes['open'] = $open_icon ? '<div class="pullquote__quote--open">' . $open_icon .'</div>' : '';
