@@ -48,6 +48,23 @@ class StoryController extends BaseController {
 		$acf_category = wp_get_post_terms( $post_id, 'category', true );
 		$acf_has_cta = get_post_meta( $post_id, 'has_cta', true );
 
+		// Set one or more participants as storytellers
+		$acf_storyteller = get_post_meta( $post_id, 'storyteller', true );
+		if ( is_numeric( $acf_storyteller ) ) {
+			$s_obj = BaseController::exchange_factory( $acf_storyteller );
+			if ( $storyteller instanceof Participant ) {
+				$this->container->storyteller[] = $s_obj;
+			}
+		}
+		if ( is_array( $acf_storyteller ) ) {
+			foreach ( $acf_storyteller as $s ) {
+				$s_obj = BaseController::exchange_factory( $s );
+				if ( $s_obj instanceof Participant ) {
+					$this->container->storyteller[] = $s_obj;
+				}
+			}
+		}
+
 		// Set editorial introduction.
 		if ( ! empty( $acf_intro ) ) {
 			$this->set_editorial_intro( $acf_intro );
@@ -142,22 +159,6 @@ class StoryController extends BaseController {
 		// Set header image.
 		$this->set_header_image( 'story__header' );
 
-		// Set one or more participants as storytellers
-		$acf_storyteller = get_post_meta( $post_id, 'storyteller', true );
-		if ( is_numeric( $acf_storyteller ) ) {
-			$s_obj = BaseController::exchange_factory( $acf_storyteller );
-			if ( $storyteller instanceof Participant ) {
-				$this->container->storyteller[] = $s_obj;
-			}
-		}
-		if ( is_array( $acf_storyteller ) ) {
-			foreach ( $acf_storyteller as $s ) {
-				$s_obj = BaseController::exchange_factory( $s );
-				if ( $s_obj instanceof Participant ) {
-					$this->container->storyteller[] = $s_obj;
-				}
-			}
-		}
 		if ( current_theme_supports( 'bylines') ) {
 			if ( ! empty( $this->container->storyteller ) ) {
 				$this->set_byline();
