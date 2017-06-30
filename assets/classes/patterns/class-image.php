@@ -627,11 +627,17 @@ class Image extends BasePattern {
 	 **/
 	protected function set_image_quality( $w, $h ) {
 		$sum = $h * $w;
-		if ( is_int( $sum ) && $sum >= $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['IMAGES']['hq-norm'] ) {
+		if ( ! is_int( $sum ) ) {
+			return;
+		}
+		if ( ( 'story__header' === $this->context
+			&& isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['IMAGES']['header-image-min-width'] )
+			&& $w <= $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['IMAGES']['header-image-min-width'] )
+			|| ( $sum <= $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['IMAGES']['hq-norm'] ) ) {
+			$this->classes[] = 'lowres';
+		} else {
 			$this->is_hq = true;
 			$this->classes[] = 'highres';
-		} else {
-			$this->classes[] = 'lowres';
 		}
 	}
 
@@ -639,7 +645,6 @@ class Image extends BasePattern {
 	 * Calculate image ratio
 	 *
 	 * @since 0.1.0
-	 *
 	 *
 	 * @param int $w Image width.
 	 * @param int $h Image height.
