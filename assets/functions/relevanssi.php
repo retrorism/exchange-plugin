@@ -10,13 +10,14 @@
  **/
 
 add_filter('relevanssi_content_to_index', 'exchange_relevanssi_add_extra_content', 10, 2);
-function exchange_relevanssi_add_extra_content($content, $post) {
+
+function exchange_relevanssi_add_extra_content( $content, $post ) {
 	if ( $post->post_status !== 'publish' ) {
 		return $content;
 	}
 	$add_to_content = array();
     if ( 'collaboration' === $post->post_type ) {
-	    $collab = BaseController::exchange_factory( $post );
+	    $collab = BaseController::exchange_factory( $post, 'relevanssi' );
 	    if ( ! $collab instanceof Collaboration ) {
 	    	return $content;
 	    }
@@ -36,7 +37,9 @@ function exchange_relevanssi_add_extra_content($content, $post) {
 	    			$add_to_content[] = $participant->$prop;
 	    		}
 	    	}
+	    	$participant = null;
 	    }
+	    $collab = null;
     } elseif ( 'story' === $post->post_type ) {
     	global $wpdb;
     	$rows = $wpdb->get_results("SELECT meta_value FROM wp_postmeta WHERE post_id = $post->ID AND meta_key LIKE 'sections_%text' OR meta_key LIKE 'sections_%question' OR meta_key LIKE 'sections_%answer'");
@@ -48,10 +51,11 @@ function exchange_relevanssi_add_extra_content($content, $post) {
 				$add_to_content[] = $row->meta_value;
 			}
 		}
-    }
+    }    
     if ( empty( $add_to_content ) ) {
 		return $content;
 	}
 	$content .= implode(' | ', $add_to_content );
+	$add_to_content = null;
 	return $content;
 }

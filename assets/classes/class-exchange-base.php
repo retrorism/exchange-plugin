@@ -243,6 +243,16 @@ class Exchange {
 	}
 
 	/**
+	 * Destructor for all CPT objects.
+	 *
+	 * @since 0.2.0
+	 * @access public
+	 **/
+	public function __destruct() {
+		$this->controller = null;
+	}
+
+	/**
 	 * Set controller property to a new instance of Collaboration controller.
 	 *
 	 * @since 0.1.0

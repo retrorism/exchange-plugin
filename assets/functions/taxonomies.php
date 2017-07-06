@@ -142,7 +142,12 @@ function exchange_create_taxonomies() {
 		array(
 			'hierarchical' => false,
 			'sort'         => true,
-			'label'        => 'Tandem Tags',  // Display name.
+			'labels'       => array(
+				'name'          => __( 'Tandem Tag', EXCHANGE_PLUGIN ),
+				'singular_name' => __( 'Tandem Tag', EXCHANGE_PLUGIN ),
+				'menu_name'     => __( 'Tandem Tags', EXCHANGE_PLUGIN ), 
+				'add_new_item'  => __( 'Add new Tandem Tag', EXCHANGE_PLUGIN ), 
+			),
 			'show_ui'      => true,
 			'show_in_menu' => true,
 			'show_in_quick_edit' => false,
@@ -152,9 +157,6 @@ function exchange_create_taxonomies() {
 			'rewrite'      => array(
 				'slug'       => 'tandem', // This controls the base slug that will display before each term.
 				'with_front' => false, // Don't display the category base before.
-			),
-			'labels'       => array(
-				'add_new_item' => 'Add new Tandem Tag',
 			),
 		)
 	);
@@ -166,7 +168,12 @@ function exchange_create_taxonomies() {
 		array(
 			'hierarchical' => false,
 			'sort'         => true,
-			'label'        => 'Languages',  // Display name.
+			'labels'       => array(
+				'name'          => __( 'Language', EXCHANGE_PLUGIN ),
+				'singular_name' => __( 'Language', EXCHANGE_PLUGIN ),
+				'menu_name'     => __( 'Languages', EXCHANGE_PLUGIN ),  
+				'add_new_item'  => __( 'Add new language tag', EXCHANGE_PLUGIN ),
+			),
 			'show_ui'      => true,
 			'show_in_menu' => true,
 			'show_in_quick_edit' => false,
@@ -176,9 +183,6 @@ function exchange_create_taxonomies() {
 			'rewrite'      => array(
 				'slug'       => 'language', // This controls the base slug that will display before each term.
 				'with_front' => false, // Don't display the category base before.
-			),
-			'labels'       => array(
-				'add_new_item' => 'Add new language tag',
 			),
 		)
 	);
@@ -190,7 +194,11 @@ function exchange_create_taxonomies() {
 		array(
 			'hierarchical' => false,
 			'sort'         => true,
-			'label'        => __( 'Topics', EXCHANGE_PLUGIN ),  // Display name.
+			'labels'       => array(
+				'name'          => __( 'Topic', EXCHANGE_PLUGIN ),
+				'singular_name' => __( 'Topic', EXCHANGE_PLUGIN ),
+				'menu_name'     => __( 'Topics', EXCHANGE_PLUGIN ),  
+			),
 			'show_ui'      => true,
 			'show_in_menu' => true,
 			'show_admin_column' => true,
@@ -212,7 +220,11 @@ function exchange_create_taxonomies() {
 		array(
 			'hierarchical' => false,
 			'sort'         => true,
-			'label'        => __( 'Locations', EXCHANGE_PLUGIN ),  // Display name.
+			'labels'       => array(
+				'name'          => __( 'Location', EXCHANGE_PLUGIN ),
+				'singular_name' => __( 'Location', EXCHANGE_PLUGIN ),
+				'menu_name'     => __( 'Locations', EXCHANGE_PLUGIN ),  
+			),			
 			'show_ui'      => true,
 			'show_in_menu' => true,
 			'show_in_quick_edit' => true,
@@ -233,7 +245,11 @@ function exchange_create_taxonomies() {
 		array(
 			'hierarchical' => false,
 			'sort'         => true,
-			'label'        => __( 'Methodologies', EXCHANGE_PLUGIN ),  // Display name.
+			'labels'       => array(
+				'name'          => __( 'Methodology', EXCHANGE_PLUGIN ),
+				'singular_name' => __( 'Methodology', EXCHANGE_PLUGIN ),
+				'menu_name'     => __( 'Methodologies', EXCHANGE_PLUGIN ),  
+			),			
 			'show_ui'      => true,
 			'show_in_menu' => true,
 			'show_in_quick_edit' => false,
@@ -254,7 +270,11 @@ function exchange_create_taxonomies() {
 		array(
 			'hierarchical' => false,
 			'sort'         => true,
-			'label'        => __( 'Disciplines', EXCHANGE_PLUGIN ),  // Display name.
+			'labels'       => array(
+				'name'          => __( 'Discipline', EXCHANGE_PLUGIN ),
+				'singular_name' => __( 'Discipline', EXCHANGE_PLUGIN ),
+				'menu_name'     => __( 'Disciplines', EXCHANGE_PLUGIN ),  
+			),
 			'show_ui'      => true,
 			'show_in_menu' => true,
 			'show_in_quick_edit' => false,
@@ -277,7 +297,11 @@ function exchange_create_taxonomies() {
 		array(
 			'hierarchical' => false,
 			'sort'         => true,
-			'label'        => __( 'Output Types', EXCHANGE_PLUGIN ),  // Display name.
+			'labels'       => array(
+				'name'          => __( 'Project Output', EXCHANGE_PLUGIN ),
+				'singular_name' => __( 'Project Output', EXCHANGE_PLUGIN ),
+				'menu_name'     => __( 'Project Outputs', EXCHANGE_PLUGIN ),  
+			),			
 			'show_ui'      => true,
 			'show_in_menu' => true,
 			'show_in_quick_edit' => false,

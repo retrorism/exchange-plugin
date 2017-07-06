@@ -37,6 +37,16 @@ class BaseController {
 	protected $container;
 
 	/**
+	 * Destructor for all CPT objects controllers.
+	 *
+	 * @since 0.2.0
+	 * @access public
+	 **/
+	public function __destruct() {
+		$this->container = null;
+	}
+
+	/**
 	 * Attaches a reference to the instantiating object.
 	 *
 	 * @since 0.1.0

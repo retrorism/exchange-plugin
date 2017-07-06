@@ -158,7 +158,7 @@ class Collaboration extends Exchange {
 		// Add standard WordPress data
 		$this->controller->map_collaboration_basics();
 		// Add featured image.
-		if ( ! in_array( $context, array( 'token-form', 'griditem', 'simplemap' ) ) ) {
+		if ( ! in_array( $context, array( 'relevanssi','token-form','griditem', 'simplemap' ) ) ) {
 			$this->controller->map_full_collaboration();
 		}
 	}

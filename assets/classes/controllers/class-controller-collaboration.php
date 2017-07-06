@@ -57,7 +57,9 @@ class CollaborationController extends BaseController {
 		$this->set_participants();
 
 		// Add featured image
-		$this->set_featured_image();
+		if ( ! in_array( $this->container->context, array( 'form-token','relevanssi' ) ) ) {
+			$this->set_featured_image();
+		}
 
 		// Add participants' locations
 		if ( $this->container->has_participants ) {
