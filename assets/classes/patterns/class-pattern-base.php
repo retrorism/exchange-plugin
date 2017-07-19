@@ -150,11 +150,8 @@ abstract class BasePattern {
 			$this->modifiers = $modifiers;
 		}
 
-		// Check if the input isn't empty, else throw error.
-		if ( empty( $input ) ) {
-			unset( $this );
-			//throw new Exception('No input provided for this pattern');
-		} else {
+		// Check if the input isn't empty.
+		if ( ! empty( $input ) ) {
 			$this->input = $input;
 		}
 
