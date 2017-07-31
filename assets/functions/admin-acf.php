@@ -263,7 +263,7 @@ function exchange_update_location_transients_on_save( $post_id, $post_obj ) {
 	if ( ! is_array( $stored_locations ) ) {
 		return;
 	}
-	$coll = CollaborationController::get_collaboration_by_participant_id( $post_id );
+	$coll = CollaborationController::get_collaboration_by_participant_id( $post_id, 'transient' );
 	if ( ! $coll instanceof Collaboration ) {
 		return;
 	}

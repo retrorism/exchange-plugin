@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  **/
 class CollaborationController extends BaseController {
 
-	public static function get_collaboration_by_participant_id( $participant_id ) {
+	public static function get_collaboration_by_participant_id( $participant_id, $context = '' ) {
 		$args = array(
 			'post_type' => 'collaboration',
 			'post_status' => 'publish',
@@ -43,7 +43,7 @@ class CollaborationController extends BaseController {
 			$collab_query = new WP_Query( $args );
 
 			if ( ! empty( $collab_query->posts ) ) {
-				return new Collaboration( $collab_query->posts[0] );
+				return new Collaboration( $collab_query->posts[0], $context );
 			} else {
 				return false;
 			}
@@ -55,11 +55,6 @@ class CollaborationController extends BaseController {
 
 		// Add participants.
 		$this->set_participants();
-
-		// Add featured image
-		if ( ! in_array( $this->container->context, array( 'form-token','relevanssi' ) ) ) {
-			$this->set_featured_image();
-		}
 
 		// Add participants' locations
 		if ( $this->container->has_participants ) {
@@ -128,11 +123,18 @@ class CollaborationController extends BaseController {
 		if ( ! class_exists( 'Leaflet_Map_Plugin' ) || ! is_a( $p_obj, 'Participant' ) ) {
 			return;
 		}
+		
+		global $leaflet_map_plugin;
+
+        if ( ! $leaflet_map_plugin instanceof Leaflet_Map_Plugin ) {
+            $leaflet_map_plugin = new Leaflet_Map_Plugin();
+        }
+
 		if ( ! empty( $p_obj->org_coords['address'] ) ) {
-			$geocoded = Leaflet_Map_Plugin::geocoder( $p_obj->org_coords['address'] );
+			$geocoded = $leaflet_map_plugin->geocoder( $p_obj->org_coords['address'] );
             $coords = array( $geocoded->{'lat'}, $geocoded->{'lng'} );
 		} elseif ( ! empty( $p_obj->org_city ) ) {
-			$geocoded = Leaflet_Map_Plugin::geocoder( $p_obj->org_city );
+			$geocoded = $leaflet_map_plugin->geocoder( $p_obj->org_city );
 			$coords = array( $geocoded->{'lat'}, $geocoded->{'lng'} );
 		}
 		if ( $coords ) {

@@ -155,10 +155,16 @@ class Collaboration extends Exchange {
 	 **/
 	public function __construct( $post, $context = '', $controller = null ) {
 		Parent::__construct( $post, $controller );
+
+		// Add featured image.
+		if ( ! in_array( $context, array( 'relevanssi','token-form' ) ) ) {
+			$this->controller->set_featured_image();
+		}
+
 		// Add standard WordPress data
 		$this->controller->map_collaboration_basics();
-		// Add featured image.
-		if ( ! in_array( $context, array( 'relevanssi','token-form','griditem', 'simplemap' ) ) ) {
+
+		if ( ! in_array( $context, array( 'relevanssi','token-form','griditem', 'simplemap', 'transient' ) ) ) {
 			$this->controller->map_full_collaboration();
 		}
 	}

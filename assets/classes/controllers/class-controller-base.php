@@ -583,7 +583,7 @@ class BaseController {
 		if ( ! $term instanceof WP_Term ) {
 			return;
 		}
-		$desc = ! empty( $term->description ) ? $tag->description : $term->name;
+		$desc = ! empty( $term->description ) ? $term->description : $term->name;
 		if ( class_exists( 'FacetWP' ) ) {
 			$term_link = get_home_url() . '/archive/?fwp_' . $term->taxonomy . '=' . $term->slug;
 		} else {

@@ -179,7 +179,9 @@ abstract class BaseMap extends BasePattern {
 	 * Sets input array to map_markers property.
 	 */
 	protected function set_map_collaborations( ) {
-		$objects = $this->input['map_collaborations'];
+		if ( ! empty( $this->input['map_collaborations'] ) ) {
+			$objects = $this->input['map_collaborations'];
+		}
 		$col_loc_transient = get_transient( 'collaboration_locations' );
 		if ( empty( $objects ) || count( $objects ) == 0 ) {
 			if ( $col_loc_transient ) {
@@ -477,11 +479,19 @@ abstract class BaseMap extends BasePattern {
 	}
 
 	protected function get_location_coords( $location ) {
+
 		if ( ! class_exists( 'Leaflet_Map_Plugin' ) || ! count( $location ) ) {
 			return;
 		}
+
+		global $leaflet_map_plugin;
+
+		if ( ! $leaflet_map_plugin instanceof Leaflet_Map_Plugin ) {
+			$leaflet_map_plugin = new Leaflet_Map_Plugin();
+		}
+
 		if ( ! empty( $location['org_address'] ) ) {
-			$geocoded = Leaflet_Map_Plugin::geocoder( $address );
+			$geocoded = $leaflet_map_plugin->geocoder( $address );
             $coords = array( $geocoded->{'lat'}, $geocoded->{'lng'} );
 		} elseif ( ! empty( $location['org_city'] ) ) {
 			$coords = array( $geocoded->{'lat'}, $geocoded->{'lng'} );
@@ -543,7 +553,9 @@ abstract class BaseMap extends BasePattern {
 	 * @access protected
 	 */
 	protected function set_caption() {
-		$caption = $this->input['map_caption'];
+		if ( ! empty( $this->input['map_caption'] ) ) {
+			$caption = $this->input['map_caption'];
+		}
 		if ( ! empty( $caption ) ) {
 			$this->caption = new Caption( $caption, $this->element );
 			$this->has_caption = true;
