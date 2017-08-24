@@ -54,8 +54,10 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 				'C_P'       => 'Tandem C&P',
 				'Europe'    => 'Tandem Europe',
 				'Shaml'     => 'Tandem Shaml',
+				'Fryslan'   => 'Tandem Fryslân',
 				'Turkey'    => 'Tandem Turkey',
 				'Ukraine'   => 'Tandem Ukraine',
+				'Moldova'   => 'Tandem Ukraine',
 				'Solo'      => 'Tandem (solo)',
 				'Strapline' => 'Tandem',
 			),
@@ -76,6 +78,7 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 			'programmes' => array(
 				'C_P'     => 'Tandem C & P',
 				'Europe'  => 'Tandem Europe',
+				'Fryslan' => 'Tandem Fryslân',
 				'Shaml'   => 'Tandem Shaml',
 				'Turkey'  => 'Tandem Turkey',
 				'Ukraine' => 'Tandem Ukraine',

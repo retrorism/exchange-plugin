@@ -392,3 +392,24 @@ function exchange_get_share_image() {
  		}
  	}
  }
+
+ /**
+  * undocumented function
+  *
+  * @return void
+  * @author 
+  **/
+ function exchange_has_active_programme_round( $p_r_page ) {
+ 	$p_r = get_post_meta( $p_r_page->ID, 'current_programme_round', true );
+ 	if ( ! $p_r ) {
+ 		return;
+	}
+ 	$programme_round = BaseController::exchange_factory( $p_r );
+	if ( ! $programme_round instanceof Programme_Round ) {
+ 		return;
+	}
+ 	if ( $programme_round->is_active ) {
+		return true;
+	}
+
+ }

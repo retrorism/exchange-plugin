@@ -328,14 +328,15 @@ function exchange_iterate_filter( $input, $post_id, $indices, $last_iter = '', $
 					// ACF post_meta with a 'sections_n_ prefix (like bg colours, headerinfo and contents).
 					$meta_name = 'sections_' . $indices['section_index'] . '_' . $field['name'];
 				}
-				// var_dump( $meta_name );
-				$previous_value = get_post_meta( $post_id, $meta_name, true );
-				// var_dump( $previous_value );
-				// Only unset the key's value if the previous value was also empty or not set.
-				if ( isset( $meta_name) && empty( $previous_value ) ) {
-					// echo "yup";
-					unset( $input[ $key ] );
-					delete_post_meta( $post_id, $meta_name );
+				if ( isset( $meta_name ) ) {
+					$previous_value = get_post_meta( $post_id, $meta_name, true );
+					// var_dump( $previous_value );
+					// Only unset the key's value if the previous value was also empty or not set.
+					if ( isset( $meta_name) && empty( $previous_value ) ) {
+						// echo "yup";
+						unset( $input[ $key ] );
+						delete_post_meta( $post_id, $meta_name );
+					}
 				}
 			}
 		}

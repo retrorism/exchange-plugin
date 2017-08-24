@@ -24,7 +24,12 @@ add_action( 'save_post_collaboration', 'exchange_set_post_tag_from_parent_id', 1
 add_action( 'save_post_story', 'exchange_set_attachments_post_tag', 10, 4 );
 add_action( 'save_post_collaboration', 'exchange_set_attachments_post_tag', 10, 4 );
 add_action( 'save_post_programme_round', 'exchange_set_attachments_post_tag', 10, 4 );
-add_action( 'attachment_updated', 'exchange_set_attachment_media_tags', 10, 3 );
+
+/*
+ * @TODO: Find out where this function went.
+ *
+ * add_action( 'attachment_updated', 'exchange_set_attachment_media_tags', 10, 3 );
+ */
 
 add_action( 'pre_get_posts', 'exchange_modify_post_tag_query' );
 
@@ -342,10 +347,14 @@ function exchange_create_tax_for_programme_round( $post_id, $post, $update ) {
 
 function exchange_get_post_tag_from_parent_id( $post_id ) {
 	$parent_id = wp_get_post_parent_id( $post_id );
-	if ( ! empty( $parent_id ) ) {
-		$parent_name = get_the_title( $parent_id );
-		$parent_name_clean = sanitize_title( $parent_name );
-		$term = get_term_by('slug', $parent_name_clean, 'post_tag' );
+	if ( empty( $parent_id ) ) {
+		return;
+	}
+	$parent_name = get_the_title( $parent_id );
+	$parent_name_clean = sanitize_title( $parent_name );
+	$term = get_term_by('slug', $parent_name_clean, 'post_tag' );
+	if ( empty( $term ) ) {
+		return;
 	}
 	return $term;
 }

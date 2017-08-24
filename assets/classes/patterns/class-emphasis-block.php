@@ -75,7 +75,7 @@ class EmphasisBlock extends BasePattern {
 					break;
 
 				case 'block_logo':
-					if ( ! empty( $e['block_programme'] ) ) {
+					if ( ! empty( $e['block_programme'] ) ) {					
 						$colour = isset( $this->modifiers['colour'] ) ? $this->modifiers['colour'] : 'default';
 						$image_mods = array(
 							'background-colour' => $colour,

@@ -212,7 +212,7 @@ class Section extends BasePattern {
 	 */
 	 protected function build_contact_block( $section_contents ) {
 		$team_members = $section_contents['contact_details'];
-		if ( count( $team_members ) < 1 ) {
+		if ( empty( $team_members ) ) {
 			return;
 		}
 		foreach( $team_members as $team_member ) {
