@@ -60,7 +60,7 @@ class ImageSVG extends BasePattern {
 		if ( ! is_string( $this->input ) ) {
 			return false;
 		}
-		if ( array_key_exists( $this->input, $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['IMAGES']['programme-logos'] ) ) {
+		if ( array_key_exists( remove_accents( $this->input ), $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['IMAGES']['programme-logos'] ) ) {
 			return true;
 		} else {
 			return false;
@@ -69,7 +69,8 @@ class ImageSVG extends BasePattern {
 
 	protected function build_logo() {
 		$white = '_White';
-		$programme_logo = get_template_directory() . '/assets/images/svg/T_logo_' . $this->input . $white . '_WEB.svg';
+		$input = remove_accents( $this->input );
+		$programme_logo = get_template_directory() . '/assets/images/svg/T_logo_' . $input . $white . '_WEB.svg';
 		if ( ! file_exists( $programme_logo ) ) {
 			return;
 		}

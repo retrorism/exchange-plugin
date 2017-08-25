@@ -87,8 +87,6 @@ class Programme_Round extends Exchange {
 		// @TODO: add this to globals.
 		if ( in_array( $prog_name, array( 'C&P', 'Community', 'C' ), true ) ) {
 			$prog_name = 'C_P';
-		} elseif ( in_array( $prog_name, array( 'Fryslân' ), true ) ) {
-			$prog_name = 'Fryslan';
 		}
 
 		$properties = array(
