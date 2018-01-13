@@ -144,13 +144,13 @@ class CollaborationController extends BaseController {
 
 
 	protected function set_collaboration_locations() {
-		$locations = array(
+		$geodata = array(
 			'title' => $this->container->title,
 			'link' => $this->container->link,
 			'locations' => array(),
 		);
 		if ( $this->container->has_featured_image && ! empty( $this->container->featured_image->input['sizes'] ) ) {
-			$locations['image'] = $this->container->featured_image->input['sizes']['thumbnail'];
+			$geodata['image'] = $this->container->featured_image->input['sizes']['thumbnail'];
 		}
 		foreach( $this->container->participants as $p_obj ) {
 			if ( ! is_a( $p_obj, 'Participant' ) ) {
@@ -178,18 +178,18 @@ class CollaborationController extends BaseController {
 			if ( ! empty( $p_obj->org_city ) ) {
 				$p['org_city'] = $p_obj->org_city;
 			}
-			if ( $p['latlngs'] ) {
-				$locations['locations'][] = $p;
+			if ( ! empty( $p['latlngs'] ) ) {
+				$geodata['locations'][] = $p;
 			}
 		}
-		if ( count( $locations['locations'] ) >= 1 ) {
-			$this->container->locations = $locations;
+		if ( count( $geodata['locations'] ) >= 1 ) {
+			$this->container->locations = $geodata;
 			$this->container->has_locations = true;
 		}
 	}
 
 	protected function set_collaboration_stories() {
-		if ( ! $this->container->participants ) {
+		if ( ! $this->container->has_participants ) {
 			return;
 		}
 		foreach ( $this->container->participants as $p_obj ) {

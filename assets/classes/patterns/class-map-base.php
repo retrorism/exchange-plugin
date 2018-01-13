@@ -126,7 +126,6 @@ abstract class BaseMap extends BasePattern {
 
 			$this->output_tag_open( $el );
 
-
 			$this->output .= apply_filters('the_content', $map_shortcode);
 
 			if ( $this->use_shortcodes_for_objects ) {
@@ -178,7 +177,11 @@ abstract class BaseMap extends BasePattern {
 	 *
 	 * Sets input array to map_markers property.
 	 */
-	protected function set_map_collaborations( ) {
+	protected function set_map_collaborations() {
+
+		// Set collaboration location transient variable.
+		$col_loc_transient = get_transient( 'collaboration_locations' );
+
 		if ( ! empty( $this->input['map_collaborations'] ) ) {
 			$objects = $this->input['map_collaborations'];
 		}
@@ -215,11 +218,15 @@ abstract class BaseMap extends BasePattern {
 				}
 			}
 			$collaborations = array_unique( $collaborations, SORT_REGULAR );
+			
 			$collab_total = count( $collaborations );
 
-			// Limit to 20 collaborations.
-			//for ( $i = 0; $i < $collab_total && $i < $GLOBALS['EXCHANGE_PLUGIN_CONFIG']['PATTERNS']['map_max-collaboration-count']; $i++ ) {
+
 			if ( $col_loc_transient ) {
+
+				/* For each collaboration, check if the id is present in the transient,
+				 * if not, use the set_collaboration_data method to fill its properties */
+
 				for ( $i = 0; $i < $collab_total; $i++ ) {
 					if ( ! empty( $col_loc_transient[ $collaborations[$i]->ID ] ) ) {
 						$this->map_polylines[] = $col_loc_transient[ $collaborations[$i]->ID ];
@@ -406,14 +413,21 @@ abstract class BaseMap extends BasePattern {
 
 	protected function create_map_polyline_data( $collab ) {
 		$response = array(
-			'title' => $collab->locations->title,
-			'link' => $collab->locations->link,
+			'title' => $collab->locations['title'],
+			'link' => $collab->locations['link'],
 		);
 		$response_locations = array();
 		// Set locations
 		foreach ( $collab->locations as $participant => $location ) {
-			$lat = floatval( $location['org_lat'] );
-			$lng = floatval( $location['org_lng'] );
+			
+			if ( ! empty( $location['org_lat'] ) ) {
+				$lat = floatval( $location['org_lat'] );
+			}
+
+			if ( ! empty( $location['org_lng'] ) ) {
+				$lng = floatval( $location['org_lng'] );
+			}
+			
 			if ( ! empty( $lat ) && ! empty( $lng ) ) {
 				$response_locations[ $participant ]['latlngs'] = array( $lat, $lng );
 			} elseif ( ! empty( $location['org_city'] ) || ! empty( $location['org_address'] ) ) {
@@ -478,7 +492,24 @@ abstract class BaseMap extends BasePattern {
 		return $response;
 	}
 
-	protected function get_location_coords( $location ) {
+	protected function get_location_coords_new( $location ) {
+
+		if ( ! class_exists( 'Leaflet_Geocoder' ) || ! count( $location ) ) {
+			return;
+		}
+
+		if ( ! empty( $location['org_address'] ) ) {
+			$geocoder = new leaflet_Geocoder( $address );
+            $coords = array( $geocoder->lat, $geocoded->lng );
+		} elseif ( ! empty( $location['org_city'] ) ) {
+			$coords = array( $geocoder->lat, $geocoded->lng );
+		}
+		if ( $coords ) {
+			return $coords;
+		}
+	}
+
+	protected function get_location_coords_old( $location ) {
 
 		if ( ! class_exists( 'Leaflet_Map_Plugin' ) || ! count( $location ) ) {
 			return;
@@ -498,6 +529,24 @@ abstract class BaseMap extends BasePattern {
 		}
 		if ( $coords ) {
 			return $coords;
+		}
+	}
+
+	protected function get_location_coords( $location ) {
+
+		if ( ! count( $location ) ) {
+			return;
+		}
+
+		if ( class_exists( 'Leaflet_Map_Plugin' ) ) {
+		// Leaflet Map plugin version <= 2.8.0
+
+			return get_location_coords_old( $location );
+		
+		} elseif ( class_exists( 'Leaflet_Geocoder' ) ) {
+		// Leaflet Map plugin version >= 2.8.1
+
+			return get_location_coords_new( $location );
 		}
 	}
 
