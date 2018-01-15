@@ -280,7 +280,6 @@ function add_term_to_cid( $cid, $arr ) {
 				foreach ( $terms as $term ) {
 					add_taxo( $tax, $term );
 					$obj = get_term_by( 'name', htmlspecialchars( $term ), $tax, 'slug');
-					var_dump( $obj );
 					if ( is_object( $obj ) && get_class( $obj ) === 'WP_Term' ) {
 						if ( ! empty( $obj->term_id ) ) {
 							$ints[] = intval( $obj->term_id );
@@ -348,7 +347,6 @@ function exchange_location_tags_by_participants() {
 			foreach( $exchange->participants as $p ) {
 				if ( ! empty( $p->org_city ) ) {
 					$locations[] = $p->org_city;
-					var_dump( $p->org_city );
 				}
 			}
 			if ( ! empty( $locations ) ) {
