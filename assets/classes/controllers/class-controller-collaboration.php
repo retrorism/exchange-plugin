@@ -132,12 +132,13 @@ class CollaborationController extends BaseController {
 
 		if ( ! empty( $p_obj->org_coords['address'] ) ) {
 			$geocoded = $leaflet_map_plugin->geocoder( $p_obj->org_coords['address'] );
-            $coords = array( $geocoded->{'lat'}, $geocoded->{'lng'} );
+
 		} elseif ( ! empty( $p_obj->org_city ) ) {
 			$geocoded = $leaflet_map_plugin->geocoder( $p_obj->org_city );
-			$coords = array( $geocoded->{'lat'}, $geocoded->{'lng'} );
 		}
-		if ( $coords ) {
+		
+		if ( $geocoded && ! empty( $geocoded->lat ) && ! empty( $geocoded->lng ) ) {
+			$coords = array( $geocoded->lat, $geocoded->lng );
 			return $coords;
 		}
 	}
