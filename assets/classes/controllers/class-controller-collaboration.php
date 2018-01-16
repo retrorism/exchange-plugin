@@ -139,10 +139,10 @@ class CollaborationController extends BaseController {
 		if ( $geocoded && ! empty( $geocoded->lat ) && ! empty( $geocoded->lng ) ) {
 			$coords = array( $geocoded->lat, $geocoded->lng );
 		} elseif ( $geocoded && ! empty( $geocoded->{'lat'} ) && ! empty( $geocoded->{'lng'} ) ) {
-			$coords = array($geocoded->{'lat'}, $geocoded->{'lng'} );
+			$coords = array( $geocoded->{'lat'}, $geocoded->{'lng'} );
 		}
 
-		if ( $coords ) {
+		if ( ! empty( $coords ) ) {
 			return $coords;
 		}
 	}
