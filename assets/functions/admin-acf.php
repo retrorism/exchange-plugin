@@ -248,7 +248,7 @@ function exchange_add_update_form_link( $post_id, $post_obj ) {
 	}
 }
 
-add_action( 'save_post', 'exchange_update_location_transients_on_save', 10, 2 );
+add_action( 'save_post', 'exchange_update_location_transients_on_save', 11, 2 );
 
 function exchange_update_location_transients_on_save( $post_id, $post_obj ) {
 	$type = $post_obj->post_type;
