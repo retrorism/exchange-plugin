@@ -110,33 +110,8 @@ function exchange_modify_post_tag_query( $query ) {
 	$query->query_vars['tag__in'][] = $pr;
 	if ( empty( $post_type ) ) {
 		$query->set( 'post_type', array( 'collaboration','story' ) );
-		// elseif ( is_post_type_archive('collaboration') || is_post_type_archive('story') ) {
 	}
 }
-
-function exchange_query_vars_filter($vars) {
-	$vars[] = 'programme-round';
-	return $vars;
-}
-add_filter( 'query_vars', 'exchange_query_vars_filter' );
-
-function exchange_url_rewrite_templates_for_post_type() {
-	$post_type = get_query_var( 'post_type' );
-	if ( ! empty( $post_type ) && ! is_array( $post_type ) ) {
-		return;
-	}
-	if ( get_query_var( 'programme-round' ) ) {
-		add_filter( 'template_include', function() {
-			$archive_template = locate_template( array( 'archive.php' ) );
-			if ( '' !== $archive_template ) {
-				return $archive_template;
-			}
-			return $archive_template;
-		});
-	}
-}
-
-add_action( 'template_redirect', 'exchange_url_rewrite_templates_for_post_type' );
 
 function exchange_create_taxonomies() {
 

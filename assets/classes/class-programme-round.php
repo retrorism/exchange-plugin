@@ -111,7 +111,7 @@ class Programme_Round extends Exchange {
 						'button_size' => 'small',
 						'button_text' => __('Read the stories', EXCHANGE_PLUGIN ),
 						'button_help_text' => __('Read the stories', EXCHANGE_PLUGIN ),
-						'button_link' => get_post_type_archive_link('story') . '?programme-round=' . $this->term,
+						'button_link' => get_post_type_archive_link('story') . '?fwp_post_tag=' . $this->term,
 						'button_target' => '_self',
 					),
 				4 => array(
@@ -120,8 +120,8 @@ class Programme_Round extends Exchange {
 						'button_text' => __('Learn about the collaborations', EXCHANGE_PLUGIN ),
 						'button_help_text' => __('Learn about the collaborations', EXCHANGE_PLUGIN ),
 						'button_target' => '_self',
-						//'button_link' => get_post_type_archive_link('collaboration') . '?programme-round=' . $this->term,
-						'button_link' => get_bloginfo('url') . '?programme-round=' . $this->term,
+						'button_link' => get_post_type_archive_link('collaboration') . '?fwp_post_tag=' . $this->term,
+						//'button_link' => get_bloginfo('url') . '/collaborations/?fwp_post_tag=' . $this->term,
 					),
 			),
 		);

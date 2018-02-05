@@ -168,7 +168,6 @@ function exchange_create_programme_round() {
 		// Supports can hold: 'title','editor','author','thumbnail','excerpt','trackbacks', 'custom-fields','comments','revisions','page-attributes','post-formats'.
 		'supports'            => array( 'title','editor', 'thumbnail' ),
 		'capability_type'     => 'page',
-		//'rewrite'             => array( 'slug' => 'programme-rounds' ),
 		'taxonomies'          => array( 'post_tag' ),
 		)
 	);
