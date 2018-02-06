@@ -252,9 +252,17 @@ add_action( 'save_post', 'exchange_update_location_transients_on_save', 11, 2 );
 
 function exchange_update_location_transients_on_save( $post_id, $post_obj ) {
 	$type = $post_obj->post_type;
-	if ( $type !== 'participant' ) {
+	if ( $type === 'participant' ) {
+		exchange_update_location_transients_on_participant_save( $post_id );
+	} elseif ( $type === 'collaboration' ) {
+		exchange_update_location_transients_on_collaboration_save( $post_obj );
+	} else {
 		return;
 	}
+	
+}
+
+function exchange_update_location_transients_on_participant_save( $post_id ) {
 	$stored_locations = get_transient('collaboration_locations');
 	
 	if ( empty( $stored_locations ) ) {
@@ -271,6 +279,29 @@ function exchange_update_location_transients_on_save( $post_id, $post_obj ) {
 		return;
 	}
 	$stored_locations[ $coll->post_id ] = $coll->locations;
+	
+	set_transient( 'collaboration_locations', $stored_locations, 365 * 24 * HOUR_IN_SECONDS );
+}
+
+function exchange_update_location_transients_on_collaboration_save( $post_obj ) {
+	
+	$stored_locations = get_transient('collaboration_locations');
+	
+	if ( empty( $stored_locations ) ) {
+		$stored_locations = array();
+	}
+	if ( ! is_array( $stored_locations ) ) {
+		return;
+	}
+	$coll = BaseController::exchange_factory( $post_obj );
+	if ( ! $coll instanceof Collaboration ) {
+		return;
+	}
+	if ( ! $coll->has_locations ) {
+		return;
+	}
+	$stored_locations[ $coll->post_id ] = $coll->locations;
+	
 	set_transient( 'collaboration_locations', $stored_locations, 365 * 24 * HOUR_IN_SECONDS );
 }
 

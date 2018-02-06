@@ -161,17 +161,32 @@ class CollaborationController extends BaseController {
 			if ( ! is_a( $p_obj, 'Participant' ) ) {
 				continue;
 			}
+
+			// Set id
 			$p['exchange_id'] = $p_obj->post_id;
+
+			// Set name
 			if ( ! empty( $p_obj->name ) ) {
 				$p['name'] = $p_obj->name;
 			}
+
+			// Set org_name
 			if ( ! empty( $p_obj->org_name ) ) {
 				$p['org_name'] = $p_obj->org_name;
 			}
+
+			// Set org_city
+			if ( ! empty( $p_obj->org_city ) ) {
+				$p['org_city'] = $p_obj->org_city;
+			}
+
+			// Set org_coords from ACF
 			if ( ! empty( $p_obj->org_coords ) ) {
 				$lat = floatval( $p_obj->org_coords['lat'] );
 				$lng = floatval( $p_obj->org_coords['lng'] );
 			}
+
+			// Set org_coords with geolocator from Leaflet-map
 			if ( ! empty( $lat ) && ! empty( $lng ) ) {
 				$p['latlngs'] = array( $lat, $lng );
 			} elseif ( ! empty( $p_obj->org_city ) || ! empty( $p_obj->org_coords['address'] ) ) {
@@ -180,12 +195,12 @@ class CollaborationController extends BaseController {
 					$p['latlngs'] = $geocoded_latlngs;
 				}
 			}
-			if ( ! empty( $p_obj->org_city ) ) {
-				$p['org_city'] = $p_obj->org_city;
-			}
+
+			// Add coordinates to locations array
 			if ( ! empty( $p['latlngs'] ) ) {
 				$geodata['locations'][] = $p;
 			}
+
 		}
 		if ( count( $geodata['locations'] ) >= 1 ) {
 			$this->container->locations = $geodata;
