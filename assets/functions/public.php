@@ -294,7 +294,7 @@ function exchange_build_social_icons( $context = '', $platforms = array(), $exch
 			'instagram' => ! empty( $instagram_url ) ? esc_url( $instagram_url ) : 'https://www.instagram.com/TandemforCulture',
 			//'twitter'   => ! empty( $twitter_url ) ? esc_url( $twitter_url ) : 'https://www.twitter.com/TandemforCulture',
 			'vimeo'     =>! empty( $vimeo_url ) ? esc_url( $vimeo_url ) : 'https://vimeo.com/tandemforculture',
-			'flickr'     =>! empty( $vimeo_url ) ? esc_url( $vimeo_url ) : 'https://www.flickr.com/photos/mitost',
+			'flickr'     =>! empty( $flickr_url ) ? esc_url( $flickr_url ) : 'https://www.flickr.com/photos/mitost',
 		);
 	}
 
