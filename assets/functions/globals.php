@@ -50,7 +50,7 @@ if ( ! isset( $GLOBALS['EXCHANGE_PLUGIN_CONFIG'] ) ) {
 				'griditem__pattern'
 			),
 			'programme-logos' => array(
-                'AlEmarat_AR' => 'Tandem Al Emarat',
+                'AlEmarat_LA' => 'Tandem Al Emarat',
                 'C_P'         => 'Tandem C & P',
 				'C_P'         => 'Tandem C&P',
 				'Europe'      => 'Tandem Europe',
